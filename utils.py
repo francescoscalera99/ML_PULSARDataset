@@ -3,30 +3,30 @@ import matplotlib.pyplot as plt
 from scipy.stats import norm
 
 
-def vcol(X):
+def vcol(x) -> np.ndarray:
     """
     Reshapes the given array into a column vector
-    :param X: the input array
+    :param x: the input array
     :return: the column vector
     """
     try:
-        X = np.array(X)
+        x = np.array(x)
     except:
-        raise RuntimeError(f"Error: {X} is not an iterable")
-    return X.reshape((X.size, 1))
+        raise RuntimeError(f"Error: {x} is not an iterable")
+    return x.reshape((x.size, 1))
 
 
-def vrow(X):
+def vrow(x) -> np.ndarray:
     """
     Reshapes the given array into a row vector
-    :param X: the input array
+    :param x: the input array
     :return: the row vector
     """
     try:
-        X = np.array(X)
+        x = np.array(x)
     except:
-        raise RuntimeError(f"Error: {X} is not an iterable")
-    return X.reshape((1, X.size))
+        raise RuntimeError(f"Error: {x} is not an iterable")
+    return x.reshape((1, x.size))
 
 
 def load_dataset(path: str = './') -> tuple:
@@ -75,7 +75,7 @@ def compute_accuracy_MVG(SPost, L):
     return (acc, 1 - acc)
 
 
-def plot_histogram(array, labels, titles, nbins: int = 10):
+def plot_histogram(array, labels, titles, nbins: int = 10) -> None:
     """
     Plots the histogram of each feature of the given array
     :param array: the (training) dataset
@@ -114,7 +114,7 @@ def empirical_dataset_covariance(dataset: np.ndarray) -> np.ndarray:
     return (dataset @ dataset.T)/n
 
 
-def z_normalization(dataset):
+def z_normalization(dataset: np.ndarray) -> np.ndarray:
     """
     Computes the Z-normalization
     :param dataset:
@@ -125,7 +125,13 @@ def z_normalization(dataset):
     return (dataset - vcol(mean)) / vcol(std)
 
 
-def gaussianize(training_data, dataset):
+def gaussianize(training_data: np.ndarray, dataset: np.ndarray) -> np.ndarray:
+    """
+    Performs the mapping from original data distribution to normal distribution, using the training set
+    :param training_data: the training partition
+    :param dataset: the data to gaussianize
+    :return: the gaussianized data
+    """
     ranks = []
     for feature in range(dataset.shape[0]):
         counts = np.zeros(dataset.shape[1])
