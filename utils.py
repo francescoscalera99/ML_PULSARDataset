@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.stats import norm
 
 
 def vcol(X):
@@ -83,13 +84,66 @@ def plot_histogram(array, labels, titles, nbins: int = 10):
     :param nbins: the number of bins for the histograms
     """
     for j in range(array.shape[0]):
+    # for j in range(1):
         f = plt.gcf()
         for i in range(len(set(labels))):
-            plt.hist(array[j, labels == i], bins=nbins, density=True)
+            plt.hist(array[j, labels == i], bins=nbins, density=True, alpha=0.7)
 
         plt.title(titles[j])
         f.show()
-        f.savefig(fname=f'outputs/figure{j}')
+        # f.savefig(fname=f'outputs/figure{j}')
+
+
+def empirical_dataset_mean(dataset: np.ndarray) -> np.ndarray:
+    """
+    Computes the empirical mean of the given dataset
+    :param dataset: the input dataset
+    :return: the vector of means
+    """
+    return vcol(np.average(dataset, axis=1))
+
+
+def empirical_dataset_covariance(dataset: np.ndarray) -> np.ndarray:
+    """
+    Computes the empirical covariance of the given dataset
+    :param dataset: the input dataset
+    :return: the covariance matrix
+    """
+    dataset = dataset - empirical_dataset_mean(dataset)
+    n = dataset.shape[1]
+    return (dataset @ dataset.T)/n
+
+
+def z_normalization(dataset):
+    """
+    Computes the Z-normalization
+    :param dataset:
+    :return:
+    """
+    mean = dataset.mean(axis=1)
+    std = dataset.std(axis=1)
+    return (dataset - vcol(mean)) / vcol(std)
+
+
+def gaussianize(training_data, dataset):
+    ranks = []
+    for feature in range(dataset.shape[0]):
+        counts = np.zeros(dataset.shape[1])
+        for sample in range(dataset.shape[1]):
+            count = np.int64(training_data[feature, :] < dataset[feature, sample]).sum()
+            counts[sample] = (count + 1) / (dataset.shape[1] + 2)
+        ranks.append(counts)
+
+    ranks = np.vstack(ranks)
+
+    data = []
+    for feature in range(dataset.shape[0]):
+        y = norm.ppf(ranks[feature])
+        data.append(y)
+
+    data = np.vstack(data)
+
+    return data
 
 
 def main():
@@ -103,7 +157,13 @@ def main():
               '6. Standard deviation of the DM-SNR curve',
               '7. Excess kurtosis of the DM-SNR curve',
               '8. Skewness of the DM-SNR curve']
-    plot_histogram(dtr, ltr, titles)
+    # plot_histogram(dtr, ltr, titles)
+
+    z_dtr = z_normalization(dtr)
+    # plot_histogram(z_dtr, ltr, titles)
+
+    gauss = gaussianize(z_dtr, z_dtr)
+    plot_histogram(gauss, ltr, titles, nbins=20)
 
 
 if __name__ == '__main__':
