@@ -1,4 +1,4 @@
-# MLPR Project Pulsar detection
+# MLPR Project: Pulsar detection
 
 ### Team members
 * Francesco Scalera (s292432)
