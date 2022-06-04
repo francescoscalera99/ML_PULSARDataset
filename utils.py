@@ -160,6 +160,70 @@ def gaussianize(training_data: np.ndarray, dataset: np.ndarray) -> np.ndarray:
     return data
 
 
+def evaluate_classification_errors(testing_labels: np.ndarray, predicted_labels) -> tuple[int, int]:
+    # the two arrays are row vectors
+    if testing_labels.size != predicted_labels.size:
+        raise RuntimeError("Testing labels and predicted labels should be the same")
+    num_samples = testing_labels.size
+    comparison = testing_labels == predicted_labels
+    num_correct = np.sum(comparison)
+    return num_samples - num_correct, num_samples
+
+
+def k_fold(dataset: np.ndarray, labels: np.ndarray, classifier, k: int, seed: int = None) -> float:
+    """
+    Perform a k-fold cross-validation on the given dataset
+
+    :param dataset: the input dataset
+    :param labels: the input labels
+    :param classifier: the classifier function
+    :param k: the number of partitions
+    :param seed: the seed for the random permutation (for debug purposes)
+    :return: the error rate
+    """
+    if not k:
+        raise RuntimeError('Value of k must be set')
+
+    num_samples = dataset.shape[1]
+    partition_size = num_samples // k
+
+    np.random.seed(seed)
+    indices = np.random.permutation(num_samples)
+    partitions = np.empty(k, np.ndarray)
+    partitions_labels = np.empty(k, np.ndarray)
+
+    q = 1
+    for p in range(k):
+        if p == k - 1:
+            partitions[p] = dataset[:, indices[p * partition_size:]]
+            partitions_labels[p] = labels[indices[p * partition_size:]]
+            break
+        partitions[p] = dataset[:, indices[p * partition_size: q * partition_size]]
+        partitions_labels[p] = labels[indices[p * partition_size: q * partition_size]]
+        q += 1
+
+    bool_indices = np.array([True] * k)
+    n_errors = 0
+    n_classifications = 0
+    for i in range(k):
+        bool_indices[i] = False
+        training_data = np.hstack(partitions[bool_indices])
+        training_labels = np.hstack(partitions_labels[bool_indices])
+        testing_data = partitions[i]
+        testing_labels = np.hstack(partitions_labels[i])
+
+        # perform the classification
+        predictions, _ = classifier(training_data, training_labels, testing_data, testing_labels)
+        # evaluate number of errors
+        err, samples = evaluate_classification_errors(testing_labels, predictions)
+        n_errors += err
+        n_classifications += samples
+        bool_indices[i] = True
+
+    return float(n_errors / n_classifications)
+
+
+
 def main():
     (dtr, ltr), (dte, lte) = load_dataset()
     # print(dtr[:, 0])
