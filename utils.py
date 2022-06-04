@@ -223,6 +223,18 @@ def k_fold(dataset: np.ndarray, labels: np.ndarray, classifier, k: int, seed: in
     return float(n_errors / n_classifications)
 
 
+def splitData_SingleFold(dataset_train, labels_train, seed = 0):
+    nTrain = int(dataset_train.shape[1] * 2.0 / 3.0)
+    np.random.seed(seed)
+    idx = np.random.permutation(dataset_train.shape[1])
+    idxTrain = idx[0:nTrain]
+    idxTest = idx[nTrain:]
+    DTR = dataset_train[:, idxTrain]
+    DTEV = dataset_train[:, idxTest]
+    LTR = labels_train[idxTrain]
+    LTEV = labels_train[idxTest]
+    return (DTR, LTR), (DTEV, LTEV)
+
 
 def main():
     (dtr, ltr), (dte, lte) = load_dataset()
@@ -246,6 +258,12 @@ def main():
     create_heatmap(gauss[:, ltr == 1], cmap="Blues", title="True class")
     create_heatmap(gauss[:, ltr == 0], cmap="Greens", title="False class")
 
+def covariance_matrix_mean(D):
+  mu = vcol(D.mean(1))
+  DC = D - mu
+  C = np.dot(DC, DC.T)
+  C = C / float(D.shape[1])
+  return C, mu
 
 if __name__ == '__main__':
     main()
