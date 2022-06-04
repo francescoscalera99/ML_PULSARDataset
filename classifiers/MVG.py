@@ -2,7 +2,7 @@ import numpy as np
 import scipy.special
 
 from classifiers.Classifier import ClassifierClass
-from utils import covariance_matrix_mean, vrow, vcol
+from utils.matrix_utils import covariance_matrix_mean, vrow, vcol
 
 
 class MVG(ClassifierClass):

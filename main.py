@@ -1,6 +1,6 @@
 import numpy as np
 
-from utils import load_dataset, \
+from utils.utils import load_dataset, \
                   z_normalization, \
                   gaussianize, \
                   compute_accuracy

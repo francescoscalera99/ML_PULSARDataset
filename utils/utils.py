@@ -1,33 +1,7 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy.stats import norm
-import seaborn as sns
 
-
-def vcol(x) -> np.ndarray:
-    """
-    Reshapes the given array into a column vector
-    :param x: the input array
-    :return: the column vector
-    """
-    try:
-        x = np.array(x)
-    except:
-        raise RuntimeError(f"Error: {x} is not an iterable")
-    return x.reshape((x.size, 1))
-
-
-def vrow(x) -> np.ndarray:
-    """
-    Reshapes the given array into a row vector
-    :param x: the input array
-    :return: the row vector
-    """
-    try:
-        x = np.array(x)
-    except:
-        raise RuntimeError(f"Error: {x} is not an iterable")
-    return x.reshape((1, x.size))
+from .matrix_utils import vcol
 
 
 def load_dataset(path: str = './') -> tuple:
@@ -48,7 +22,7 @@ def load_dataset(path: str = './') -> tuple:
 
     dataset_test = []
     labels_test = []
-    with open('data/Test.txt') as f:
+    with open(f'{path}data/Test.txt') as f:
         for line in f:
             fields = line.split(',')
             label = fields[-1]
@@ -73,52 +47,6 @@ def compute_accuracy(predictedLabels: np.ndarray, L: np.ndarray):
 
     acc = nCorrect_labels / nSamples
     return acc, 1 - acc
-
-
-def plot_histogram(array, labels, titles, nbins: int = 10) -> None:
-    """
-    Plots the histogram of each feature of the given array
-    :param array: the (training) dataset
-    :param labels: the labels of parameter array
-    :param titles: the array for the titles of the histograms (the names of each feature)
-    :param nbins: the number of bins for the histograms
-    """
-    for j in range(array.shape[0]):
-        # for j in range(1):
-        f = plt.gcf()
-        for i in range(len(set(labels))):
-            plt.hist(array[j, labels == i], bins=nbins, density=True, alpha=0.7)
-
-        plt.title(titles[j])
-        f.show()
-        # f.savefig(fname=f'outputs/figure{j}')
-
-
-def create_heatmap(dataset, cmap='Reds', title=None):
-    heatmap = np.corrcoef(dataset)
-    plt.title(title)
-    sns.heatmap(heatmap, cmap=cmap, annot=True)
-    plt.show()
-
-
-def empirical_dataset_mean(dataset: np.ndarray) -> np.ndarray:
-    """
-    Computes the empirical mean of the given dataset
-    :param dataset: the input dataset
-    :return: the vector of means
-    """
-    return vcol(np.average(dataset, axis=1))
-
-
-def empirical_dataset_covariance(dataset: np.ndarray) -> np.ndarray:
-    """
-    Computes the empirical covariance of the given dataset
-    :param dataset: the input dataset
-    :return: the covariance matrix
-    """
-    dataset = dataset - empirical_dataset_mean(dataset)
-    n = dataset.shape[1]
-    return (dataset @ dataset.T) / n
 
 
 def z_normalization(dataset: np.ndarray) -> np.ndarray:
@@ -235,14 +163,6 @@ def splitData_SingleFold(dataset_train, labels_train, seed=0):
     return (DTR, LTR), (DTEV, LTEV)
 
 
-def covariance_matrix_mean(D):
-    mu = vcol(D.mean(1))
-    DC = D - mu
-    C = np.dot(DC, DC.T)
-    C = C / float(D.shape[1])
-    return C, mu
-
-
 def main():
     (dtr, ltr), (dte, lte) = load_dataset()
     # print(dtr[:, 0])
@@ -261,9 +181,9 @@ def main():
 
     gauss = gaussianize(z_dtr, z_dtr)
     # plot_histogram(gauss, ltr, titles, nbins=20)
-    create_heatmap(gauss, title="Whole dataset")
-    create_heatmap(gauss[:, ltr == 1], cmap="Blues", title="True class")
-    create_heatmap(gauss[:, ltr == 0], cmap="Greens", title="False class")
+    # create_heatmap(gauss, title="Whole dataset")
+    # create_heatmap(gauss[:, ltr == 1], cmap="Blues", title="True class")
+    # create_heatmap(gauss[:, ltr == 0], cmap="Greens", title="False class")
 
 
 if __name__ == '__main__':
