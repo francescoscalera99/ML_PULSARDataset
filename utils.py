@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
+import seaborn as sns
 
 
 def vcol(x) -> np.ndarray:
@@ -94,6 +95,13 @@ def plot_histogram(array, labels, titles, nbins: int = 10) -> None:
         # f.savefig(fname=f'outputs/figure{j}')
 
 
+def create_heatmap(dataset, cmap='Reds', title=None):
+    heatmap = np.corrcoef(dataset)
+    plt.title(title)
+    sns.heatmap(heatmap, cmap=cmap, annot=True)
+    plt.show()
+
+
 def empirical_dataset_mean(dataset: np.ndarray) -> np.ndarray:
     """
     Computes the empirical mean of the given dataset
@@ -169,7 +177,10 @@ def main():
     # plot_histogram(z_dtr, ltr, titles)
 
     gauss = gaussianize(z_dtr, z_dtr)
-    plot_histogram(gauss, ltr, titles, nbins=20)
+    # plot_histogram(gauss, ltr, titles, nbins=20)
+    create_heatmap(gauss, title="Whole dataset")
+    create_heatmap(gauss[:, ltr == 1], cmap="Blues", title="True class")
+    create_heatmap(gauss[:, ltr == 0], cmap="Greens", title="False class")
 
 
 if __name__ == '__main__':
