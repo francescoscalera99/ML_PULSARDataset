@@ -2,7 +2,7 @@ import abc
 import numpy as np
 
 
-class Classifier(abc.ABC):
+class ClassifierClass(abc.ABC):
     class Model(abc.ABC):
         pass
 

@@ -62,10 +62,10 @@ def load_dataset(path: str = './') -> tuple:
 
 def compute_accuracy_MVG(SPost, L):
     """
-        Loads the dataset from the specified path
-        :param SPost: matrix of post conditional class probabilities
-        :param L: labels of training set
-        :return: two tuples: (train_partition, train_labels), (test_partition, test_labels)
+    Loads the dataset from the specified path
+    :param predictedLabels: the labels produced by the classifier
+    :param L: labels of testing set
+    :return: one tuples: (accuracy, error_rate)
     """
     predictedLabels = np.argmax(SPost, axis=0)
 
@@ -73,7 +73,7 @@ def compute_accuracy_MVG(SPost, L):
     nSamples = predictedLabels.shape[0]
 
     acc = nCorrect_labels / nSamples
-    return (acc, 1 - acc)
+    return acc, 1 - acc
 
 
 def plot_histogram(array, labels, titles, nbins: int = 10) -> None:
@@ -85,7 +85,7 @@ def plot_histogram(array, labels, titles, nbins: int = 10) -> None:
     :param nbins: the number of bins for the histograms
     """
     for j in range(array.shape[0]):
-    # for j in range(1):
+        # for j in range(1):
         f = plt.gcf()
         for i in range(len(set(labels))):
             plt.hist(array[j, labels == i], bins=nbins, density=True, alpha=0.7)
@@ -119,7 +119,7 @@ def empirical_dataset_covariance(dataset: np.ndarray) -> np.ndarray:
     """
     dataset = dataset - empirical_dataset_mean(dataset)
     n = dataset.shape[1]
-    return (dataset @ dataset.T)/n
+    return (dataset @ dataset.T) / n
 
 
 def z_normalization(dataset: np.ndarray) -> np.ndarray:
@@ -223,7 +223,7 @@ def k_fold(dataset: np.ndarray, labels: np.ndarray, classifier, k: int, seed: in
     return float(n_errors / n_classifications)
 
 
-def splitData_SingleFold(dataset_train, labels_train, seed = 0):
+def splitData_SingleFold(dataset_train, labels_train, seed=0):
     nTrain = int(dataset_train.shape[1] * 2.0 / 3.0)
     np.random.seed(seed)
     idx = np.random.permutation(dataset_train.shape[1])
@@ -234,6 +234,14 @@ def splitData_SingleFold(dataset_train, labels_train, seed = 0):
     LTR = labels_train[idxTrain]
     LTEV = labels_train[idxTest]
     return (DTR, LTR), (DTEV, LTEV)
+
+
+def covariance_matrix_mean(D):
+    mu = vcol(D.mean(1))
+    DC = D - mu
+    C = np.dot(DC, DC.T)
+    C = C / float(D.shape[1])
+    return C, mu
 
 
 def main():
@@ -258,12 +266,6 @@ def main():
     create_heatmap(gauss[:, ltr == 1], cmap="Blues", title="True class")
     create_heatmap(gauss[:, ltr == 0], cmap="Greens", title="False class")
 
-def covariance_matrix_mean(D):
-  mu = vcol(D.mean(1))
-  DC = D - mu
-  C = np.dot(DC, DC.T)
-  C = C / float(D.shape[1])
-  return C, mu
 
 if __name__ == '__main__':
     main()
