@@ -57,6 +57,19 @@ class MVG(ClassifierClass):
         return np.array(Y).ravel()
 
 
+def tied_covariance_matrix(D, L):
+    D0 = D[:, L == 0]
+    D1 = D[:, L == 1]
+    D2 = D[:, L == 2]
+
+    C0 = covariance_matrix_mean(D0)[0]
+    C1 = covariance_matrix_mean(D1)[0]
+    C2 = covariance_matrix_mean(D2)[0]
+
+    SW = D0.shape[1] * C0 + D1.shape[1] * C1 + D2.shape[1] * C2
+    return SW / D.shape[1]
+
+
 def main():
     pass
 

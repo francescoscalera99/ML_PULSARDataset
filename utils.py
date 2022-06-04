@@ -60,14 +60,13 @@ def load_dataset(path: str = './') -> tuple:
            (np.array(dataset_test, dtype=float).T, np.array(labels_test, dtype=int))
 
 
-def compute_accuracy_MVG(SPost, L):
+def compute_accuracy(predictedLabels: np.ndarray, L: np.ndarray):
     """
     Loads the dataset from the specified path
     :param predictedLabels: the labels produced by the classifier
     :param L: labels of testing set
     :return: one tuples: (accuracy, error_rate)
     """
-    predictedLabels = np.argmax(SPost, axis=0)
 
     nCorrect_labels = (predictedLabels == L).sum()
     nSamples = predictedLabels.shape[0]
