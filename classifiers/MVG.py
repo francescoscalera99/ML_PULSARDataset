@@ -42,12 +42,12 @@ class MVG(ClassifierClass):
 
     def classify(self, testing_data: np.ndarray, priors: np.ndarray) -> np.ndarray:
         if self.variant == 'tied':
-            class0_conditional_probability = self.logpdf_GAU_ND(testing_data, self._model.mu0, self._model.c)
-            class1_conditional_probability = self.logpdf_GAU_ND(testing_data, self._model.mu1, self._model.c)
+            class0_conditional_probability = self.logpdf_GAU_ND(testing_data, vcol(self._model.mu0), self._model.c)
+            class1_conditional_probability = self.logpdf_GAU_ND(testing_data, vcol(self._model.mu1), self._model.c)
         else:
             class0_conditional_probability = self.logpdf_GAU_ND(testing_data, self._model.mu0, self._model.c0)
             class1_conditional_probability = self.logpdf_GAU_ND(testing_data, self._model.mu1, self._model.c1)
-        logScores = np.vstack((class0_conditional_probability.ravel(), class1_conditional_probability.ravel()))
+        logScores = np.vstack((class0_conditional_probability, class1_conditional_probability))
         logJoint = logScores + vcol(np.log(priors))
         logMarginal = vrow(scipy.special.logsumexp(logJoint, axis=0))
         logPost = logJoint - logMarginal

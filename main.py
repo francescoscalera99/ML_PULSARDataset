@@ -139,6 +139,26 @@ def compute_OBD_given_treshold(llr, labels, treshold):
       OBD[0, labels[i]]+=1
   return OBD
 
+def compute_normalizeDCF(optimal_bayes_decisions, prior_class_probability, Cfn, Cfp):
+  FNR = optimal_bayes_decisions[0,1]/(optimal_bayes_decisions[0,1]+optimal_bayes_decisions[1,1])
+  FPR = optimal_bayes_decisions[1,0]/(optimal_bayes_decisions[0,0]+optimal_bayes_decisions[1,0])
+
+  DCF = (prior_class_probability*Cfn*FNR) + ((1-prior_class_probability)*Cfp*FPR)
+  return DCF/min(prior_class_probability*Cfn, (1-prior_class_probability)*Cfp)
+
+def compute_min_DCF(llr, labels, prior_class_probability, Cfn, Cfp):
+    minDCF = np.inf
+    tresholds = np.hstack(([-np.inf], llr, [np.inf]))
+    tresholds.sort()
+    for treshold in tresholds:
+        OBD = compute_OBD_given_treshold(llr, labels, treshold)
+        currentDCF = compute_normalizeDCF(OBD, prior_class_probability, Cfn, Cfp)
+        if (currentDCF < minDCF):
+            minDCF = currentDCF
+
+    return minDCF
+
+
 
 if __name__ == '__main__':
     main()
