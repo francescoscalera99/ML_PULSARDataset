@@ -23,9 +23,16 @@ def main():
     # raw, z-normalized, z + gauss
     # PCA : 7, 5, 4
 
-    gaussianized_training_data = gaussianize(training_data, training_data)
-    #gaussianized_dte = gaussianize(z_normalized_dte, z_normalized_dte)
-    z_normalized_training_data = z_normalization(gaussianized_training_data)
+    # gaussianized_training_data = gaussianize(training_data, training_data)
+    # gaussianized_dte = gaussianize(z_normalized_dte, z_normalized_dte)
+
+    z_normalized_training_data = z_normalization(training_data)
+
+    z_gauss_training_data = gaussianize(z_normalized_training_data, z_normalized_training_data)
+
+    datas = [training_data, z_normalized_training_data, z_gauss_training_data]
+    data_types = ['raw', 'z-normalized', 'z-normalized + gaussianized']
+    ds = list(range(3))
 
     hyperparameters = itertools.product(variants, m, ds, pis)
 
