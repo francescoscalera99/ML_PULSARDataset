@@ -12,12 +12,13 @@ def plot_histogram(array, labels, titles, nbins: int = 10) -> None:
     :param nbins: the number of bins for the histograms
     """
     for j in range(array.shape[0]):
-        # for j in range(1):
+    # for j in range(1):
         f = plt.gcf()
         for i in range(len(set(labels))):
-            plt.hist(array[j, labels == i], bins=nbins, density=True, alpha=0.7)
+            plt.hist(array[j, labels == i], label=f'Class {bool(i)}', bins=nbins, density=True, alpha=0.7)
 
         plt.title(titles[j])
+        plt.legend()
         f.show()
         # f.savefig(fname=f'outputs/figure{j}')
 

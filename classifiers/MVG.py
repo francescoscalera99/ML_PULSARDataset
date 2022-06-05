@@ -7,7 +7,12 @@ from utils.matrix_utils import covariance_matrix_mean, vrow, vcol
 
 class MVG(ClassifierClass):
     class Model(ClassifierClass.Model):
-        def __init__(self, mu0: np.ndarray, c0: np.ndarray, mu1: np.ndarray, c1: np.ndarray = None, variant='full-cov'):
+        def __init__(self,
+                     mu0: np.ndarray,
+                     c0: np.ndarray,
+                     mu1: np.ndarray,
+                     c1: np.ndarray = None,
+                     variant='full-cov'):
             self.mu0 = mu0
             self.mu1 = mu1
             if variant == 'tied':
@@ -23,6 +28,7 @@ class MVG(ClassifierClass):
         super().__init__(training_data, training_labels)
         self._model = None
         self.variant = variant
+        self._score_matrix = None
 
     def train_model(self) -> None:
         c0, mu0 = covariance_matrix_mean(self.training_data[:, self.training_labels == 0])
@@ -47,18 +53,22 @@ class MVG(ClassifierClass):
         logPost = logJoint - logMarginal
         class_posterior_probabilities = np.exp(logPost)
         predicted_labels = np.argmax(class_posterior_probabilities, axis=0)
+        self._score_matrix = logScores
         return predicted_labels
 
     def logpdf_GAU_1sample(self, x, mu, C):
         M = mu.shape[0]
         logDet_E = np.linalg.slogdet(C)[1]
 
-        return -(M / 2) * np.log(2 * np.pi) - 0.5 * logDet_E - 0.5 * np.dot(np.dot((x - mu).T, np.linalg.inv(C)),
-                                                                            (x - mu))
+        return -(M / 2) * np.log(2 * np.pi) - 0.5 * logDet_E - 0.5 * np.dot(np.dot((vcol(x) - vcol(mu)).T, np.linalg.inv(C)),
+                                                                            (vcol(x) - vcol(mu)))
 
     def logpdf_GAU_ND(self, X, mu, C):
         Y = [self.logpdf_GAU_1sample(X[:, i:i + 1], mu, C) for i in range(X.shape[1])]
         return np.array(Y).ravel()
+
+    def get_llrs(self):
+        return self._score_matrix[1, :] - self._score_matrix[0, :]
 
 
 def tied_covariance_matrix(D, L):
@@ -70,6 +80,7 @@ def tied_covariance_matrix(D, L):
 
     SW = D0.shape[1] * C0 + D1.shape[1] * C1
     return SW / D.shape[1]
+
 
 def within_class_variability(dataset, labels) -> np.ndarray:
     """
@@ -92,9 +103,11 @@ def within_class_variability(dataset, labels) -> np.ndarray:
 
     return sw / n_samples
 
+
 def class_mean(dataset, labels, c):
     data = dataset[:, labels == c]
     return np.mean(data, axis=1)
+
 
 def main():
     pass

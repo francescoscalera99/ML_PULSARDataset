@@ -45,6 +45,7 @@ def empirical_dataset_covariance(dataset: np.ndarray) -> np.ndarray:
     n = dataset.shape[1]
     return (dataset @ dataset.T) / n
 
+
 def covariance_matrix_mean(D):
     mu = vcol(D.mean(1))
     DC = D - mu

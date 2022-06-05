@@ -42,7 +42,7 @@ def compute_accuracy(predictedLabels: np.ndarray, L: np.ndarray):
     :return: one tuples: (accuracy, error_rate)
     """
 
-    nCorrect_labels = (predictedLabels == L).sum()
+    nCorrect_labels = np.array(predictedLabels == L).sum()
     nSamples = predictedLabels.shape[0]
 
     acc = nCorrect_labels / nSamples
