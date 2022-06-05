@@ -1,5 +1,8 @@
+import itertools
 import numpy as np
+from prettytable import PrettyTable
 
+from PCA import PCA
 from utils.matrix_utils import vrow, vcol
 from utils.plot_utils import plot_histogram
 from utils.utils import load_dataset, \
@@ -7,43 +10,53 @@ from utils.utils import load_dataset, \
     gaussianize, \
     compute_accuracy, splitData_SingleFold
 from classifiers.MVG import MVG
-from sklearn import preprocessing
 
 
 def main():
     (training_data, training_labels), _ = load_dataset()
 
+    variants = ['full-cov', 'diag', 'tied']
+    m = [7, 5, 4]
+    pis = [0.1, 0.5, 0.9]
 
+    # tied, diag, full-cov
+    # raw, z-normalized, z + gauss
+    # PCA : 7, 5, 4
 
     gaussianized_training_data = gaussianize(training_data, training_data)
     #gaussianized_dte = gaussianize(z_normalized_dte, z_normalized_dte)
     z_normalized_training_data = z_normalization(gaussianized_training_data)
 
-    (gaussianized_dtr, ltr), (gaussianized_dte, lte) = splitData_SingleFold(z_normalized_training_data, training_labels, seed=0)
+    hyperparameters = itertools.product(variants, m, ds, pis)
 
-    titles = ['1. Mean of the integrated profile',
-              '2. Standard deviation of the integrated profile',
-              '3. Excess kurtosis of the integrated profile',
-              '4. Excess kurtosis of the integrated profile',
-              '5. Mean of the DM-SNR curve',
-              '6. Standard deviation of the DM-SNR curve',
-              '7. Excess kurtosis of the DM-SNR curve',
-              '8. Skewness of the DM-SNR curve']
+    table = PrettyTable()
+    table.field_names = ['Hyperparameters', 'min DCF']
 
-    # gaussianized_dtr = gaussianize(dtr, dtr)
+    for variant, m, d, pi in hyperparameters:
+        dtr = PCA(datas[d], m)
+        (gaussianized_dtr, ltr), (gaussianized_dte, lte) = splitData_SingleFold(dtr, training_labels, seed=0)
 
+        titles = ['1. Mean of the integrated profile',
+                  '2. Standard deviation of the integrated profile',
+                  '3. Excess kurtosis of the integrated profile',
+                  '4. Excess kurtosis of the integrated profile',
+                  '5. Mean of the DM-SNR curve',
+                  '6. Standard deviation of the DM-SNR curve',
+                  '7. Excess kurtosis of the DM-SNR curve',
+                  '8. Skewness of the DM-SNR curve']
 
+        mvg = MVG(gaussianized_dtr, ltr, variant=variant)
+        mvg.train_model()
+        predictions = mvg.classify(gaussianized_dte, np.array([1-pi, pi]))
+        cm = build_confusion_matrix(lte, predictions)
+        # print(cm)
 
-    mvg = MVG(gaussianized_dtr, ltr, variant='tied')
-    mvg.train_model()
-    predictions = mvg.classify(gaussianized_dte, np.array([0.5, 0.5]))
-    cm = build_confusion_matrix(lte, predictions)
-    print(cm)
+        llrs = mvg.get_llrs()
+        min_dcf = compute_min_DCF(llrs, lte, pi, 1, 1)
+        # print(min_dcf)
+        table.add_row([f'{variant}, m={m}, data:{data_types[d]}, π={pi}', min_dcf])
 
-    llrs = mvg.get_llrs()
-    # min_dcf = min_dcf_function((0.5, 1, 1), llrs, lte)
-    min_dcf = compute_min_DCF(llrs, lte, 0.5, 1, 1)
-    print(min_dcf)
+    print(table)
 
 
 def build_confusion_matrix(testing_labels: np.ndarray, predicted_labels: np.ndarray) -> np.ndarray:
