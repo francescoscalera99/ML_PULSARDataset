@@ -107,11 +107,3 @@ def within_class_variability(dataset, labels) -> np.ndarray:
 def class_mean(dataset, labels, c):
     data = dataset[:, labels == c]
     return np.mean(data, axis=1)
-
-
-def main():
-    pass
-
-
-if __name__ == '__main__':
-    main()

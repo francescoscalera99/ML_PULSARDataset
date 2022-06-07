@@ -1,10 +1,11 @@
 import itertools
 import numpy as np
 from prettytable import PrettyTable
+import matplotlib.pyplot as plt
 
 from PCA import PCA
-from utils.matrix_utils import vrow, vcol
-from utils.plot_utils import plot_histogram
+from classifiers.LR import LR
+from utils.metrics_utils import build_confusion_matrix, compute_min_DCF
 from utils.utils import load_dataset, \
     z_normalization, \
     gaussianize, \
@@ -12,27 +13,13 @@ from utils.utils import load_dataset, \
 from classifiers.MVG import MVG
 
 
-def main():
-    (training_data, training_labels), _ = load_dataset()
-
-    variants = ['full-cov', 'diag', 'tied']
-    m = [7, 5, 4]
-    pis = [0.1, 0.5, 0.9]
-
-    # tied, diag, full-cov
-    # raw, z-normalized, z + gauss
-    # PCA : 7, 5, 4
-
-    # gaussianized_training_data = gaussianize(training_data, training_data)
-    # gaussianized_dte = gaussianize(z_normalized_dte, z_normalized_dte)
-
-    z_normalized_training_data = z_normalization(training_data)
-
-    z_gauss_training_data = gaussianize(z_normalized_training_data, z_normalized_training_data)
-
+def MVG_simulations(training_data, z_normalized_training_data, z_gauss_training_data, training_labels):
     datas = [training_data, z_normalized_training_data, z_gauss_training_data]
     data_types = ['raw', 'z-normalized', 'z-normalized + gaussianized']
     ds = list(range(3))
+    variants = ['full-cov', 'diag', 'tied']
+    m = [None, 7, 5, 4]
+    pis = [0.1, 0.5, 0.9]
 
     hyperparameters = itertools.product(variants, m, ds, pis)
 
@@ -40,8 +27,10 @@ def main():
     table.field_names = ['Hyperparameters', 'min DCF']
 
     for variant, m, d, pi in hyperparameters:
-        dtr = PCA(datas[d], m)
-        (gaussianized_dtr, ltr), (gaussianized_dte, lte) = splitData_SingleFold(dtr, training_labels, seed=0)
+        dtr = datas[d]
+        if m is not None:
+            dtr = PCA(dtr, m)
+        (dtr, ltr), (dte, lte) = splitData_SingleFold(dtr, training_labels, seed=0)
 
         titles = ['1. Mean of the integrated profile',
                   '2. Standard deviation of the integrated profile',
@@ -52,131 +41,78 @@ def main():
                   '7. Excess kurtosis of the DM-SNR curve',
                   '8. Skewness of the DM-SNR curve']
 
-        mvg = MVG(gaussianized_dtr, ltr, variant=variant)
+        mvg = MVG(dtr, ltr, variant=variant)
         mvg.train_model()
-        predictions = mvg.classify(gaussianized_dte, np.array([1-pi, pi]))
-        cm = build_confusion_matrix(lte, predictions)
+        mvg.classify(dte, np.array([1-pi, pi]))
+        # cm = build_confusion_matrix(lte, predictions)
         # print(cm)
 
         llrs = mvg.get_llrs()
         min_dcf = compute_min_DCF(llrs, lte, pi, 1, 1)
         # print(min_dcf)
-        table.add_row([f'{variant}, m={m}, data:{data_types[d]}, π={pi}', min_dcf])
+        table.add_row([f'{variant}, m={m}, data:{data_types[d]}, π={pi}', round(min_dcf, 3)])
 
     print(table)
 
 
-def build_confusion_matrix(testing_labels: np.ndarray, predicted_labels: np.ndarray) -> np.ndarray:
-    if testing_labels.size != predicted_labels.size:
-        raise RuntimeError("Testing labels array and predicted labels array should have the same size.\n"
-                           f"Got instead 'len(testing_labels)'={len(testing_labels)},"
-                           f" 'len(predicted_labels)'={len(predicted_labels)}")
+def LR_simulations(training_data, z_normalized_training_data, z_gauss_training_data, training_labels):
+    datas = [z_normalized_training_data]
+    data_types = ['z-normalized']
+    ds = list(range(len(datas)))
+    m = [None]
+    pis = [0.1, 0.5, 0.9]
+    lambdas = np.logspace(-5, 5, 50)
+    # datas = [training_data, z_normalized_training_data, z_gauss_training_data]
+    # data_types = ['raw', 'z-normalized', 'z-normalized + gaussianized']
+    # ds = list(range(3))
+    # m = [None, 7, 5, 4]
+    # pis = [0.1, 0.5, 0.9]
+    # lambdas = np.logspace(-5, 5, 50)
 
-    num_classes = np.unique(testing_labels).size
-    num_samples = testing_labels.size
-    predicted_labels = list(predicted_labels)
-    testing_labels = list(testing_labels)
+    hyperparameters = itertools.product(m, ds, pis, lambdas)
 
-    cf = np.zeros((num_classes, num_classes), dtype=int)
+    table = PrettyTable()
+    table.field_names = ['Hyperparameters', 'min DCF']
 
-    for i in range(num_samples):
-        cf[predicted_labels[i], testing_labels[i]] += 1
+    dcfs = dict.fromkeys(pis, [])
 
-    return cf
+    for m, d, pi, lbd in hyperparameters:
+        dtr = datas[d]
+        if m is not None:
+            dtr = PCA(dtr, m)
+        (dtr, ltr), (dte, lte) = splitData_SingleFold(dtr, training_labels, seed=0)
 
+        lr = LR(dtr, ltr, lbd, pi)
+        lr.train_model()
+        lr.classify(dte, np.array([1-pi, pi]))
 
-def min_dcf_function(working_point: tuple, llrs: np.ndarray, testing_labels: np.ndarray, plot=False, out=False):
-    thresholds = np.array([-np.inf, *sorted(list(llrs)), +np.inf])
-    min_dcf = +np.inf
-    tprs = []
-    fprs = []
-    for t in thresholds:
-        predicted_labels = predict_bayes_optimal_decisions(llrs, t)
+        llrs = lr.get_llrs()
+        min_dcf = compute_min_DCF(llrs, lte, pi, 1, 1)
 
-        confusion_matrix = build_confusion_matrix(testing_labels, predicted_labels)
+        # table.add_row([f"PCA m={m}, data:{data_types[d]}, π={pi}, λ={lbd}", round(min_dcf, 3)])
+        dcfs[pi].append(min_dcf)
 
-        _, normalized_bayes_risk = compute_bayes_risk(working_point, confusion_matrix, normalized=True)
-
-        min_dcf = min(min_dcf, normalized_bayes_risk)
-
-        tpr, fpr = tpr_fpr(confusion_matrix)
-        tprs.append(tpr)
-        fprs.append(fpr)
-
-    return min_dcf
-
-
-def predict_bayes_optimal_decisions(llrs: np.ndarray, threshold: float):
-    # True class is on row 0 and false on row 1
-
-    return np.array(llrs > threshold, dtype=int)
+    return dcfs, lambdas
 
 
-def compute_bayes_risk(working_point: tuple, confusion_matrix: np.ndarray, normalized=False):
-    if len(working_point) != 3:
-        raise RuntimeError("Error: working point must be a tuple of the type\n", "(π_1, C_fn, C_fp)")
+def main():
+    (training_data, training_labels), _ = load_dataset()
 
-    fn = confusion_matrix[0, 1]
-    fp = confusion_matrix[1, 0]
-    tn = confusion_matrix[0, 0]
-    tp = confusion_matrix[1, 1]
+    z_normalized_training_data = z_normalization(training_data)
 
-    fnr = fn / (fn + tp)
-    fpr = fp / (fp + tn)
+    z_gauss_training_data = gaussianize(z_normalized_training_data, z_normalized_training_data)
 
-    pi_1, c_fn, c_fp = working_point
-    pi_0 = 1 - pi_1
-
-    b_risk = (pi_1 * c_fn * fnr) + (pi_0 * c_fp * fpr)
-
-    if normalized:
-        b_dummy = min(pi_1 * c_fn, pi_0 * c_fp)
-        return b_risk, b_risk / b_dummy
-    else:
-        return b_risk
-
-
-def tpr_fpr(confusion_matrix: np.ndarray) -> tuple:
-    fn = confusion_matrix[0, 1]
-    fp = confusion_matrix[1, 0]
-    tn = confusion_matrix[0, 0]
-    tp = confusion_matrix[1, 1]
-
-    fnr = fn / (fn + tp)
-    fpr = fp / (fp + tn)
-
-    tpr = 1 - fnr
-
-    return tpr, fpr
-
-def compute_OBD_given_treshold(llr, labels, treshold):
-  nClasses = np.unique(labels).size
-  OBD = np.zeros([nClasses, nClasses])
-  for i in range(llr.size):
-    if (llr[i]>treshold):
-      OBD[1, labels[i]]+=1
-    else:
-      OBD[0, labels[i]]+=1
-  return OBD
-
-def compute_normalizeDCF(optimal_bayes_decisions, prior_class_probability, Cfn, Cfp):
-  FNR = optimal_bayes_decisions[0,1]/(optimal_bayes_decisions[0,1]+optimal_bayes_decisions[1,1])
-  FPR = optimal_bayes_decisions[1,0]/(optimal_bayes_decisions[0,0]+optimal_bayes_decisions[1,0])
-
-  DCF = (prior_class_probability*Cfn*FNR) + ((1-prior_class_probability)*Cfp*FPR)
-  return DCF/min(prior_class_probability*Cfn, (1-prior_class_probability)*Cfp)
-
-def compute_min_DCF(llr, labels, prior_class_probability, Cfn, Cfp):
-    minDCF = np.inf
-    tresholds = np.hstack(([-np.inf], llr, [np.inf]))
-    tresholds.sort()
-    for treshold in tresholds:
-        OBD = compute_OBD_given_treshold(llr, labels, treshold)
-        currentDCF = compute_normalizeDCF(OBD, prior_class_probability, Cfn, Cfp)
-        if (currentDCF < minDCF):
-            minDCF = currentDCF
-
-    return minDCF
+    dcfs, lambdas = LR_simulations(training_data, z_normalized_training_data, z_gauss_training_data, training_labels)
+    for k, v in dcfs.items():
+        np.save(f"pi{k}", np.array(v))
+    # print(table)
+    plt.figure()
+    colors = ['red', 'green', 'blue']
+    for i, (k, v) in enumerate(dcfs.items()):
+        plt.plot(lambdas, v, color=colors[i], label=f'π={k}')
+    plt.legend()
+    plt.xticks()
+    plt.show()
 
 
 

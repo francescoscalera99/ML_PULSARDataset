@@ -18,6 +18,10 @@ class ClassifierClass(abc.ABC):
     def classify(self, testing_data: np.ndarray, priors: np.ndarray) -> np.ndarray:
         pass
 
+    @abc.abstractmethod
+    def get_llrs(self):
+        pass
+
 
 def main():
     pass
