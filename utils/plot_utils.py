@@ -32,7 +32,7 @@ def create_heatmap(dataset, cmap='Reds', title=None):
     :param title:
     :return:
     """
-    heatmap = np.corrcoef(dataset)
+    heatmap = np.abs(np.corrcoef(dataset))
     plt.title(title)
     sns.heatmap(heatmap, cmap=cmap, annot=True)
     plt.show()

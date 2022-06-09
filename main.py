@@ -98,17 +98,32 @@ def LR_simulations(training_data, training_labels):
         llrs_gauss = lr_raw.get_llrs()
         min_dcf_gauss = compute_min_DCF(llrs_gauss, lte, pi, 1, 1)
 
-        table.add_row([f"PCA m={m}, data: raw, π={pi}, λ={lbd}", round(min_dcf_raw, 3)])
-        table.add_row([f"PCA m={m}, data: gaussianized, π={pi}, λ={lbd}", round(min_dcf_gauss, 3)])
+        # table.add_row([f"PCA m={m}, data: raw, π={pi}, λ={lbd}", round(min_dcf_raw, 3)])
+        # table.add_row([f"PCA m={m}, data: gaussianized, π={pi}, λ={lbd}", round(min_dcf_gauss, 3)])
         # dcfs[pi].append(min_dcf_raw)
-
-    return dcfs, lambdas
 
 
 def main():
     (training_data, training_labels), _ = load_dataset()
 
     # dcfs, lambdas = LR_simulations(training_data, training_labels)
+    (dtr, ltr), (dte, lte) = splitData_SingleFold(training_data, training_labels, seed=0)
+    dtr_gaussianized = gaussianize(dtr, dtr)
+    dte_gaussianized = gaussianize(dtr, dte)
+    lbd = np.logspace(-5, +5, 50)
+    DCFs = []
+    for lb in lbd:
+        lr = LR(dtr_gaussianized, ltr, lb, 0.5)
+        lr.train_model()
+        lr.classify(dte_gaussianized, np.array([0.5, 0.5]))
+        llr = lr.get_llrs()
+        min_dcf = compute_min_DCF(llr, lte, 0.5, 1, 1)
+        DCFs.append(min_dcf)
+
+    plt.figure()
+    plt.plot(lbd, DCFs, color="Blue")
+    plt.xscale('log')
+    plt.show()
     # for k, v in dcfs.items():
     #     np.save(f"pi{k}", np.array(v))
     # # print(table)
@@ -119,8 +134,8 @@ def main():
     # plt.legend()
     # plt.xticks()
     # plt.show()
-
-    MVG_simulations(training_data, training_labels)
+    #
+    # MVG_simulations(training_data, training_labels)
 
 
 if __name__ == '__main__':
