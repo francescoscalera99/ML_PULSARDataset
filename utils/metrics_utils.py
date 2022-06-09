@@ -21,22 +21,22 @@ def build_confusion_matrix(testing_labels: np.ndarray, predicted_labels: np.ndar
 
 
 def compute_OBD_given_treshold(llr, labels, treshold):
-  nClasses = np.unique(labels).size
-  OBD = np.zeros([nClasses, nClasses])
-  for i in range(llr.size):
-    if (llr[i]>treshold):
-      OBD[1, labels[i]]+=1
-    else:
-      OBD[0, labels[i]]+=1
-  return OBD
+    nClasses = np.unique(labels).size
+    OBD = np.zeros([nClasses, nClasses])
+    for i in range(llr.size):
+        if (llr[i] > treshold):
+            OBD[1, labels[i]] += 1
+        else:
+            OBD[0, labels[i]] += 1
+    return OBD
 
 
 def compute_normalizeDCF(optimal_bayes_decisions, prior_class_probability, Cfn, Cfp):
-  FNR = optimal_bayes_decisions[0,1]/(optimal_bayes_decisions[0,1]+optimal_bayes_decisions[1,1])
-  FPR = optimal_bayes_decisions[1,0]/(optimal_bayes_decisions[0,0]+optimal_bayes_decisions[1,0])
+    FNR = optimal_bayes_decisions[0, 1] / (optimal_bayes_decisions[0, 1] + optimal_bayes_decisions[1, 1])
+    FPR = optimal_bayes_decisions[1, 0] / (optimal_bayes_decisions[0, 0] + optimal_bayes_decisions[1, 0])
 
-  DCF = (prior_class_probability*Cfn*FNR) + ((1-prior_class_probability)*Cfp*FPR)
-  return DCF/min(prior_class_probability*Cfn, (1-prior_class_probability)*Cfp)
+    DCF = (prior_class_probability * Cfn * FNR) + ((1 - prior_class_probability) * Cfp * FPR)
+    return DCF / min(prior_class_probability * Cfn, (1 - prior_class_probability) * Cfp)
 
 
 def compute_min_DCF(llr, labels, prior_class_probability, Cfn, Cfp):
@@ -50,6 +50,7 @@ def compute_min_DCF(llr, labels, prior_class_probability, Cfn, Cfp):
             minDCF = currentDCF
 
     return minDCF
+
 
 def main():
     pass

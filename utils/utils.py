@@ -86,7 +86,6 @@ def gaussianize(training_data: np.ndarray, dataset: np.ndarray) -> np.ndarray:
 
     return data
 
-
 def evaluate_classification_errors(testing_labels: np.ndarray, predicted_labels) -> tuple[int, int]:
     # the two arrays are row vectors
     if testing_labels.size != predicted_labels.size:
