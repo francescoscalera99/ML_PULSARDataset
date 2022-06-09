@@ -68,23 +68,14 @@ def gaussianize(training_data: np.ndarray, dataset: np.ndarray) -> np.ndarray:
     :return: the gaussianized data
     """
     ranks = []
-    for feature in range(dataset.shape[0]):
-        counts = np.zeros(dataset.shape[1])
-        for sample in range(dataset.shape[1]):
-            count = np.int64(dataset[feature, :] < training_data[feature, sample]).sum()
-            counts[sample] = (count + 1) / (dataset.shape[1] + 2)
-        ranks.append(counts)
-
-    ranks = np.vstack(ranks)
-
-    data = []
-    for feature in range(dataset.shape[0]):
-        y = norm.ppf(ranks[feature])
-        data.append(y)
-
-    data = np.vstack(data)
-
-    return data
+    for j in range(dataset.shape[0]):
+        count = 0
+        for i in range(training_data.shape[1]):
+            count += (dataset[j, :] < training_data[j, i]).astype(int)
+        count += 1
+        ranks.append(count / (training_data.shape[1] + 2))
+    y = norm.ppf(ranks)
+    return y
 
 
 def evaluate_classification_errors(testing_labels: np.ndarray, predicted_labels) -> tuple[int, int]:
