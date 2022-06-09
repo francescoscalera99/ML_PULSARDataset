@@ -71,7 +71,7 @@ def gaussianize(training_data: np.ndarray, dataset: np.ndarray) -> np.ndarray:
     for feature in range(dataset.shape[0]):
         counts = np.zeros(dataset.shape[1])
         for sample in range(dataset.shape[1]):
-            count = np.int64(training_data[feature, :] < dataset[feature, sample]).sum()
+            count = np.int64(dataset[feature, :] < training_data[feature, sample]).sum()
             counts[sample] = (count + 1) / (dataset.shape[1] + 2)
         ranks.append(counts)
 
@@ -85,6 +85,7 @@ def gaussianize(training_data: np.ndarray, dataset: np.ndarray) -> np.ndarray:
     data = np.vstack(data)
 
     return data
+
 
 def evaluate_classification_errors(testing_labels: np.ndarray, predicted_labels) -> tuple[int, int]:
     # the two arrays are row vectors

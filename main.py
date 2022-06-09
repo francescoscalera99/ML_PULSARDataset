@@ -39,9 +39,13 @@ def MVG_simulations(training_data, training_labels):
                   '7. Excess kurtosis of the DM-SNR curve',
                   '8. Skewness of the DM-SNR curve']
 
-        mvg = MVG(dtr, ltr, variant=variant)
-        mvg.train_model()
-        mvg.classify(dte, np.array([1-pi, pi]))
+        mvg_raw = MVG(dtr, ltr, variant=variant)
+        mvg_raw.train_model()
+        mvg_raw.classify(dte, np.array([1-pi, pi]))
+
+        mvg_gauss = MVG(dtr_gaussianized, ltr, variant=variant)
+        mvg_gauss.train_model()
+        mvg_gauss.classify(dte_gaussianized, np.array([1-pi, pi]))
         # cm = build_confusion_matrix(lte, predictions)
         # print(cm)
 
@@ -103,10 +107,6 @@ def LR_simulations(training_data, training_labels):
 
 def main():
     (training_data, training_labels), _ = load_dataset()
-
-    z_normalized_training_data = z_normalization(training_data)
-
-    z_gauss_training_data = gaussianize(z_normalized_training_data, z_normalized_training_data)
 
     # dcfs, lambdas = LR_simulations(training_data, training_labels)
     # for k, v in dcfs.items():
