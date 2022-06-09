@@ -84,7 +84,7 @@ def LR_simulations(training_data, training_labels):
             training_data = PCA(training_data, m)
         (dtr, ltr), (dte, lte) = splitData_SingleFold(training_data, training_labels, seed=0)
         dtr_gaussianized = gaussianize(dtr, dtr)
-        dte_gaussianized = gaussianize(dte, dtr)
+        dte_gaussianized = gaussianize(dtr, dte)
 
         lr_raw = LR(dtr, ltr, lbd, pi)
         lr_raw.train_model()
