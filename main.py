@@ -4,12 +4,12 @@ from prettytable import PrettyTable
 import matplotlib.pyplot as plt
 
 from PCA import PCA
-from classifiers.LR import LR
+from classifiers.LR import LR, find_optLambda
 from utils.metrics_utils import build_confusion_matrix, compute_min_DCF
 from utils.utils import load_dataset, \
     z_normalization, \
     gaussianize, \
-    compute_accuracy, splitData_SingleFold, k_foldLR, Kfold_without_train
+    compute_accuracy, splitData_SingleFold
 from classifiers.MVG import MVG
 
 
@@ -61,6 +61,7 @@ def MVG_simulations(training_data, training_labels):
     print(table)
 
 
+# FIXME : bisogna fixarla perchè è errata
 def LR_simulations(training_data, training_labels):
     m = [None]
     pis = [0.1, 0.5, 0.9]
@@ -105,56 +106,8 @@ def LR_simulations(training_data, training_labels):
 
 def main():
     (training_data, training_labels), _ = load_dataset()
+    find_optLambda(training_data, training_labels)
 
-    # dcfs, lambdas = LR_simulations(training_data, training_labels)
-    # (dtr, ltr), (dte, lte) = splitData_SingleFold(training_data, training_labels, seed=0)
-    # dtr_gaussianized = gaussianize(dtr, dtr)
-    # dte_gaussianized = gaussianize(dtr, dte)
-    # lbd = np.logspace(-5, +5, 50)
-    # DCFs = []
-    # for lb in lbd:
-    #     lr = LR(dtr_gaussianized, ltr, lb, 0.5)
-    #     lr.train_model()
-    #     lr.classify(dte_gaussianized, np.array([0.5, 0.5]))
-    #     llr = lr.get_llrs()
-    #     min_dcf = compute_min_DCF(llr, lte, 0.5, 1, 1)
-    #     DCFs.append(min_dcf)
-    #
-    # plt.figure()
-    # plt.plot(lbd, DCFs, color="Blue")
-    # plt.xscale('log')
-    # plt.show()
-    lbd = np.logspace(-5, 5, 20)
-    priors = [0.5, 0.1, 0.9]
-    colors = ['Red', 'Green', 'Blue']
-    labels = ['min DCF (π=0.5)', 'min DCF (π=0.1)', 'min DCF (π=0.9)']
-    allKFolds, evaluationLabels = Kfold_without_train(training_data, training_labels)
-    i = 0
-    plt.figure()
-    plt.title('Raw features')
-    for prior in priors:
-        DCFs = []
-        for lb in lbd:
-            llrs = []
-            for singleKFold in allKFolds:
-                # dtr_gaussianized = gaussianize(singleKFold[1], singleKFold[1])
-                # dte_gaussianized = gaussianize(singleKFold[1], singleKFold[2])
-                lr = LR(singleKFold[1], singleKFold[0], lb, 0.5)
-                lr.train_model()
-                lr.classify(singleKFold[2], np.array([0.5, 0.5]))
-                llr = lr.get_llrs()
-                llr = llr.tolist()
-                llrs.extend(llr)
-            # print(llrs)
-            min_dcf = compute_min_DCF(np.array(llrs), evaluationLabels, prior, 1, 1)
-            print("lambda: ", lb, "prior: ", prior, ":", min_dcf)
-            DCFs.append(min_dcf)
-        plt.plot(lbd, DCFs, color=colors[i], label=labels[i])
-        i += 1
-    plt.xscale('log')
-    plt.legend()
-    plt.show()
-    #k_foldLR(training_data, training_labels, 5)
     # for k, v in dcfs.items():
     #     np.save(f"pi{k}", np.array(v))
     # # print(table)

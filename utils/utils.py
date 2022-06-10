@@ -1,6 +1,5 @@
 import numpy as np
 from scipy.stats import norm
-
 from classifiers.LR import LR
 from utils.metrics_utils import compute_min_DCF
 from .matrix_utils import vcol
@@ -69,23 +68,6 @@ def gaussianize(training_data: np.ndarray, dataset: np.ndarray) -> np.ndarray:
     :param dataset: the data to gaussianize
     :return: the gaussianized data
     """
-    # ranks = []
-    # for feature in range(dataset.shape[0]):
-    #     counts = np.zeros(dataset.shape[1])
-    #     for sample in range(dataset.shape[1]):
-    #         count = np.int64(training_data[feature, :] < dataset[feature, sample]).sum()
-    #         counts[sample] = (count + 1) / (dataset.shape[1] + 2)
-    #     ranks.append(counts)
-    #
-    # ranks = np.vstack(ranks)
-    #
-    # data = []
-    # for feature in range(dataset.shape[0]):
-    #     y = norm.ppf(ranks[feature])
-    #     data.append(y)
-    #
-    # data = np.vstack(data)
-    #
     ranks = []
     for j in range(dataset.shape[0]):
         tempSum = 0
@@ -160,7 +142,7 @@ def k_fold(dataset: np.ndarray, labels: np.ndarray, classifier, k: int, seed: in
     return float(n_errors / n_classifications)
 
 
-def Kfold_without_train(D, L, seed=0, K=5):
+def kFold(D, L, seed=0, K=5):
     # 1. Split the dataset in k folds, we choose 5
     foldSize = int(D.shape[1] / K)
 
@@ -209,71 +191,6 @@ def Kfold_without_train(D, L, seed=0, K=5):
     return allKFolds, evaluationLabels
 
 
-def k_foldLR(dataset: np.ndarray, labels: np.ndarray, k: int, seed: int = None):
-    """
-    Perform a k-fold cross-validation on the given dataset
-
-    :param dataset: the input dataset
-    :param labels: the input labels
-    :param classifier: the classifier function
-    :param k: the number of partitions
-    :param seed: the seed for the random permutation (for debug purposes)
-    :return: the error rate
-    """
-    if not k:
-        raise RuntimeError('Value of k must be set')
-
-    num_samples = dataset.shape[1]
-    partition_size = num_samples // k
-
-    np.random.seed(seed)
-    indices = np.random.permutation(num_samples)
-    partitions = np.empty(k, np.ndarray)
-    partitions_labels = np.empty(k, np.ndarray)
-
-    q = 1
-    for p in range(k):
-        if p == k - 1:
-            partitions[p] = dataset[:, indices[p * partition_size:]]
-            partitions_labels[p] = labels[indices[p * partition_size:]]
-            break
-        partitions[p] = dataset[:, indices[p * partition_size: q * partition_size]]
-        partitions_labels[p] = labels[indices[p * partition_size: q * partition_size]]
-        q += 1
-
-    bool_indices = np.array([True] * k)
-    lbd = np.logspace(-5, 5, 50)
-    priors = [0.5, 0.9, 0.1]
-
-    plt.figure()
-    for prior in priors:
-        DCFs = []
-        for lb in lbd:
-            llrs = []
-            for i in range(k):
-                bool_indices[i] = False
-                dtr = np.hstack(partitions[bool_indices])
-                ltr = np.hstack(partitions_labels[bool_indices])
-                dte = partitions[i]
-                lte = np.hstack(partitions_labels[i])
-                dtr_gaussianized = gaussianize(dtr, dtr)
-                dte_gaussianized = gaussianize(dtr, dte)
-                lr = LR(dtr_gaussianized, ltr, lb, 0.5)
-                lr.train_model()
-                lr.classify(dte_gaussianized, np.array([0.5, 0.5]))
-                llr = lr.get_llrs()
-                llr = llr.tolist()
-                llrs.extend(llr)
-                bool_indices[i] = True
-            min_dcf = compute_min_DCF(np.array(llrs), labels, prior, 1, 1)
-            DCFs.append(min_dcf)
-
-        plt.plot(lbd, DCFs, color="Blue")
-        plt.xscale('log')
-
-    plt.show()
-
-
 def splitData_SingleFold(dataset_train, labels_train, seed=0):
     nTrain = int(dataset_train.shape[1] * 2.0 / 3.0)
     np.random.seed(seed)
@@ -288,26 +205,27 @@ def splitData_SingleFold(dataset_train, labels_train, seed=0):
 
 
 def main():
-    (dtr, ltr), (dte, lte) = load_dataset()
+    # (dtr, ltr), (dte, lte) = load_dataset()
     # print(dtr[:, 0])
-    titles = ['1. Mean of the integrated profile',
-              '2. Standard deviation of the integrated profile',
-              '3. Excess kurtosis of the integrated profile',
-              '4. Excess kurtosis of the integrated profile',
-              '5. Mean of the DM-SNR curve',
-              '6. Standard deviation of the DM-SNR curve',
-              '7. Excess kurtosis of the DM-SNR curve',
-              '8. Skewness of the DM-SNR curve']
+    # titles = ['1. Mean of the integrated profile',
+    #           '2. Standard deviation of the integrated profile',
+    #           '3. Excess kurtosis of the integrated profile',
+    #           '4. Excess kurtosis of the integrated profile',
+    #           '5. Mean of the DM-SNR curve',
+    #           '6. Standard deviation of the DM-SNR curve',
+    #           '7. Excess kurtosis of the DM-SNR curve',
+    #           '8. Skewness of the DM-SNR curve']
     # plot_histogram(dtr, ltr, titles)
-
-    z_dtr = z_normalization(dtr)
+    #
+    # z_dtr = z_normalization(dtr)
     # plot_histogram(z_dtr, ltr, titles)
-
-    gauss = gaussianize(z_dtr, z_dtr)
+    #
+    # gauss = gaussianize(z_dtr, z_dtr)
     # plot_histogram(gauss, ltr, titles, nbins=20)
     # create_heatmap(gauss, title="Whole dataset")
     # create_heatmap(gauss[:, ltr == 1], cmap="Blues", title="True class")
     # create_heatmap(gauss[:, ltr == 0], cmap="Greens", title="False class")
+    pass
 
 
 if __name__ == '__main__':
