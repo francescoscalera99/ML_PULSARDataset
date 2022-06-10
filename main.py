@@ -124,32 +124,35 @@ def main():
     # plt.plot(lbd, DCFs, color="Blue")
     # plt.xscale('log')
     # plt.show()
-    lbd = np.logspace(-5, 5, 50)
+    lbd = np.logspace(-5, 5, 20)
     priors = [0.5, 0.1, 0.9]
     colors = ['Red', 'Green', 'Blue']
+    labels = ['min DCF (π=0.5)', 'min DCF (π=0.1)', 'min DCF (π=0.9)']
     allKFolds, evaluationLabels = Kfold_without_train(training_data, training_labels)
     i = 0
     plt.figure()
+    plt.title('Raw features')
     for prior in priors:
         DCFs = []
         for lb in lbd:
             llrs = []
             for singleKFold in allKFolds:
-                dtr_gaussianized = gaussianize(singleKFold[1], singleKFold[1])
-                dte_gaussianized = gaussianize(singleKFold[1], singleKFold[2])
-                lr = LR(dtr_gaussianized, singleKFold[0], lb, 0.5)
+                # dtr_gaussianized = gaussianize(singleKFold[1], singleKFold[1])
+                # dte_gaussianized = gaussianize(singleKFold[1], singleKFold[2])
+                lr = LR(singleKFold[1], singleKFold[0], lb, 0.5)
                 lr.train_model()
-                lr.classify(dte_gaussianized, np.array([0.5, 0.5]))
+                lr.classify(singleKFold[2], np.array([0.5, 0.5]))
                 llr = lr.get_llrs()
                 llr = llr.tolist()
                 llrs.extend(llr)
-            print(llrs)
+            # print(llrs)
             min_dcf = compute_min_DCF(np.array(llrs), evaluationLabels, prior, 1, 1)
             print("lambda: ", lb, "prior: ", prior, ":", min_dcf)
             DCFs.append(min_dcf)
-        plt.plot(lbd, DCFs, color=colors[i])
+        plt.plot(lbd, DCFs, color=colors[i], label=labels[i])
         i += 1
     plt.xscale('log')
+    plt.legend()
     plt.show()
     #k_foldLR(training_data, training_labels, 5)
     # for k, v in dcfs.items():

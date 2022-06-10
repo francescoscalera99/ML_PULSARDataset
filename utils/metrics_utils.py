@@ -30,6 +30,8 @@ def compute_OBD_given_treshold(llr, labels, treshold):
             OBD[0, labels[i]] += 1
     return OBD
 
+# OBD[int(llr[i] > threshold), labels[i]] += 1
+
 
 def compute_normalizeDCF(optimal_bayes_decisions, prior_class_probability, Cfn, Cfp):
     FNR = optimal_bayes_decisions[0, 1] / (optimal_bayes_decisions[0, 1] + optimal_bayes_decisions[1, 1])

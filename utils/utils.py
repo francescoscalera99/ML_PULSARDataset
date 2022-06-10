@@ -159,6 +159,7 @@ def k_fold(dataset: np.ndarray, labels: np.ndarray, classifier, k: int, seed: in
 
     return float(n_errors / n_classifications)
 
+
 def Kfold_without_train(D, L, seed=0, K=5):
     # 1. Split the dataset in k folds, we choose 5
     foldSize = int(D.shape[1] / K)
@@ -207,6 +208,7 @@ def Kfold_without_train(D, L, seed=0, K=5):
 
     return allKFolds, evaluationLabels
 
+
 def k_foldLR(dataset: np.ndarray, labels: np.ndarray, k: int, seed: int = None):
     """
     Perform a k-fold cross-validation on the given dataset
@@ -242,6 +244,8 @@ def k_foldLR(dataset: np.ndarray, labels: np.ndarray, k: int, seed: int = None):
     bool_indices = np.array([True] * k)
     lbd = np.logspace(-5, 5, 50)
     priors = [0.5, 0.9, 0.1]
+
+    plt.figure()
     for prior in priors:
         DCFs = []
         for lb in lbd:
@@ -263,10 +267,11 @@ def k_foldLR(dataset: np.ndarray, labels: np.ndarray, k: int, seed: int = None):
                 bool_indices[i] = True
             min_dcf = compute_min_DCF(np.array(llrs), labels, prior, 1, 1)
             DCFs.append(min_dcf)
-        plt.figure()
+
         plt.plot(lbd, DCFs, color="Blue")
         plt.xscale('log')
-        plt.show()
+
+    plt.show()
 
 
 def splitData_SingleFold(dataset_train, labels_train, seed=0):
