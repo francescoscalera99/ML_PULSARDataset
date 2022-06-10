@@ -1,8 +1,10 @@
 import numpy as np
 from scipy.stats import norm
 
+from classifiers.LR import LR
+from utils.metrics_utils import compute_min_DCF
 from .matrix_utils import vcol
-
+import matplotlib.pyplot as plt
 
 def load_dataset(path: str = './') -> tuple:
     """
@@ -67,13 +69,30 @@ def gaussianize(training_data: np.ndarray, dataset: np.ndarray) -> np.ndarray:
     :param dataset: the data to gaussianize
     :return: the gaussianized data
     """
+    # ranks = []
+    # for feature in range(dataset.shape[0]):
+    #     counts = np.zeros(dataset.shape[1])
+    #     for sample in range(dataset.shape[1]):
+    #         count = np.int64(training_data[feature, :] < dataset[feature, sample]).sum()
+    #         counts[sample] = (count + 1) / (dataset.shape[1] + 2)
+    #     ranks.append(counts)
+    #
+    # ranks = np.vstack(ranks)
+    #
+    # data = []
+    # for feature in range(dataset.shape[0]):
+    #     y = norm.ppf(ranks[feature])
+    #     data.append(y)
+    #
+    # data = np.vstack(data)
+    #
     ranks = []
     for j in range(dataset.shape[0]):
-        count = 0
+        tempSum = 0
         for i in range(training_data.shape[1]):
-            count += (dataset[j, :] < training_data[j, i]).astype(int)
-        count += 1
-        ranks.append(count / (training_data.shape[1] + 2))
+            tempSum += (dataset[j, :] < training_data[j, i]).astype(int)
+        tempSum += 1
+        ranks.append(tempSum / (training_data.shape[1] + 2))
     y = norm.ppf(ranks)
     return y
 
@@ -139,6 +158,115 @@ def k_fold(dataset: np.ndarray, labels: np.ndarray, classifier, k: int, seed: in
         bool_indices[i] = True
 
     return float(n_errors / n_classifications)
+
+def Kfold_without_train(D, L, seed=0, K=5):
+    # 1. Split the dataset in k folds, we choose 5
+    foldSize = int(D.shape[1] / K)
+
+    folds = []
+    labels = []
+
+    # Generate a random seed and compute a permutation from 0 to 8929
+    np.random.seed(seed)
+    idx = np.random.permutation(D.shape[1])
+
+    for i in range(K):
+        fold_idx = idx[(i * foldSize): ((i + 1) * (foldSize))]
+        folds.append(D[:, fold_idx])
+        labels.append(L[fold_idx])
+
+    # 2. Re-arrange folds and train the model
+    evaluationLabels = []  # Each iteration we save here the labels for the evaluation set. At the end we have the labels in the new shuffled order
+
+    allKFolds = []
+
+    # The algorithm is trained and evaluated K times
+    for i in range(K):
+        # Each time we iterate, we create K-1 training folds and one evaluation set to train and evaluate the model
+        trainingFolds = []
+        trainingLabels = []
+        evaluationFold = []
+
+        # We iterate over the folds. The i-th fold will be the evaluation one
+        for j in range(K):
+            if j == i:
+                evaluationFold.append(folds[i])
+                evaluationLabels.append(labels[i])
+            else:
+                trainingFolds.append(folds[j])
+                trainingLabels.append(labels[j])
+
+        trainingFolds = np.hstack(trainingFolds)
+        trainingLabels = np.hstack(trainingLabels)
+        evaluationFold = np.hstack(evaluationFold)
+
+        singleKFold = [trainingLabels, trainingFolds, evaluationFold]
+        allKFolds.append(singleKFold)
+
+    evaluationLabels = np.hstack(evaluationLabels)
+
+    return allKFolds, evaluationLabels
+
+def k_foldLR(dataset: np.ndarray, labels: np.ndarray, k: int, seed: int = None):
+    """
+    Perform a k-fold cross-validation on the given dataset
+
+    :param dataset: the input dataset
+    :param labels: the input labels
+    :param classifier: the classifier function
+    :param k: the number of partitions
+    :param seed: the seed for the random permutation (for debug purposes)
+    :return: the error rate
+    """
+    if not k:
+        raise RuntimeError('Value of k must be set')
+
+    num_samples = dataset.shape[1]
+    partition_size = num_samples // k
+
+    np.random.seed(seed)
+    indices = np.random.permutation(num_samples)
+    partitions = np.empty(k, np.ndarray)
+    partitions_labels = np.empty(k, np.ndarray)
+
+    q = 1
+    for p in range(k):
+        if p == k - 1:
+            partitions[p] = dataset[:, indices[p * partition_size:]]
+            partitions_labels[p] = labels[indices[p * partition_size:]]
+            break
+        partitions[p] = dataset[:, indices[p * partition_size: q * partition_size]]
+        partitions_labels[p] = labels[indices[p * partition_size: q * partition_size]]
+        q += 1
+
+    bool_indices = np.array([True] * k)
+    lbd = np.logspace(-5, 5, 50)
+    priors = [0.5, 0.9, 0.1]
+    for prior in priors:
+        DCFs = []
+        for lb in lbd:
+            llrs = []
+            for i in range(k):
+                bool_indices[i] = False
+                dtr = np.hstack(partitions[bool_indices])
+                ltr = np.hstack(partitions_labels[bool_indices])
+                dte = partitions[i]
+                lte = np.hstack(partitions_labels[i])
+                dtr_gaussianized = gaussianize(dtr, dtr)
+                dte_gaussianized = gaussianize(dtr, dte)
+                lr = LR(dtr_gaussianized, ltr, lb, 0.5)
+                lr.train_model()
+                lr.classify(dte_gaussianized, np.array([0.5, 0.5]))
+                llr = lr.get_llrs()
+                llr = llr.tolist()
+                llrs.extend(llr)
+                bool_indices[i] = True
+            min_dcf = compute_min_DCF(np.array(llrs), labels, prior, 1, 1)
+            DCFs.append(min_dcf)
+        plt.figure()
+        plt.plot(lbd, DCFs, color="Blue")
+        plt.xscale('log')
+        plt.show()
 
 
 def splitData_SingleFold(dataset_train, labels_train, seed=0):
