@@ -5,13 +5,9 @@ import matplotlib.pyplot as plt
 
 from PCA import PCA
 from classifiers.LR import LR, find_optLambda
-from utils.metrics_utils import build_confusion_matrix, compute_min_DCF
-from utils.utils import load_dataset, \
-    z_normalization, \
-    gaussianize, \
-    compute_accuracy, splitData_SingleFold
 from classifiers.MVG import MVG
-
+from utils.utils import load_dataset, gaussianize, splitData_SingleFold, kFold
+from utils.metrics_utils import compute_min_DCF
 
 def MVG_simulations(training_data, training_labels):
     variants = ['full-cov', 'diag', 'tied']
@@ -41,11 +37,11 @@ def MVG_simulations(training_data, training_labels):
 
         mvg_raw = MVG(dtr, ltr, variant=variant)
         mvg_raw.train_model()
-        mvg_raw.classify(dte, np.array([1-pi, pi]))
+        mvg_raw.classify(dte, np.array([1 - pi, pi]))
 
         mvg_gauss = MVG(dtr_gaussianized, ltr, variant=variant)
         mvg_gauss.train_model()
-        mvg_gauss.classify(dte_gaussianized, np.array([1-pi, pi]))
+        mvg_gauss.classify(dte_gaussianized, np.array([1 - pi, pi]))
         # cm = build_confusion_matrix(lte, predictions)
         # print(cm)
 
@@ -61,56 +57,48 @@ def MVG_simulations(training_data, training_labels):
     print(table)
 
 
-# FIXME : bisogna fixarla perchè è errata
 def LR_simulations(training_data, training_labels):
-    m = [None]
-    pis = [0.1, 0.5, 0.9]
-    lambdas = np.logspace(-5, 5, 50)
     # datas = [training_data, z_normalized_training_data, z_gauss_training_data]
     # data_types = ['raw', 'z-normalized', 'z-normalized + gaussianized']
     # ds = list(range(3))
     # m = [None, 7, 5, 4]
-    # pis = [0.1, 0.5, 0.9]
-    # lambdas = np.logspace(-5, 5, 50)
+    m = [None, 7, 5, 4]
+    pis = [0.1, 0.5, 0.9]
+    pis_T = [0.5, 0.1, 0.9]
+    pis = [0.5, 0.1, 0.9]
+    lbd = 1e-3
 
-    hyperparameters = itertools.product(m, pis, lambdas)
+    hyperparameters = itertools.product(m, pis, pis_T)
 
     table = PrettyTable()
     table.field_names = ['Hyperparameters', 'min DCF']
 
-    dcfs = dict.fromkeys(pis, [])
-
-    for m, pi, lbd in hyperparameters:
+    for m, pi, pi_T in hyperparameters:
         if m is not None:
             training_data = PCA(training_data, m)
-        (dtr, ltr), (dte, lte) = splitData_SingleFold(training_data, training_labels, seed=0)
-        dtr_gaussianized = gaussianize(dtr, dtr)
-        dte_gaussianized = gaussianize(dtr, dte)
+        allKFolds, evaluationLabels = kFold(training_data, training_labels)
+        llrs = []
+        for singleKFold in allKFolds:
+            dtr_gaussianized = gaussianize(singleKFold[1], singleKFold[1])
+            dte_gaussianized = gaussianize(singleKFold[1], singleKFold[2])
+            lr = LR(dtr_gaussianized, singleKFold[0], lbd, pi_T)
+            lr.train_model()
+            lr.classify(dte_gaussianized, np.array([0.5, 0.5]))
+            llr = lr.get_llrs()
+            llr = llr.tolist()
+            llrs.extend(llr)
+        min_dcf = compute_min_DCF(np.array(llrs), evaluationLabels, pi, 1, 1)
+        table.add_row([f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T}  λ={lbd}", round(min_dcf, 3)])
 
-        lr_raw = LR(dtr, ltr, lbd, pi)
-        lr_raw.train_model()
-        lr_raw.classify(dte, np.array([1-pi, pi]))
-        llrs_raw = lr_raw.get_llrs()
-        min_dcf_raw = compute_min_DCF(llrs_raw, lte, pi, 1, 1)
-
-        lr_gauss = LR(dtr_gaussianized, ltr, lbd, pi)
-        lr_gauss.train_model()
-        lr_gauss.classify(dte_gaussianized, np.array([1-pi, pi]))
-        llrs_gauss = lr_raw.get_llrs()
-        min_dcf_gauss = compute_min_DCF(llrs_gauss, lte, pi, 1, 1)
-
-        # table.add_row([f"PCA m={m}, data: raw, π={pi}, λ={lbd}", round(min_dcf_raw, 3)])
-        # table.add_row([f"PCA m={m}, data: gaussianized, π={pi}, λ={lbd}", round(min_dcf_gauss, 3)])
-        # dcfs[pi].append(min_dcf_raw)
-
+    print(table)
 
 def main():
     (training_data, training_labels), _ = load_dataset()
-    find_optLambda(training_data, training_labels)
-
+    #find_optLambda(training_data, training_labels)
+    LR_simulations(training_data, training_labels)
     # for k, v in dcfs.items():
     #     np.save(f"pi{k}", np.array(v))
-    # # print(table)
+    # #
     # plt.figure()
     # colors = ['red', 'green', 'blue']
     # for i, (k, v) in enumerate(dcfs.items()):

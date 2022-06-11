@@ -1,7 +1,6 @@
 import numpy as np
 from scipy.stats import norm
-from classifiers.LR import LR
-from utils.metrics_utils import compute_min_DCF
+
 from .matrix_utils import vcol
 import matplotlib.pyplot as plt
 
