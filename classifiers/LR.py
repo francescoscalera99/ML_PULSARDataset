@@ -1,11 +1,7 @@
 import numpy as np
-from matplotlib import pyplot as plt
 from scipy import optimize as opt
 
-from PCA import PCA
 from classifiers.Classifier import ClassifierClass
-from utils.metrics_utils import compute_min_DCF
-from utils.utils import gaussianize, splitData_SingleFold
 
 
 class LR(ClassifierClass):

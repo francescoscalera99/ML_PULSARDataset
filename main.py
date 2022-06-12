@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from PCA import PCA
 from classifiers.LR import LR
 from classifiers.MVG import MVG
+from classifiers.SVM import SVM
 from utils.utils import load_dataset, gaussianize, splitData_SingleFold, k_fold
 from utils.metrics_utils import compute_min_DCF
 
@@ -89,7 +90,7 @@ def LR_simulations(training_data, training_labels):
 def main():
     (training_data, training_labels), _ = load_dataset()
     # find_optLambda(training_data, training_labels)
-    LR_simulations(training_data, training_labels)
+    # LR_simulations(training_data, training_labels)
     # for k, v in dcfs.items():
     #     np.save(f"pi{k}", np.array(v))
     # #
@@ -102,7 +103,17 @@ def main():
     # plt.show()
     #
     # MVG_simulations(training_data, training_labels)
+    (dtr, ltr), (dte, lte) = splitData_SingleFold(training_data, training_labels, seed=0)
 
+    dtr = gaussianize(dtr, dtr)
+    dte = gaussianize(dtr, dte)
+
+    classifier = SVM(dtr, ltr, k=1, c=5e-5, kernel_params=(2, 15), kernel_type='poly')
+    classifier.train_model()
+    classifier.classify(dte, None)
+    llrs = classifier.get_llrs()
+    min_dcf = compute_min_DCF(np.array(llrs), lte, 0.5, 1, 1)
+    print(min_dcf)
 
 
 
