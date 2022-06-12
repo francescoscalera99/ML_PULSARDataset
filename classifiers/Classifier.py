@@ -6,7 +6,7 @@ class ClassifierClass(abc.ABC):
     class Model(abc.ABC):
         pass
 
-    def __init__(self, training_data: np.ndarray, training_labels: np.ndarray):
+    def __init__(self, training_data: np.ndarray, training_labels: np.ndarray, **kwargs):
         self.training_data = training_data
         self.training_labels = training_labels
 

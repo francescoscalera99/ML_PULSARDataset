@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.stats import norm
 
+from classifiers.Classifier import ClassifierClass
 from .matrix_utils import vcol
 import matplotlib.pyplot as plt
 
@@ -88,7 +89,13 @@ def evaluate_classification_errors(testing_labels: np.ndarray, predicted_labels)
     return num_samples - num_correct, num_samples
 
 
-def k_fold(dataset: np.ndarray, labels: np.ndarray, classifier, k: int, seed: int = None) -> float:
+def k_fold(dataset: np.ndarray,
+           labels: np.ndarray,
+           classifier: ClassifierClass.__class__,
+           k: int,
+           seed: int = None,
+           **kwargs) \
+        -> tuple[np.ndarray, np.ndarray]:
     """
     Perform a k-fold cross-validation on the given dataset
 
@@ -121,8 +128,8 @@ def k_fold(dataset: np.ndarray, labels: np.ndarray, classifier, k: int, seed: in
         q += 1
 
     bool_indices = np.array([True] * k)
-    n_errors = 0
-    n_classifications = 0
+    llrs = []
+    labels = []
     for i in range(k):
         bool_indices[i] = False
         training_data = np.hstack(partitions[bool_indices])
@@ -130,64 +137,67 @@ def k_fold(dataset: np.ndarray, labels: np.ndarray, classifier, k: int, seed: in
         testing_data = partitions[i]
         testing_labels = np.hstack(partitions_labels[i])
 
-        # perform the classification
-        predictions, _ = classifier(training_data, training_labels, testing_data, testing_labels)
-        # evaluate number of errors
-        err, samples = evaluate_classification_errors(testing_labels, predictions)
-        n_errors += err
-        n_classifications += samples
+        dtr_gaussianized = gaussianize(training_data, training_data)
+        dte_gaussianized = gaussianize(training_data, testing_data)
+
+        c = classifier(dtr_gaussianized, training_labels, lbd=kwargs['lbd'], pi_T=kwargs['pi_T'])
+        c.train_model()
+        c.classify(dte_gaussianized, None)
+        llrs.extend(c.get_llrs())
+        labels.extend(testing_labels)
+
         bool_indices[i] = True
 
-    return float(n_errors / n_classifications)
+    return np.array(llrs), np.array(labels)
 
 
-def kFold(D, L, seed=0, K=5):
-    # 1. Split the dataset in k folds, we choose 5
-    foldSize = int(D.shape[1] / K)
-
-    folds = []
-    labels = []
-
-    # Generate a random seed and compute a permutation from 0 to 8929
-    np.random.seed(seed)
-    idx = np.random.permutation(D.shape[1])
-
-    for i in range(K):
-        fold_idx = idx[(i * foldSize): ((i + 1) * (foldSize))]
-        folds.append(D[:, fold_idx])
-        labels.append(L[fold_idx])
-
-    # 2. Re-arrange folds and train the model
-    evaluationLabels = []  # Each iteration we save here the labels for the evaluation set. At the end we have the labels in the new shuffled order
-
-    allKFolds = []
-
-    # The algorithm is trained and evaluated K times
-    for i in range(K):
-        # Each time we iterate, we create K-1 training folds and one evaluation set to train and evaluate the model
-        trainingFolds = []
-        trainingLabels = []
-        evaluationFold = []
-
-        # We iterate over the folds. The i-th fold will be the evaluation one
-        for j in range(K):
-            if j == i:
-                evaluationFold.append(folds[i])
-                evaluationLabels.append(labels[i])
-            else:
-                trainingFolds.append(folds[j])
-                trainingLabels.append(labels[j])
-
-        trainingFolds = np.hstack(trainingFolds)
-        trainingLabels = np.hstack(trainingLabels)
-        evaluationFold = np.hstack(evaluationFold)
-
-        singleKFold = [trainingLabels, trainingFolds, evaluationFold]
-        allKFolds.append(singleKFold)
-
-    evaluationLabels = np.hstack(evaluationLabels)
-
-    return allKFolds, evaluationLabels
+# def kFold(D, L, seed=0, K=5):
+#     # 1. Split the dataset in k folds, we choose 5
+#     foldSize = int(D.shape[1] / K)
+#
+#     folds = []
+#     labels = []
+#
+#     # Generate a random seed and compute a permutation from 0 to 8929
+#     np.random.seed(seed)
+#     idx = np.random.permutation(D.shape[1])
+#
+#     for i in range(K):
+#         fold_idx = idx[(i * foldSize): ((i + 1) * (foldSize))]
+#         folds.append(D[:, fold_idx])
+#         labels.append(L[fold_idx])
+#
+#     # 2. Re-arrange folds and train the model
+#     evaluationLabels = []  # Each iteration we save here the labels for the evaluation set. At the end we have the labels in the new shuffled order
+#
+#     allKFolds = []
+#
+#     # The algorithm is trained and evaluated K times
+#     for i in range(K):
+#         # Each time we iterate, we create K-1 training folds and one evaluation set to train and evaluate the model
+#         trainingFolds = []
+#         trainingLabels = []
+#         evaluationFold = []
+#
+#         # We iterate over the folds. The i-th fold will be the evaluation one
+#         for j in range(K):
+#             if j == i:
+#                 evaluationFold.append(folds[i])
+#                 evaluationLabels.append(labels[i])
+#             else:
+#                 trainingFolds.append(folds[j])
+#                 trainingLabels.append(labels[j])
+#
+#         trainingFolds = np.hstack(trainingFolds)
+#         trainingLabels = np.hstack(trainingLabels)
+#         evaluationFold = np.hstack(evaluationFold)
+#
+#         singleKFold = [trainingLabels, trainingFolds, evaluationFold]
+#         allKFolds.append(singleKFold)
+#
+#     evaluationLabels = np.hstack(evaluationLabels)
+#
+#     return allKFolds, evaluationLabels
 
 
 def splitData_SingleFold(dataset_train, labels_train, seed=0):

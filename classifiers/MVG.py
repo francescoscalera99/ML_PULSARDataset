@@ -24,10 +24,10 @@ class MVG(ClassifierClass):
                 self.c0 = c0
                 self.c1 = c1
 
-    def __init__(self, training_data: np.ndarray, training_labels: np.ndarray, variant='full-cov'):
+    def __init__(self, training_data: np.ndarray, training_labels: np.ndarray, **kwargs):
         super().__init__(training_data, training_labels)
         self._model = None
-        self.variant = variant
+        self.variant = kwargs['variant']
         self._score_matrix = None
 
     def train_model(self) -> None:

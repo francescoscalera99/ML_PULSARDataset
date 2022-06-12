@@ -4,10 +4,11 @@ from prettytable import PrettyTable
 import matplotlib.pyplot as plt
 
 from PCA import PCA
-from classifiers.LR import LR, find_optLambda
+from classifiers.LR import LR
 from classifiers.MVG import MVG
-from utils.utils import load_dataset, gaussianize, splitData_SingleFold, kFold
+from utils.utils import load_dataset, gaussianize, splitData_SingleFold, k_fold
 from utils.metrics_utils import compute_min_DCF
+
 
 def MVG_simulations(training_data, training_labels):
     variants = ['full-cov', 'diag', 'tied']
@@ -76,25 +77,18 @@ def LR_simulations(training_data, training_labels):
     for m, pi, pi_T in hyperparameters:
         if m is not None:
             training_data = PCA(training_data, m)
-        allKFolds, evaluationLabels = kFold(training_data, training_labels)
-        llrs = []
-        for singleKFold in allKFolds:
-            dtr_gaussianized = gaussianize(singleKFold[1], singleKFold[1])
-            dte_gaussianized = gaussianize(singleKFold[1], singleKFold[2])
-            lr = LR(dtr_gaussianized, singleKFold[0], lbd, pi_T)
-            lr.train_model()
-            lr.classify(dte_gaussianized, np.array([0.5, 0.5]))
-            llr = lr.get_llrs()
-            llr = llr.tolist()
-            llrs.extend(llr)
-        min_dcf = compute_min_DCF(np.array(llrs), evaluationLabels, pi, 1, 1)
+
+        llrs, labels = k_fold(training_data, training_labels, LR, 5, seed=0, lbd=lbd, pi_T=pi_T)
+
+        min_dcf = compute_min_DCF(np.array(llrs), labels, pi, 1, 1)
         table.add_row([f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T}  λ={lbd}", round(min_dcf, 3)])
 
     print(table)
 
+
 def main():
     (training_data, training_labels), _ = load_dataset()
-    #find_optLambda(training_data, training_labels)
+    # find_optLambda(training_data, training_labels)
     LR_simulations(training_data, training_labels)
     # for k, v in dcfs.items():
     #     np.save(f"pi{k}", np.array(v))
@@ -108,6 +102,8 @@ def main():
     # plt.show()
     #
     # MVG_simulations(training_data, training_labels)
+
+
 
 
 if __name__ == '__main__':
