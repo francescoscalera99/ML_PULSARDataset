@@ -20,14 +20,12 @@ def build_confusion_matrix(testing_labels: np.ndarray, predicted_labels: np.ndar
     return cf
 
 
-def compute_OBD_given_treshold(llr, labels, treshold):
+def compute_OBD(pred, labels):
     nClasses = np.unique(labels).size
     OBD = np.zeros([nClasses, nClasses])
-    for i in range(llr.size):
-        if (llr[i] > treshold):
-            OBD[1, labels[i]] += 1
-        else:
-            OBD[0, labels[i]] += 1
+    for i in range(nClasses):
+        for j in range(nClasses):
+            OBD[i, j] = ((pred == i) * (labels == j)).sum()
     return OBD
 
 
@@ -44,7 +42,8 @@ def compute_min_DCF(llr, labels, prior_class_probability, Cfn, Cfp):
     tresholds = np.hstack(([-np.inf], llr, [np.inf]))
     tresholds.sort()
     for treshold in tresholds:
-        OBD = compute_OBD_given_treshold(llr, labels, treshold)
+        pred = np.int32(llr > treshold)
+        OBD = compute_OBD(pred, labels)
         currentDCF = compute_normalizeDCF(OBD, prior_class_probability, Cfn, Cfp)
         if (currentDCF < minDCF):
             minDCF = currentDCF
