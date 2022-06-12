@@ -140,7 +140,7 @@ def k_fold(dataset: np.ndarray,
         dtr_gaussianized = gaussianize(training_data, training_data)
         dte_gaussianized = gaussianize(training_data, testing_data)
 
-        c = classifier(dtr_gaussianized, training_labels, lbd=kwargs['lbd'], pi_T=kwargs['pi_T'])
+        c = classifier(dtr_gaussianized, training_labels, kwargs)
         c.train_model()
         c.classify(dte_gaussianized, None)
         llrs.extend(c.get_llrs())
