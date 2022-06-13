@@ -92,7 +92,7 @@ def evaluate_classification_errors(testing_labels: np.ndarray, predicted_labels)
 def k_fold(dataset: np.ndarray,
            labels: np.ndarray,
            classifier: ClassifierClass.__class__,
-           k: int,
+           nFold: int,
            seed: int = None,
            **kwargs) \
         -> tuple[np.ndarray, np.ndarray]:
@@ -106,20 +106,20 @@ def k_fold(dataset: np.ndarray,
     :param seed: the seed for the random permutation (for debug purposes)
     :return: the error rate
     """
-    if not k:
+    if not nFold:
         raise RuntimeError('Value of k must be set')
 
     num_samples = dataset.shape[1]
-    partition_size = num_samples // k
+    partition_size = num_samples // nFold
 
     np.random.seed(seed)
     indices = np.random.permutation(num_samples)
-    partitions = np.empty(k, np.ndarray)
-    partitions_labels = np.empty(k, np.ndarray)
+    partitions = np.empty(nFold, np.ndarray)
+    partitions_labels = np.empty(nFold, np.ndarray)
 
     q = 1
-    for p in range(k):
-        if p == k - 1:
+    for p in range(nFold):
+        if p == nFold - 1:
             partitions[p] = dataset[:, indices[p * partition_size:]]
             partitions_labels[p] = labels[indices[p * partition_size:]]
             break
@@ -127,10 +127,10 @@ def k_fold(dataset: np.ndarray,
         partitions_labels[p] = labels[indices[p * partition_size: q * partition_size]]
         q += 1
 
-    bool_indices = np.array([True] * k)
+    bool_indices = np.array([True] * nFold)
     llrs = []
     labels = []
-    for i in range(k):
+    for i in range(nFold):
         bool_indices[i] = False
         training_data = np.hstack(partitions[bool_indices])
         training_labels = np.hstack(partitions_labels[bool_indices])
@@ -140,11 +140,11 @@ def k_fold(dataset: np.ndarray,
         dtr_gaussianized = gaussianize(training_data, training_data)
         dte_gaussianized = gaussianize(training_data, testing_data)
 
-        c = classifier(dtr_gaussianized, training_labels, kwargs)
+        c = classifier(dtr_gaussianized, training_labels, **kwargs)
         c.train_model()
         c.classify(dte_gaussianized, None)
-        llrs.extend(c.get_llrs())
-        labels.extend(testing_labels)
+        llrs.extend(c.get_llrs().tolist())
+        labels.extend(testing_labels.tolist())
 
         bool_indices[i] = True
 
