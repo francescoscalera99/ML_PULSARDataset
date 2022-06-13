@@ -37,23 +37,20 @@ class SVM(ClassifierClass):
                 raise RuntimeError("Unexpected value for self._type.\n"
                                    f"Expected either 'poly' or 'RBF', got {self._type} instead.")
 
-        def generate_scores(self, alpha_star, dtr, ltr, dte):
-            if self._type == 'poly':
-                return np.sum(
-                    (alpha_star * ltr).reshape(1, dtr.shape[1]) @ (dtr.T @ dte + self.c) ** self.d + self._csi, axis=0)
-            elif self._type == 'RBF':
-                num_features, num_samples = dtr.shape
-                return np.exp(np.linalg.norm(
-                    (dtr.reshape((1, num_features, num_samples)).T - dtr) * self.gamma, axis=1)) + self._csi
-            else:
-                raise RuntimeError("Unexpected value for self._type.\n"
-                                   f"Expected either 'poly' or 'RBF', got {self._type} instead.")
-
         def function(self, x1: np.ndarray, x2: np.ndarray):
+            """
+            Implementation of the (possibly , based on self._csi parameter, regularized) kernel function of the SVM,
+            chosen depending on self._type parameter.
+            :param x1: the first dataset
+            :param x2: the second dataset
+            :return: the kernel matrix of size NxN
+            """
             if self._type == 'poly':
-                return (vrow(x1) @ vcol(x2) + self.c) ** self.d + self._csi
+                return (x1.T @ x2 + self.c) ** self.d + self._csi
             elif self._type == 'RBF':
-                return np.exp(-self.gamma * (x1 - x2).T @ (x1 - x2)) + self._csi
+                num_features, num_samples = x1.shape
+                return np.exp(np.linalg.norm(
+                    (x1.reshape((1, num_features, num_samples)).T - x2) * self.gamma, axis=1)) + self._csi
             else:
                 raise RuntimeError("Unexpected value for self._type.\n"
                                    f"Expected either 'poly' or 'RBF', got {self._type} instead.")
@@ -68,14 +65,9 @@ class SVM(ClassifierClass):
         self._kernel = SVM.Kernel(kwargs['kernel_params'], kwargs['kernel_type'], self._k ** 2)
         self._D = np.vstack((self.training_data, self._k * np.ones(self.training_labels.size)))
         self._scores = None
-        if self._kernel is None:
-            g_matrix = self._D.T @ self._D
-        elif kwargs['kernel_type'] == 'poly':
-            g_matrix = (self.training_data.T @ self.training_data + self._kernel.c) ** self._kernel.d + self._k ** 2
-        else:
-            # TODO: RBF
-            pass
-        self._H = (vcol(self.training_labels) * g_matrix) * vrow(self.training_labels)
+        self._H = (vcol(self.training_labels)
+                   * self._kernel.function(self.training_data, self.training_data)) \
+                  * vrow(self.training_labels)
         print('finished constructor')
 
     def _primal(self, w, b):
@@ -91,23 +83,26 @@ class SVM(ClassifierClass):
         gradient = self._H @ alpha - 1
         return dual_objective_neg, vrow(gradient)
 
-    def _solve_dual(self) -> Model:
+    def _solve_dual(self, balanced) -> Model:
         num_samples = self.training_labels.size
         alpha0 = np.zeros(num_samples)
-        pi_t_emp = np.sum(self.training_labels == 1) / self.training_labels.size
-        pi_f_emp = np.sum(self.training_labels == -1) / self.training_labels.size
-        pi_t = 0.5
-        c_t = self._C * pi_t / pi_t_emp
-        c_f = self._C * (1 - pi_t) / pi_f_emp
-        bounds = [(0, c_t) if label == 1 else (0, c_f) for label in self.training_labels]
+        if balanced:
+            pi_t_emp = np.sum(self.training_labels == 1) / self.training_labels.size
+            pi_f_emp = np.sum(self.training_labels == -1) / self.training_labels.size
+            pi_t = 0.5
+            c_t = self._C * pi_t / pi_t_emp
+            c_f = self._C * (1 - pi_t) / pi_f_emp
+            bounds = [(0, c_t) if label == 1 else (0, c_f) for label in self.training_labels]
+        else:
+            bounds = [(0, self._C)] * num_samples
         alpha_star, _, _ = scipy.optimize.fmin_l_bfgs_b(self._neg_dual, x0=alpha0, bounds=bounds, factr=1.0,
                                                         maxiter=10000)
         coefficients = self.training_labels * alpha_star
         w_star = vcol(np.sum(coefficients * self._D, axis=1))
         return self.Model(w_star, alpha_star)
 
-    def train_model(self):
-        self._model = self._solve_dual()
+    def train_model(self, balanced=False):
+        self._model = self._solve_dual(balanced)
 
     def classify(self, testing_data, priors: np.ndarray):
         if self._kernel is None:
@@ -115,8 +110,8 @@ class SVM(ClassifierClass):
             b = self._model.b
             self._scores = w.T @ testing_data + self._k * b
         else:
-            alpha = self._model.alpha
-            self._scores = self._kernel.generate_scores(alpha, self.training_data, self.training_labels, testing_data)
+            self._scores = (self._model.alpha * self.training_labels).reshape(1, self.training_data.shape[1]) \
+                           @  self._kernel.function(self.training_data, testing_data)
 
         predictions = np.array(self._scores > 0, dtype=int)
         print("Finished classification")
@@ -137,12 +132,3 @@ class SVM(ClassifierClass):
         d = float(self._neg_dual(alpha)[0])
 
         return p, d, p + d
-
-
-def getScore_kernelRBFSVM(alpha_star, DTR, LTR, DTE, K, gamma):
-    k = np.zeros((DTR.shape[1], DTE.shape[1]))
-    for i in range(DTR.shape[1]):
-        for j in range(DTE.shape[1]):
-            k[i, j] = np.exp(-gamma * (np.linalg.norm(DTR[:, i] - DTE[:, j]) ** 2)) + K ** 2
-
-
