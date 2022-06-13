@@ -30,7 +30,7 @@ def plot_histogram(array, labels, titles, nbins: int = 10) -> None:
                )
     fig.tight_layout()
     fig.show()
-    fig.savefig(fname=f'outputs/features')
+    fig.savefig(fname=f'outputs/gauss_features')
 
 
 def create_heatmap(dataset, labels, cmap='Reds', title=None):
@@ -43,15 +43,15 @@ def create_heatmap(dataset, labels, cmap='Reds', title=None):
     fig, axs = plt.subplots(1, 3)
     fig.set_size_inches((15, 5))
     heatmap = np.abs(np.corrcoef(dataset))
-    axs[0].set_title("Whole dataset", size='large')
+    axs[0].set_title("Whole dataset", size='xx-large')
     sns.heatmap(heatmap, cmap='Greys', annot=True, ax=axs[0])
 
     heatmap = np.abs(np.corrcoef(dataset[:, labels == 1]))
-    axs[1].set_title("Positive class", size='large')
+    axs[1].set_title("Positive class", size='xx-large')
     sns.heatmap(heatmap, cmap='Oranges', annot=True, ax=axs[1])
 
     heatmap = np.abs(np.corrcoef(dataset[:, labels == 0]))
-    axs[2].set_title("Negative class", size='large')
+    axs[2].set_title("Negative class", size='xx-large')
     sns.heatmap(heatmap, cmap='Blues', annot=True, ax=axs[2])
     fig.tight_layout()
     fig.show()

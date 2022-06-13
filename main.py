@@ -55,7 +55,8 @@ def LR_simulations(training_data, training_labels, lbd):
 
 
 def tuning_parameters_PolySVM(training_data, training_labels):
-    titles_Kfold = ['Gaussianized feature (5-fold, no PCA)', 'Guassianized feature (5-fold, PCA = 7)', 'Gaussianized feature (5-fold, PCA = 5)']
+    titles_Kfold = ['Gaussianized feature (5-fold, no PCA)', 'Guassianized feature (5-fold, PCA = 7)',
+                    'Gaussianized feature (5-fold, PCA = 5)']
 
     datasets = []
 
@@ -77,13 +78,14 @@ def tuning_parameters_PolySVM(training_data, training_labels):
         for c, K in hyperparameters:
             DCFs = []
             for C in C_values:
-                llrs, evaluationLabels = k_fold(dataset, training_labels, SVM, 5, k=K, c=C, kernel_params=(2, c), kernel_type='poly')
+                llrs, evaluationLabels = k_fold(dataset, training_labels, SVM, 5, k=K, c=C, kernel_params=(2, c),
+                                                kernel_type='poly')
                 print(llrs)
                 min_dcf = compute_min_DCF(llrs, evaluationLabels, 0.5, 1, 1)
-                print("min_DCF for C = ", C, "with c = ", c, "and K =", K, "->", min_dcf )
+                print("min_DCF for C = ", C, "with c = ", c, "and K =", K, "->", min_dcf)
                 DCFs.append(min_dcf)
             # f"prior:0.5, c:{c}, K:{K}"
-            plt.plot(C_values, DCFs, color=np.random.rand(3,), label=r"$\pi_{}T=0.5$, c="+str(c)+r", K="+str(K))
+            plt.plot(C_values, DCFs, color=np.random.rand(3, ), label=r"$\pi_{}T=0.5$, c=" + str(c) + r", K=" + str(K))
         plt.title(titles_Kfold[j])
         j += 1
         plt.legend()
@@ -92,19 +94,32 @@ def tuning_parameters_PolySVM(training_data, training_labels):
 
 
 def main():
-    (training_data, training_labels), (testing_data, testing_labels) = load_dataset()
+    (training_data, training_labels), _ = load_dataset()
 
     # =============== MULTIVARIATE GAUSSIAN CLASSIFIER ===============
-    MVG_simulations(training_data, training_labels)
+    # MVG_simulations(training_data, training_labels)
 
     # =============== LOGISTIC REGRESSION ===============
-    #find_optLambda(training_data, training_labels)
-    #lbd = 1e-3
-    #LR_simulations(training_data, training_labels, lbd)
+    # find_optLambda(training_data, training_labels)
+    # lbd = 1e-3
+    # LR_simulations(training_data, training_labels, lbd)
 
     # =============== SUPPORT VECTOR MACHINE ===============
-    #tuning_parameters_PolySVM(training_data, training_labels)
-    #tuning_parameters_LinearSVMBalanced(training_data, training_labels)
+    # tuning_parameters_PolySVM(training_data, training_labels)
+    # tuning_parameters_LinearSVMBalanced(training_data, training_labels)
+
+    titles = ['1. Mean of the integrated profile',
+              '2. Standard deviation of the integrated profile',
+              '3. Excess kurtosis of the integrated profile',
+              '4. Excess kurtosis of the integrated profile',
+              '5. Mean of the DM-SNR curve',
+              '6. Standard deviation of the DM-SNR curve',
+              '7. Excess kurtosis of the DM-SNR curve',
+              '8. Skewness of the DM-SNR curve']
+    # plot_histogram(training_data, training_labels, titles, nbins=20)
+    training_data = gaussianize(training_data, training_data)
+    plot_histogram(training_data, training_labels, titles, nbins=20)
+    # create_heatmap(whole_dataset, labels)
 
 
 if __name__ == '__main__':
