@@ -7,6 +7,7 @@ from PCA import PCA
 from classifiers.LR import LR
 from classifiers.MVG import MVG
 from classifiers.SVM import SVM
+from utils.plot_utils import plot_histogram, create_heatmap
 from utils.utils import load_dataset, gaussianize, splitData_SingleFold, k_fold
 from utils.metrics_utils import compute_min_DCF
 
@@ -153,7 +154,7 @@ def tuning_parameters_PolySVM(training_data, training_labels):
 
 
 def main():
-    (training_data, training_labels), _ = load_dataset()
+    (training_data, training_labels), (testing_data, testing_labels) = load_dataset()
     # find_optLambda(training_data, training_labels)
     # LR_simulations(training_data, training_labels)
     # for k, v in dcfs.items():
@@ -179,7 +180,24 @@ def main():
     # llrs = classifier.get_llrs()
     # min_dcf = compute_min_DCF(np.array(llrs), lte, 0.5, 1, 1)
     # print(min_dcf)
-    tuning_parameters_PolySVM(training_data, training_labels)
+    # tuning_parameters_PolySVM(training_data, training_labels)
+
+    whole_dataset = np.hstack((training_data, testing_data))
+    labels = np.hstack((training_labels, testing_labels))
+    titles = ['1. Mean of the integrated profile',
+              '2. Standard deviation of the integrated profile',
+              '3. Excess kurtosis of the integrated profile',
+              '4. Excess kurtosis of the integrated profile',
+              '5. Mean of the DM-SNR curve',
+              '6. Standard deviation of the DM-SNR curve',
+              '7. Excess kurtosis of the DM-SNR curve',
+              '8. Skewness of the DM-SNR curve']
+
+    # plot_histogram(whole_dataset, labels, titles, nbins=20)
+    # create_heatmap(whole_dataset, cmap='Greys', title="Whole dataset")
+    # create_heatmap(whole_dataset[:, labels == 1], cmap="Oranges", title="Positive Class")
+    # create_heatmap(whole_dataset[:, labels == 0], cmap="Blues", title="Negative Class")
+    create_heatmap(whole_dataset, labels)
 
 
 if __name__ == '__main__':
