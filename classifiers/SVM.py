@@ -1,5 +1,3 @@
-from itertools import product
-
 import numpy as np
 import scipy.optimize
 
@@ -13,6 +11,9 @@ class SVM(ClassifierClass):
             self.w = w_star[:-1]
             self.b = w_star[-1]
             self.alpha = alpha_star
+
+        def __str__(self):
+            return f"Parameters:\nw:\n{self.w}\nb:{self.b}\nalpha:{self.alpha}"
 
         def get(self):
             return self.w, self.b, self.alpha
@@ -39,7 +40,7 @@ class SVM(ClassifierClass):
 
         def function(self, x1: np.ndarray, x2: np.ndarray):
             """
-            Implementation of the (possibly , based on self._csi parameter, regularized) kernel function of the SVM,
+            Implementation of the (possibly regularized) kernel function of the SVM,
             chosen depending on self._type parameter.
             :param x1: the first dataset
             :param x2: the second dataset
@@ -48,9 +49,9 @@ class SVM(ClassifierClass):
             if self._type == 'poly':
                 return (x1.T @ x2 + self.c) ** self.d + self._csi
             elif self._type == 'RBF':
-                num_features, num_samples = x1.shape
-                return np.exp(np.linalg.norm(
-                    (x1.reshape((1, num_features, num_samples)).T - x2) * self.gamma, axis=1)) + self._csi
+                k = x1.reshape((*x1.shape, 1)) - x2.reshape((x2.shape[0], 1, x2.shape[1]))
+                k = -self.gamma * np.linalg.norm(k, axis=0)**2
+                return np.exp(k) + self._csi
             else:
                 raise RuntimeError("Unexpected value for self._type.\n"
                                    f"Expected either 'poly' or 'RBF', got {self._type} instead.")
@@ -65,9 +66,9 @@ class SVM(ClassifierClass):
         self._kernel = SVM.Kernel(kwargs['kernel_params'], kwargs['kernel_type'], self._k ** 2)
         self._D = np.vstack((self.training_data, self._k * np.ones(self.training_labels.size)))
         self._scores = None
-        self._H = (vcol(self.training_labels)
-                   * self._kernel.function(self.training_data, self.training_data)) \
-                  * vrow(self.training_labels)
+        self._H = ((vcol(self.training_labels)
+                   * self._kernel.function(self.training_data, self.training_data))
+                   * vrow(self.training_labels))
         print('finished constructor')
 
     def _primal(self, w, b):
@@ -95,8 +96,7 @@ class SVM(ClassifierClass):
             bounds = [(0, c_t) if label == 1 else (0, c_f) for label in self.training_labels]
         else:
             bounds = [(0, self._C)] * num_samples
-        alpha_star, _, _ = scipy.optimize.fmin_l_bfgs_b(self._neg_dual, x0=alpha0, bounds=bounds, factr=1.0,
-                                                        maxiter=10000)
+        alpha_star, _, _ = scipy.optimize.fmin_l_bfgs_b(self._neg_dual, x0=alpha0, bounds=bounds, factr=1.0)
         coefficients = self.training_labels * alpha_star
         w_star = vcol(np.sum(coefficients * self._D, axis=1))
         return self.Model(w_star, alpha_star)
@@ -111,7 +111,7 @@ class SVM(ClassifierClass):
             self._scores = w.T @ testing_data + self._k * b
         else:
             self._scores = (self._model.alpha * self.training_labels).reshape(1, self.training_data.shape[1]) \
-                           @  self._kernel.function(self.training_data, testing_data)
+                           @ self._kernel.function(self.training_data, testing_data)
 
         predictions = np.array(self._scores > 0, dtype=int)
         print("Finished classification")
