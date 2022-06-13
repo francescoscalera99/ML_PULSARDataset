@@ -1,8 +1,14 @@
+import itertools
+
 import numpy as np
 import scipy.optimize
+from matplotlib import pyplot as plt
 
+from PCA import PCA
 from classifiers.Classifier import ClassifierClass
 from utils.matrix_utils import vrow, vcol
+from utils.metrics_utils import compute_min_DCF
+from utils.utils import k_fold
 
 
 class SVM(ClassifierClass):
@@ -69,7 +75,6 @@ class SVM(ClassifierClass):
         self._H = ((vcol(self.training_labels)
                    * self._kernel.function(self.training_data, self.training_data))
                    * vrow(self.training_labels))
-        print('finished constructor')
 
     def _primal(self, w, b):
         w_ = np.vstack((vcol(w), b))
@@ -114,7 +119,6 @@ class SVM(ClassifierClass):
                            @ self._kernel.function(self.training_data, testing_data)
 
         predictions = np.array(self._scores > 0, dtype=int)
-        print("Finished classification")
         return predictions
 
     def get_llrs(self):
@@ -132,3 +136,78 @@ class SVM(ClassifierClass):
         d = float(self._neg_dual(alpha)[0])
 
         return p, d, p + d
+
+
+def tuning_parameters_PolySVM(training_data, training_labels):
+    titles_Kfold = ['Gaussianized feature (5-fold, no PCA)', 'Guassianized feature (5-fold, PCA = 7)', 'Gaussianized feature (5-fold, PCA = 5)']
+
+    datasets = []
+
+    training_dataPCA7 = PCA(training_data, 7)
+    training_dataPCA5 = PCA(training_data, 5)
+    datasets.append(training_data)
+    datasets.append(training_dataPCA7)
+    datasets.append(training_dataPCA5)
+    C_values = np.logspace(-3, 3, 20)
+    K_values = [0.0, 1.0]
+    c_values = [0, 1, 10, 15]
+
+    hyperparameters = itertools.product(c_values, K_values)
+    j = 0
+    for dataset in datasets:
+        i = 0
+        plt.figure()
+        plt.rcParams['text.usetex'] = True
+        for c, K in hyperparameters:
+            DCFs = []
+            for C in C_values:
+                llrs, evaluationLabels = k_fold(dataset, training_labels, SVM, 5, k=K, c=C, kernel_params=(2, c), kernel_type='poly')
+                print(llrs)
+                min_dcf = compute_min_DCF(llrs, evaluationLabels, 0.5, 1, 1)
+                print("min_DCF for C = ", C, "with c = ", c, "and K =", K, "->", min_dcf )
+                DCFs.append(min_dcf)
+            # f"prior:0.5, c:{c}, K:{K}"
+            plt.plot(C_values, DCFs, color=np.random.rand(3,), label=r"$\pi_{}T=0.5$, c="+str(c)+r", K="+str(K))
+        plt.title(titles_Kfold[j])
+        j += 1
+        plt.legend()
+        plt.xscale('log')
+        plt.show()
+
+
+def tuning_parameters_LinearSVMBalanced(training_data, training_labels):
+    titles_Kfold = ['Gaussianized feature (5-fold, no PCA)', 'Guassianized feature (5-fold, PCA = 7)',
+                    'Gaussianized feature (5-fold, PCA = 5)']
+
+    datasets = []
+
+    training_dataPCA7 = PCA(training_data, 7)
+    training_dataPCA5 = PCA(training_data, 5)
+    datasets.append(training_data)
+    datasets.append(training_dataPCA7)
+    datasets.append(training_dataPCA5)
+    C_values = np.logspace(-2, 2, 20)
+    K_values = [1.0, 10.0]
+    priors = [0.5, 0.1, 0.9]
+
+    hyperparameters = itertools.product(K_values, priors)
+    j = 0
+    for dataset in datasets:
+        plt.figure()
+        plt.rcParams['text.usetex'] = True
+        for K, p in hyperparameters:
+            DCFs = []
+            for C in C_values:
+                llrs, evaluationLabels = k_fold(dataset, training_labels, SVM, 5, k=K, c=C, kernel_params=(2, 0),
+                                                kernel_type='poly')
+                print(llrs)
+                min_dcf = compute_min_DCF(llrs, evaluationLabels, p, 1, 1)
+                print("min_DCF for K = ", K, "with prior = ", p, "->", min_dcf)
+                DCFs.append(min_dcf)
+            # f"prior:0.5, c:{c}, K:{K}"
+            plt.plot(C_values, DCFs, color=np.random.rand(3, ), label=r"$\pi_{T}=0.5$, K=" + str(K) + r", $\widetilde(\pi)$=" + str(p))
+        plt.title(titles_Kfold[j])
+        j += 1
+        plt.legend()
+        plt.xscale('log')
+        plt.show()

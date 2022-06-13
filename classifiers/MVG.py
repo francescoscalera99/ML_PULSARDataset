@@ -48,13 +48,16 @@ class MVG(ClassifierClass):
             class0_conditional_probability = self.logpdf_GAU_ND(testing_data, self._model.mu0, self._model.c0)
             class1_conditional_probability = self.logpdf_GAU_ND(testing_data, self._model.mu1, self._model.c1)
         logScores = np.vstack((class0_conditional_probability, class1_conditional_probability))
-        logJoint = logScores + vcol(np.log(priors))
-        logMarginal = vrow(scipy.special.logsumexp(logJoint, axis=0))
-        logPost = logJoint - logMarginal
-        class_posterior_probabilities = np.exp(logPost)
-        predicted_labels = np.argmax(class_posterior_probabilities, axis=0)
         self._score_matrix = logScores
-        return predicted_labels
+        if priors is not None:
+            logJoint = logScores + vcol(np.log(priors))
+            logMarginal = vrow(scipy.special.logsumexp(logJoint, axis=0))
+            logPost = logJoint - logMarginal
+            class_posterior_probabilities = np.exp(logPost)
+            predicted_labels = np.argmax(class_posterior_probabilities, axis=0)
+            return predicted_labels
+        else:
+            return
 
     def logpdf_GAU_1sample(self, x, mu, C):
         M = mu.shape[0]
