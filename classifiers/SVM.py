@@ -39,18 +39,21 @@ class SVM(ClassifierClass):
 
         def generate_scores(self, alpha_star, dtr, ltr, dte):
             if self._type == 'poly':
-                return np.sum((alpha_star * ltr).reshape(1, dtr.shape[1]) @ (dtr.T @ dte+self.c)**self.d+self._csi, axis=0)
+                return np.sum(
+                    (alpha_star * ltr).reshape(1, dtr.shape[1]) @ (dtr.T @ dte + self.c) ** self.d + self._csi, axis=0)
             elif self._type == 'RBF':
-                pass
+                num_features, num_samples = dtr.shape
+                return np.exp(np.linalg.norm(
+                    (dtr.reshape((1, num_features, num_samples)).T - dtr) * self.gamma, axis=1)) + self._csi
             else:
                 raise RuntimeError("Unexpected value for self._type.\n"
                                    f"Expected either 'poly' or 'RBF', got {self._type} instead.")
 
         def function(self, x1: np.ndarray, x2: np.ndarray):
             if self._type == 'poly':
-                return (vrow(x1) @ vcol(x2) + self.c)**self.d + self._csi
+                return (vrow(x1) @ vcol(x2) + self.c) ** self.d + self._csi
             elif self._type == 'RBF':
-                return np.exp(-self.gamma * (x1-x2).T @ (x1-x2)) + self._csi
+                return np.exp(-self.gamma * (x1 - x2).T @ (x1 - x2)) + self._csi
             else:
                 raise RuntimeError("Unexpected value for self._type.\n"
                                    f"Expected either 'poly' or 'RBF', got {self._type} instead.")
@@ -62,14 +65,13 @@ class SVM(ClassifierClass):
         self._k = kwargs['k']
         self._C = kwargs['c']
         self._model = None
-        self._kernel = SVM.Kernel(kwargs['kernel_params'], kwargs['kernel_type'], self._k**2)
+        self._kernel = SVM.Kernel(kwargs['kernel_params'], kwargs['kernel_type'], self._k ** 2)
         self._D = np.vstack((self.training_data, self._k * np.ones(self.training_labels.size)))
         self._scores = None
         if self._kernel is None:
             g_matrix = self._D.T @ self._D
         elif kwargs['kernel_type'] == 'poly':
-            num_samples = training_labels.size
-            g_matrix = (self.training_data.T @ self.training_data + self._kernel.c)**self._kernel.d + self._k**2
+            g_matrix = (self.training_data.T @ self.training_data + self._kernel.c) ** self._kernel.d + self._k ** 2
         else:
             # TODO: RBF
             pass
@@ -96,9 +98,10 @@ class SVM(ClassifierClass):
         pi_f_emp = np.sum(self.training_labels == -1) / self.training_labels.size
         pi_t = 0.5
         c_t = self._C * pi_t / pi_t_emp
-        c_f = self._C * (1-pi_t) / pi_f_emp
+        c_f = self._C * (1 - pi_t) / pi_f_emp
         bounds = [(0, c_t) if label == 1 else (0, c_f) for label in self.training_labels]
-        alpha_star, _, _ = scipy.optimize.fmin_l_bfgs_b(self._neg_dual, x0=alpha0, bounds=bounds, factr=1.0, maxiter=10000)
+        alpha_star, _, _ = scipy.optimize.fmin_l_bfgs_b(self._neg_dual, x0=alpha0, bounds=bounds, factr=1.0,
+                                                        maxiter=10000)
         coefficients = self.training_labels * alpha_star
         w_star = vcol(np.sum(coefficients * self._D, axis=1))
         return self.Model(w_star, alpha_star)
@@ -137,7 +140,9 @@ class SVM(ClassifierClass):
 
 
 def getScore_kernelRBFSVM(alpha_star, DTR, LTR, DTE, K, gamma):
-  k = np.zeros((DTR.shape[1], DTE.shape[1]))
-  for i in range(DTR.shape[1]):
-    for j in range(DTE.shape[1]):
-      k[i, j] = np.exp(-gamma*(np.linalg.norm(DTR[:, i]- DTE[:, j])**2))+K**2
+    k = np.zeros((DTR.shape[1], DTE.shape[1]))
+    for i in range(DTR.shape[1]):
+        for j in range(DTE.shape[1]):
+            k[i, j] = np.exp(-gamma * (np.linalg.norm(DTR[:, i] - DTE[:, j]) ** 2)) + K ** 2
+
+
