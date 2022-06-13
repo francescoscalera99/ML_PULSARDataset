@@ -122,13 +122,14 @@ def tuning_parameters_PolySVM(training_data, training_labels):
 
     training_dataPCA7 = PCA(training_data, 7)
     training_dataPCA5 = PCA(training_data, 5)
-    datasets.append(training_data, training_dataPCA7, training_dataPCA5)
-
+    datasets.append(training_data)
+    datasets.append(training_dataPCA7)
+    datasets.append(training_dataPCA5)
     C_values = np.logspace(-3, 3, 20)
     K_values = [0.0, 1.0, 10.0]
     c_values = [0, 1, 10, 15]
 
-    hyperparameters = itertools.product(C_values, c_values, K_values)
+    hyperparameters = itertools.product(c_values, K_values)
     j = 0
     for dataset in datasets:
         i = 0
@@ -137,9 +138,10 @@ def tuning_parameters_PolySVM(training_data, training_labels):
         for c, K in hyperparameters:
             DCFs = []
             for C in C_values:
-                llrs = k_fold(dataset, training_labels, SVM, 5, seed=0, k=K, c=C, kernel_params=(2, c), kernel_type='poly')
-                min_dcf = compute_min_DCF(llrs, training_labels, 0.5, 1, 1)
-                print("min_DCF for C = ", C, "with c = ", c, "and K =", K)
+                llrs, evaluationLabels = k_fold(dataset, training_labels, SVM, 5, k=K, c=C, kernel_params=(2, c), kernel_type='poly')
+                print(llrs)
+                min_dcf = compute_min_DCF(llrs, evaluationLabels, 0.5, 1, 1)
+                print("min_DCF for C = ", C, "with c = ", c, "and K =", K, "->", min_dcf )
                 DCFs.append(min_dcf)
             # f"prior:0.5, c:{c}, K:{K}"
             plt.plot(C_values, DCFs, color=np.random.rand(3,), label=r"$\pi_{}T=0.5$, c="+str(c)+r", K="+str(K))
@@ -148,6 +150,7 @@ def tuning_parameters_PolySVM(training_data, training_labels):
         plt.legend()
         plt.xscale('log')
         plt.show()
+
 
 def main():
     (training_data, training_labels), _ = load_dataset()
