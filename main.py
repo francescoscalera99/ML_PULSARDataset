@@ -117,9 +117,10 @@ def main():
               '7. Excess kurtosis of the DM-SNR curve',
               '8. Skewness of the DM-SNR curve']
     # plot_histogram(training_data, training_labels, titles, nbins=20)
+    # create_heatmap(training_data, training_labels)
     training_data = gaussianize(training_data, training_data)
-    plot_histogram(training_data, training_labels, titles, nbins=20)
-    # create_heatmap(whole_dataset, labels)
+    # plot_histogram(training_data, training_labels, titles, nbins=20)
+    create_heatmap(training_data, training_labels)
 
 
 if __name__ == '__main__':

@@ -55,4 +55,4 @@ def create_heatmap(dataset, labels, cmap='Reds', title=None):
     sns.heatmap(heatmap, cmap='Blues', annot=True, ax=axs[2])
     fig.tight_layout()
     fig.show()
-    fig.savefig(fname=f'outputs/heatmap')
+    fig.savefig(fname=f'outputs/gauss_heatmap')
