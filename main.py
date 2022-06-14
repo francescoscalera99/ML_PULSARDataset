@@ -24,16 +24,17 @@ def MVG_simulations(training_data, training_labels):
 
     for variant, m, pi in hyperparameters:
         if m is not None:
-            training_data = PCA(training_data, m)
-
-        llrs, labels = k_fold(training_data, training_labels, MVG, 5, seed=0, variant=variant)
+            dtr = PCA(training_data, m)
+        else:
+            dtr = training_data
+        llrs, labels = k_fold(dtr, training_labels, MVG, 5, seed=0, variant=variant)
         min_dcf = compute_min_DCF(np.array(llrs), labels, pi, 1, 1)
         table.add_row([f"PCA m={m}, data: gaussianized, variant={variant}, π_tilde={pi}", round(min_dcf, 3)])
     print(table)
 
 
 def LR_simulations(training_data, training_labels, lbd):
-    m = [None, 7, 5, 4]
+    m = [None, 7, 5]
     pis_T = [0.5, 0.1, 0.9]
     pis = [0.5, 0.1, 0.9]
 
@@ -44,18 +45,20 @@ def LR_simulations(training_data, training_labels, lbd):
 
     for m, pi, pi_T in hyperparameters:
         if m is not None:
-            training_data = PCA(training_data, m)
+            dtr = PCA(training_data, m)
+        else:
+            dtr = training_data
 
-        llrs, labels = k_fold(training_data, training_labels, LR, 5, seed=0, lbd=lbd, pi_T=pi_T)
+        llrs, labels = k_fold(dtr, training_labels, LR, 5, seed=0, lbd=lbd, pi_T=pi_T)
 
         min_dcf = compute_min_DCF(np.array(llrs), labels, pi, 1, 1)
-        table.add_row([f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T}  λ={lbd}", round(min_dcf, 3)])
+        table.add_row([f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T}", round(min_dcf, 3)])
 
     print(table)
 
 
 def SVM_LinearSimulations(training_data, training_labels, K, C_piT):
-    m = [None, 7, 5, 4]
+    m = [None, 7, 5]
     priors = [0.5, 0.1, 0.9]
 
     hyperparameters = itertools.product(m, C_piT, priors)
@@ -65,11 +68,15 @@ def SVM_LinearSimulations(training_data, training_labels, K, C_piT):
 
     for m, (C, pi_T), pi in hyperparameters:
         if m is not None:
-            training_data = PCA(training_data, m)
-        if pi_T == None:
-            llrs, labels = k_fold(training_data, training_labels, SVM, 5, seed=0, balanced=False, pi_T=pi_T, k=K, c=C, kernel_params=(1, 0), kernel_type='poly')
+            dtr = PCA(training_data, m)
         else:
-            llrs, labels = k_fold(training_data, training_labels, SVM, 5, seed=0, balanced=True, pi_T=pi_T, k=K, c=C, kernel_params=(1, 0), kernel_type='poly')
+            dtr = training_data
+        if pi_T == None:
+            llrs, labels = k_fold(dtr, training_labels, SVM, 5, seed=0, balanced=False, pi_T=pi_T, k=K, c=C,
+                                  kernel_params=(1, 0), kernel_type='poly')
+        else:
+            llrs, labels = k_fold(training_data, training_labels, SVM, 5, seed=0, balanced=True, pi_T=pi_T, k=K, c=C,
+                                  kernel_params=(1, 0), kernel_type='poly')
         min_dcf = compute_min_DCF(np.array(llrs), labels, pi, 1, 1)
         print(f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T}  C ={C}", "-->", round(min_dcf, 3))
         table.add_row([f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T}  C ={C}", round(min_dcf, 3)])
@@ -78,7 +85,7 @@ def SVM_LinearSimulations(training_data, training_labels, K, C_piT):
 
 
 def SVM_PolySimulations(training_data, training_labels, K, C, pi_T, c, d):
-    m = [None, 7, 5, 4]
+    m = [None, 7, 5]
     priors = [0.5, 0.1, 0.9]
     hyperparameters = itertools.product(m, priors)
 
@@ -87,9 +94,33 @@ def SVM_PolySimulations(training_data, training_labels, K, C, pi_T, c, d):
 
     for m, pi in hyperparameters:
         if m is not None:
-            training_data = PCA(training_data, m)
-        llrs, labels = k_fold(training_data, training_labels, SVM, 5, seed=0, balanced=True, pi_T=pi_T, k=K, c=C,
-                                  kernel_params=(d, c), kernel_type='poly')
+            dtr = PCA(training_data, m)
+        else:
+            dtr = training_data
+        llrs, labels = k_fold(dtr, training_labels, SVM, 5, seed=0, balanced=True, pi_T=pi_T, k=K, c=C,
+                              kernel_params=(d, c), kernel_type='poly')
+        min_dcf = compute_min_DCF(np.array(llrs), labels, pi, 1, 1)
+        print(f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T}  C ={C}", "-->", round(min_dcf, 3))
+        table.add_row([f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T}  C ={C}", round(min_dcf, 3)])
+
+    print(table)
+
+
+def SVM_RBFSimulations(training_data, training_labels, K, C, pi_T, gamma):
+    m = [None, 7, 5]
+    priors = [0.5, 0.1, 0.9]
+    hyperparameters = itertools.product(m, priors)
+
+    table = PrettyTable()
+    table.field_names = ['Hyperparameters', 'min DCF']
+
+    for m, pi in hyperparameters:
+        if m is not None:
+            dtr = PCA(training_data, m)
+        else:
+            dtr = training_data
+        llrs, labels = k_fold(dtr, training_labels, SVM, 5, seed=0, balanced=True, pi_T=pi_T, k=K, c=C,
+                              kernel_params=gamma, kernel_type='RBF')
         min_dcf = compute_min_DCF(np.array(llrs), labels, pi, 1, 1)
         print(f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T}  C ={C}", "-->", round(min_dcf, 3))
         table.add_row([f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T}  C ={C}", round(min_dcf, 3)])
@@ -99,26 +130,44 @@ def SVM_PolySimulations(training_data, training_labels, K, C, pi_T, c, d):
 
 def main():
     (training_data, training_labels), (testing_data, testing_labels) = load_dataset()
+    titles = ['1. Mean of the integrated profile',
+              '2. Standard deviation of the integrated profile',
+              '3. Excess kurtosis of the integrated profile',
+              '4. Excess kurtosis of the integrated profile',
+              '5. Mean of the DM-SNR curve',
+              '6. Standard deviation of the DM-SNR curve',
+              '7. Excess kurtosis of the DM-SNR curve',
+              '8. Skewness of the DM-SNR curve']
+    # =============== FEATURE ANALYSIS ===============
+    # plot_histogram(training_data, training_labels, titles)
+    # create_heatmap(training_data, training_labels)
 
     # =============== MULTIVARIATE GAUSSIAN CLASSIFIER ===============
     # MVG_simulations(training_data, training_labels)
 
     # =============== LOGISTIC REGRESSION ===============
-    #find_optLambda(training_data, training_labels)
-    #lbd = 1e-3
-    #LR_simulations(training_data, training_labels, lbd)
+    # find_optLambda(training_data, training_labels)
+    # lbd = 1e-3
+    # LR_simulations(training_data, training_labels, lbd)
 
     # =============== SUPPORT VECTOR MACHINE ===============
-    #tuning_parameters_PolySVM(training_data, training_labels)
-    #tuning_parameters_LinearSVMBalanced(training_data, training_labels)
-    K = 1.0 #This values comes from tuning of hyperparameters
-    #C_piT = [(1e-2, None), (1e-3, 0.5), (6 * 1e-3, 0.1), (7 * 1e-4, 0.9)] #These values comes from tuning of hyperparameter
-    #SVM_LinearSimulations(training_data, training_labels, K, C_piT)
-    pi_TPoly = 0.5
-    CPoly = 5*1e-5
-    c = 15
-    d = 2
-    SVM_PolySimulations(training_data, training_labels, K, CPoly, pi_TPoly, c, d)
+    # tuning_parameters_PolySVM(training_data, training_labels)
+    # tuning_parameters_LinearSVMBalanced(training_data, training_labels)
+    # K_Linear = 1.0 #This values comes from tuning of hyperparameters
+    # C_piT_Linear = [(1e-2, None), (1e-3, 0.5), (6 * 1e-3, 0.1), (7 * 1e-4, 0.9)] #These values comes from tuning of hyperparameter
+    # SVM_LinearSimulations(training_data, training_labels, K_Linear, C_piT_Linear)
+    # K_Poly = 1.0
+    # pi_TPolyRBF = 0.5
+    # CPoly = 5*1e-5
+    # c = 15
+    # d = 2
+    # SVM_PolySimulations(training_data, training_labels, K_Poly, CPoly, pi_TPolyRBF, c, d)
+    # K_RBF = 1.0
+    # gamma_RBF = 1e-3
+    # C_RBF = 1e-1
+    # SVM_RBFSimulations(training_data, training_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF)
+
+    # =============== GAUSSIAN MIXTURE MODELS ===============
 
 
 if __name__ == '__main__':

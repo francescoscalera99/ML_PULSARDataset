@@ -175,6 +175,38 @@ def tuning_parameters_PolySVM(training_data, training_labels):
         plt.show()
 
 
+def tuning_parameters_RBFSVM(training_data, training_labels):
+    titles_Kfold = ['Gaussianized feature (5-fold, no PCA)', 'Guassianized feature (5-fold, PCA = 7)', 'Gaussianized feature (5-fold, PCA = 5)']
+    m_values = [None, 7, 5]
+    C_values = np.logspace(-3, 3, 20)
+    K_values = [0.0, 1.0]
+    gamma_values = [1e-2, 1e-3, 1e-4]
+
+    hyperparameters = itertools.product(gamma_values, K_values)
+    j = 0
+    for m in m_values:
+        plt.figure()
+        plt.rcParams['text.usetex'] = True
+        if m is not None:
+            dtr = PCA(training_data, m)
+        else:
+            dtr = training_data
+        for gamma, K in hyperparameters:
+            DCFs = []
+            for C in C_values:
+                llrs, evaluationLabels = k_fold(dtr, training_labels, SVM, 5, k=K, c=C, kernel_params=gamma, kernel_type='RBF')
+                print(llrs)
+                min_dcf = compute_min_DCF(llrs, evaluationLabels, 0.5, 1, 1)
+                print("min_DCF for C = ", C, "with gamma = ", gamma, "and K =", K, "->", min_dcf )
+                DCFs.append(min_dcf)
+            plt.plot(C_values, DCFs, color=np.random.rand(3,), label=r"$\pi_{}T=0.5$, gamma="+str(gamma)+r", K="+str(K))
+        plt.title(titles_Kfold[j])
+        j += 1
+        plt.legend()
+        plt.xscale('log')
+        plt.show()
+
+
 def tuning_parameters_LinearSVMBalanced(training_data, training_labels):
     titles_Kfold = ['Gaussianized feature (5-fold, no PCA)', 'Guassianized feature (5-fold, PCA = 7)',
                     'Gaussianized feature (5-fold, PCA = 5)']
