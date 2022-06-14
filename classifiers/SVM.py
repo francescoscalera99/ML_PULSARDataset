@@ -89,7 +89,7 @@ class SVM(ClassifierClass):
         gradient = self._H @ alpha - 1
         return dual_objective_neg, vrow(gradient)
 
-    def _solve_dual(self, balanced) -> Model:
+    def _solve_dual(self, balanced, pi_t) -> Model:
         num_samples = self.training_labels.size
         alpha0 = np.zeros(num_samples)
         if balanced:
@@ -106,8 +106,8 @@ class SVM(ClassifierClass):
         w_star = vcol(np.sum(coefficients * self._D, axis=1))
         return self.Model(w_star, alpha_star)
 
-    def train_model(self, balanced=False):
-        self._model = self._solve_dual(balanced)
+    def train_model(self, balanced=False, pi_T=None):
+        self._model = self._solve_dual(balanced, pi_t=pi_T)
 
     def classify(self, testing_data, priors: np.ndarray):
         if self._kernel is None:
@@ -122,7 +122,7 @@ class SVM(ClassifierClass):
         return predictions
 
     def get_llrs(self):
-        return self._scores
+        return self._scores[0]
 
     def compute_duality_gap(self) -> tuple:
         w = self._model.w

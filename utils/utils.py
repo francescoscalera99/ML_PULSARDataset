@@ -141,7 +141,9 @@ def k_fold(dataset: np.ndarray,
         dte_gaussianized = gaussianize(training_data, testing_data)
 
         c = classifier(dtr_gaussianized, training_labels, **kwargs)
-        c.train_model()
+        balance = kwargs['balanced'] or False
+        pi_T = kwargs['pi_T'] or None
+        c.train_model(balance, pi_T)
         c.classify(dte_gaussianized, None)
         llrs.extend(c.get_llrs().tolist())
         labels.extend(testing_labels.tolist())
