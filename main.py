@@ -178,5 +178,12 @@ def main():
     # =============== GAUSSIAN MIXTURE MODELS ===============
 
 
+def logpdf_GAU_ND(x, mu, C):
+  M = x.shape[0]
+  _, detC = np.linalg.slogdet(C)
+  invC = np.linalg.inv(C)
+  return np.diag(-(M/2)*np.log(2*np.pi) - (1/2)*(detC) - (1/2)*np.dot(np.dot((x-mu).T, invC),(x-mu)))
+
+
 if __name__ == '__main__':
     main()
