@@ -153,11 +153,11 @@ def main():
     # LR_simulations(training_data, training_labels, lbd)
 
     # =============== SUPPORT VECTOR MACHINE ===============
-    print("LINEAR SVM - TUNING PARAMETERS")
-    tuning_parameters_LinearSVMUnbalanced(training_data, training_labels)
+    # print("LINEAR SVM - TUNING PARAMETERS")
+    # tuning_parameters_LinearSVMUnbalanced(training_data, training_labels)
     # tuning_parameters_LinearSVMBalanced(training_data, training_labels)
-    # print("POLY SVM - TUNING PARAMETERS")
-    # tuning_parameters_PolySVM(training_data, training_labels)
+    print("POLY SVM - TUNING PARAMETERS")
+    tuning_parameters_PolySVM(training_data, training_labels)
     # print("RBF SVM - TUNING PARAMETERS")
     # tuning_parameters_RBFSVM(training_data, training_labels)
     # tuning_parameters_LinearSVMBalanced(training_data, training_labels)

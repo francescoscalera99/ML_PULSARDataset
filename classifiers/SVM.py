@@ -146,8 +146,8 @@ def tuning_parameters_PolySVM(training_data, training_labels):
     training_dataPCA7 = PCA(training_data, 7)
     training_dataPCA5 = PCA(training_data, 5)
     datasets.append(training_data)
-    datasets.append(training_dataPCA7)
-    datasets.append(training_dataPCA5)
+    #datasets.append(training_dataPCA7)
+    #datasets.append(training_dataPCA5)
     C_values = np.logspace(-3, 3, 20)
     K_values = [0.0, 1.0]
     c_values = [0, 1, 10, 15]
@@ -155,9 +155,9 @@ def tuning_parameters_PolySVM(training_data, training_labels):
     hyperparameters = itertools.product(c_values, K_values)
     j = 0
     for dataset in datasets:
-        i = 0
-        plt.figure()
-        plt.rcParams['text.usetex'] = True
+        # i = 0
+        #plt.figure()
+        #plt.rcParams['text.usetex'] = True
         for c, K in hyperparameters:
             DCFs = []
             for C in C_values:
@@ -166,12 +166,12 @@ def tuning_parameters_PolySVM(training_data, training_labels):
                 print("min_DCF for C = ", C, "with c = ", c, "and K =", K, "->", min_dcf )
                 DCFs.append(min_dcf)
             # f"prior:0.5, c:{c}, K:{K}"
-            plt.plot(C_values, DCFs, color=np.random.rand(3,), label=r"$\pi_{}T=0.5$, c="+str(c)+r", K="+str(K))
-        plt.title(titles_Kfold[j])
-        j += 1
-        plt.legend()
-        plt.xscale('log')
-        plt.show()
+            np.save(f"K{str(K).replace('.', '-')}_c{str(c).replace('.', '-')}", np.array(DCFs))
+        # plt.title(titles_Kfold[j])
+        # j += 1
+        # plt.legend()
+        # plt.xscale('log')
+        # plt.show()
 
 
 def tuning_parameters_RBFSVM(training_data, training_labels):
