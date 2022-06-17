@@ -220,7 +220,7 @@ def tuning_parameters_LinearSVMUnbalanced(training_data, training_labels):
     # K_values = [1.0, 10.0]
     # priors = [0.5, 0.1, 0.9]
     K_values = [1.0]
-    priors = [0.1]
+    priors = [0.9]
 
     hyperparameters = itertools.product(K_values, priors)
     j = 0
@@ -229,11 +229,11 @@ def tuning_parameters_LinearSVMUnbalanced(training_data, training_labels):
         plt.rcParams['text.usetex'] = True
         for K, p in hyperparameters:
             DCFs = []
-            for C in C_values:
+            for i, C in enumerate(C_values):
                 llrs, evaluationLabels = k_fold(dataset, training_labels, SVM, 5, k=K, c=C, kernel_params=(1, 0),
                                                 kernel_type='poly', balanced=False, pi_T=None)
                 min_dcf = compute_min_DCF(llrs, evaluationLabels, p, 1, 1)
-                print("min_DCF for K = ", K, "with prior = ", p, "->", min_dcf)
+                print(f"iteration {i+1} ", "min_DCF for K = ", K, "with prior = ", p, "->", min_dcf)
                 DCFs.append(min_dcf)
             # f"prior:0.5, c:{c}, K:{K}"
             # plt.plot(C_values, DCFs, color=np.random.rand(3, ), label=r"$\pi_{T}=0.5$, K=" + str(K) + r", $\widetilde(\pi)$=" + str(p))
