@@ -220,7 +220,7 @@ def tuning_parameters_LinearSVMUnbalanced(training_data, training_labels):
     # K_values = [1.0, 10.0]
     # priors = [0.5, 0.1, 0.9]
     K_values = [1.0]
-    priors = [0.5]
+    priors = [0.1]
 
     hyperparameters = itertools.product(K_values, priors)
     j = 0
@@ -237,7 +237,7 @@ def tuning_parameters_LinearSVMUnbalanced(training_data, training_labels):
                 DCFs.append(min_dcf)
             # f"prior:0.5, c:{c}, K:{K}"
             # plt.plot(C_values, DCFs, color=np.random.rand(3, ), label=r"$\pi_{T}=0.5$, K=" + str(K) + r", $\widetilde(\pi)$=" + str(p))
-            np.save(f"K{K}_p{p}", np.array(DCFs))
+            np.save(f"K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}", np.array(DCFs))
         # plt.title(titles_Kfold[j])
         # j += 1
         # plt.legend()
