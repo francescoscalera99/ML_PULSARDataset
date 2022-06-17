@@ -237,7 +237,7 @@ def tuning_parameters_LinearSVMUnbalanced(training_data, training_labels):
                 DCFs.append(min_dcf)
             # f"prior:0.5, c:{c}, K:{K}"
             # plt.plot(C_values, DCFs, color=np.random.rand(3, ), label=r"$\pi_{T}=0.5$, K=" + str(K) + r", $\widetilde(\pi)$=" + str(p))
-            np.save(f"K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}", np.array(DCFs))
+            np.save(f"simulations/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}", np.array(DCFs))
         # plt.title(titles_Kfold[j])
         # j += 1
         # plt.legend()
