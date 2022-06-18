@@ -220,7 +220,7 @@ def tuning_parameters_LinearSVMUnbalanced(training_data, training_labels):
     # K_values = [1.0, 10.0]
     # priors = [0.5, 0.1, 0.9]
     K_values = [10.0]
-    priors = [0.5]
+    priors = [0.9]
 
     hyperparameters = itertools.product(K_values, priors)
     j = 0
