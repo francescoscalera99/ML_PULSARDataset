@@ -222,7 +222,6 @@ def tuning_parameters_LinearSVMUnbalanced(training_data, training_labels):
     priors = [0.5, 0.1, 0.9]
 
     hyperparameters = itertools.product(K_values, priors)
-
     for j, dataset in enumerate(datasets):
         plt.figure()
         plt.rcParams['text.usetex'] = True
