@@ -210,6 +210,7 @@ def tuning_parameters_LinearSVMUnbalanced(training_data, training_labels):
                     'Gaussianized feature (5-fold, PCA = 5)']
 
     datasets = []
+    datasets_labels = ["", "PCA7", "PCA5"]
 
     training_dataPCA7 = PCA(training_data, 7)
     training_dataPCA5 = PCA(training_data, 5)
@@ -217,14 +218,12 @@ def tuning_parameters_LinearSVMUnbalanced(training_data, training_labels):
     datasets.append(training_dataPCA7)
     datasets.append(training_dataPCA5)
     C_values = np.logspace(-2, 2, 20)
-    # K_values = [1.0, 10.0]
-    # priors = [0.5, 0.1, 0.9]
-    K_values = [10.0]
-    priors = [0.9]
+    K_values = [1.0, 10.0]
+    priors = [0.5, 0.1, 0.9]
 
     hyperparameters = itertools.product(K_values, priors)
-    j = 0
-    for dataset in datasets:
+
+    for j, dataset in enumerate(datasets):
         plt.figure()
         plt.rcParams['text.usetex'] = True
         for K, p in hyperparameters:
@@ -233,13 +232,12 @@ def tuning_parameters_LinearSVMUnbalanced(training_data, training_labels):
                 llrs, evaluationLabels = k_fold(dataset, training_labels, SVM, 5, k=K, c=C, kernel_params=(1, 0),
                                                 kernel_type='poly', balanced=False, pi_T=None)
                 min_dcf = compute_min_DCF(llrs, evaluationLabels, p, 1, 1)
-                print(f"iteration {i+1} ", "min_DCF for K = ", K, "with prior = ", p, "->", min_dcf)
+                print(f"Dataset {datasets_labels[j]} iteration {i+1} ", "min_DCF for K = ", K, "with prior = ", p, "->", min_dcf)
                 DCFs.append(min_dcf)
             # f"prior:0.5, c:{c}, K:{K}"
             # plt.plot(C_values, DCFs, color=np.random.rand(3, ), label=r"$\pi_{T}=0.5$, K=" + str(K) + r", $\widetilde(\pi)$=" + str(p))
-            np.save(f"simulations/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}", np.array(DCFs))
+            np.save(f"simulations/linearSVM/unbalanced/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}_{datasets_labels[j]}", np.array(DCFs))
         # plt.title(titles_Kfold[j])
-        # j += 1
         # plt.legend()
         # plt.xscale('log')
         # plt.show()
@@ -250,6 +248,7 @@ def tuning_parameters_LinearSVMBalanced(training_data, training_labels):
                     'Gaussianized feature (5-fold, PCA = 5)']
 
     datasets = []
+    datasets_labels = ["", "PCA7", "PCA5"]
 
     training_dataPCA7 = PCA(training_data, 7)
     training_dataPCA5 = PCA(training_data, 5)
@@ -257,13 +256,15 @@ def tuning_parameters_LinearSVMBalanced(training_data, training_labels):
     datasets.append(training_dataPCA7)
     datasets.append(training_dataPCA5)
     C_values = np.logspace(-2, 2, 20)
-    K_values = [1.0, 10.0]
+    # K_values = [1.0, 10.0]
+    # priors = [0.5, 0.1, 0.9]
+    # pi_T_values = [0.5, 0.1, 0.9]
+    K_values = [1.0]
     priors = [0.5, 0.1, 0.9]
     pi_T_values = [0.5, 0.1, 0.9]
     hyperparameters = itertools.product(K_values, priors)
-    j = 0
 
-    for dataset in datasets:
+    for j, dataset in enumerate(datasets):
         for pi_T in pi_T_values:
             plt.figure()
             plt.rcParams['text.usetex'] = True
@@ -276,9 +277,9 @@ def tuning_parameters_LinearSVMBalanced(training_data, training_labels):
                     print("min_DCF for K = ", K, "with prior = ", p, "->", min_dcf)
                     DCFs.append(min_dcf)
                 # f"prior:0.5, c:{c}, K:{K}"
-                plt.plot(C_values, DCFs, color=np.random.rand(3, ), label=r"$\pi_{T}=" + str(pi_T)+ ", K=" + str(K) + r", $\widetilde(\pi)$=" + str(p))
+                # plt.plot(C_values, DCFs, color=np.random.rand(3, ), label=r"$\pi_{T}=" + str(pi_T)+ ", K=" + str(K) + r", $\widetilde(\pi)$=" + str(p))
+                np.save(f"simulations/linearSVM/balanced/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}_{datasets_labels[j]}", np.array(DCFs))
             plt.title(titles_Kfold[j])
-            j += 1
             plt.legend()
             plt.xscale('log')
             plt.show()
