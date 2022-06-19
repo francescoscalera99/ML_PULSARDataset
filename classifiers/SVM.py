@@ -278,7 +278,7 @@ def tuning_parameters_LinearSVMBalanced(training_data, training_labels):
                     DCFs.append(min_dcf)
                 # f"prior:0.5, c:{c}, K:{K}"
                 # plt.plot(C_values, DCFs, color=np.random.rand(3, ), label=r"$\pi_{T}=" + str(pi_T)+ ", K=" + str(K) + r", $\widetilde(\pi)$=" + str(p))
-                np.save(f"simulations/linearSVM/balanced/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}_{datasets_labels[j]}", np.array(DCFs))
+                np.save(f"simulations/linearSVM/balanced/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}_piT{str(pi_T).replace('.', '-')}_{datasets_labels[j]}", np.array(DCFs))
             plt.title(titles_Kfold[j])
             plt.legend()
             plt.xscale('log')
