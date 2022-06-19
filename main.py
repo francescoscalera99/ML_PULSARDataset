@@ -123,14 +123,14 @@ def SVM_LinearSimulations(training_data, training_labels, K, C_piT):
 #         llrs, labels = k_fold(dtr, training_labels, SVM, 5, seed=0, balanced=True, pi_T=pi_T, k=K, c=C,
 #                               kernel_params=gamma, kernel_type='RBF')
 #         min_dcf = compute_min_DCF(np.array(llrs), labels, pi, 1, 1)
-#         print(f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T}  C ={C}", "-->", round(min_dcf, 3))
-#         table.add_row([f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T}  C ={C}", round(min_dcf, 3)])
+#         print(f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T}  C ={C}", "-->", round( min_dcf, 3))
+#         table.add_row([f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T}  C ={C}", round(min_dcf, 3 )])
 #
 #     print(table)
 
 
 def main():
-    (training_data, training_labels), (testing_data, testing_labels) = load_dataset()
+    (training_data, training_labels), _ = load_dataset()
     titles = ['1. Mean of the integrated profile',
               '2. Standard deviation of the integrated profile',
               '3. Excess kurtosis of the integrated profile',
@@ -153,11 +153,11 @@ def main():
     # LR_simulations(training_data, training_labels, lbd)
 
     # =============== SUPPORT VECTOR MACHINE ===============
-    # print("LINEAR SVM - TUNING PARAMETERS")
-    # tuning_parameters_LinearSVMUnbalanced(training_data, training_labels)
+    print("LINEAR SVM - TUNING PARAMETERS")
+    tuning_parameters_LinearSVMUnbalanced(training_data, training_labels)
     # tuning_parameters_LinearSVMBalanced(training_data, training_labels)
-    print("POLY SVM - TUNING PARAMETERS")
-    tuning_parameters_PolySVM(training_data, training_labels)
+    # print("POLY SVM - TUNING PARAMETERS")
+    # tuning_parameters_PolySVM(training_data, training_labels)
     # print("RBF SVM - TUNING PARAMETERS")
     # tuning_parameters_RBFSVM(training_data, training_labels)
     # tuning_parameters_LinearSVMBalanced(training_data, training_labels)
@@ -177,13 +177,27 @@ def main():
 
     # =============== GAUSSIAN MIXTURE MODELS ===============
 
+    titles = ['1. Mean of the integrated profile',
+              '2. Standard deviation of the integrated profile',
+              '3. Excess kurtosis of the integrated profile',
+              '4. Excess kurtosis of the integrated profile',
+              '5. Mean of the DM-SNR curve',
+              '6. Standard deviation of the DM-SNR curve',
+              '7. Excess kurtosis of the DM-SNR curve',
+              '8. Skewness of the DM-SNR curve']
+    # plot_histogram(training_data, training_labels, titles, nbins=20)
+    # create_heatmap(training_data, training_labels)
+    # training_data = gaussianize(training_data, training_data)
+    # plot_histogram(training_data, training_labels, titles, nbins=20)
+    # create_heatmap(training_data, training_labels)
+
+
+if __name__ == '__main__':
+    main()
+
 
 def logpdf_GAU_ND(x, mu, C):
   M = x.shape[0]
   _, detC = np.linalg.slogdet(C)
   invC = np.linalg.inv(C)
   return np.diag(-(M/2)*np.log(2*np.pi) - (1/2)*(detC) - (1/2)*np.dot(np.dot((x-mu).T, invC),(x-mu)))
-
-
-if __name__ == '__main__':
-    main()
