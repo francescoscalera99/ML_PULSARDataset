@@ -100,9 +100,7 @@ class SVM(ClassifierClass):
             bounds = [(0, c_t) if label == 1 else (0, c_f) for label in self.training_labels]
         else:
             bounds = [(0, self._C)] * num_samples
-        print('start optimizing')
         alpha_star, _, _ = scipy.optimize.fmin_l_bfgs_b(self._neg_dual, x0=alpha0, bounds=bounds, factr=10000000.0)
-        print('end optimizing')
         coefficients = self.training_labels * alpha_star
         w_star = vcol(np.sum(coefficients * self._D, axis=1))
         return self.Model(w_star, alpha_star)
@@ -261,42 +259,76 @@ def tuning_parameters_LinearSVMUnbalanced(training_data, training_labels):
         # plt.plot(C_values, DCFs, color=np.random.rand(3, ), label=r"$\pi_{T}=0.5$, K=" + str(K) + r", $\widetilde(\pi)$=" + str(p))
         np.save(f"simulations/linearSVM/unbalanced/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}_PCA{m}", np.array(DCFs))
 
-
 def tuning_parameters_LinearSVMBalanced(training_data, training_labels):
-    titles_Kfold = ['Gaussianized feature (5-fold, no PCA)', 'Guassianized feature (5-fold, PCA = 7)',
-                    'Gaussianized feature (5-fold, PCA = 5)']
+    datasets_labels = ["PCA7", "PCA5"]
 
-    datasets = []
-
-    training_dataPCA7 = PCA(training_data, 7)
-    training_dataPCA5 = PCA(training_data, 5)
-    datasets.append(training_data)
-    datasets.append(training_dataPCA7)
-    datasets.append(training_dataPCA5)
+    # K_values = [1.0, 10.0]
+    # priors = [0.5, 0.1, 0.9]
+    # pi_T_values = [0.5, 0.1, 0.9]
+    # ms = [None, 7, 5]
     C_values = np.logspace(-2, 2, 20)
-    K_values = [1.0, 10.0]
-    priors = [0.5, 0.1, 0.9]
-    pi_T_values = [0.5, 0.1, 0.9]
+    K_values = [1.0]
+    priors = [0.5]
+    pi_T_values = [0.5]
+    ms = [None]
 
-    hyperparameters = itertools.product(K_values, priors)
-    j = 0
+    dataset = training_data
 
-    for dataset in datasets:
+    for m in ms:
+        if m is not None:
+            dataset = PCA(dataset, m)
         for pi_T in pi_T_values:
-            plt.figure()
-            plt.rcParams['text.usetex'] = True
+            hyperparameters = itertools.product(K_values, priors)
             for K, p in hyperparameters:
                 DCFs = []
-                for C in C_values:
-                    llrs, evaluationLabels = k_fold(dataset, training_labels, SVM, 5, k=K, c=C, balanced=True, pi_T=pi_T, kernel_params=(1, 0),
-                                                    kernel_type='poly')
+                for i, C in enumerate(C_values):
+                    llrs, evaluationLabels = k_fold(dataset, training_labels, SVM, 5, k=K, c=C, balanced=True, pi_T=pi_T,
+                                                    kernel_params=(1, 0), kernel_type='poly')
                     min_dcf = compute_min_DCF(llrs, evaluationLabels, p, 1, 1)
-                    print("min_DCF for K = ", K, "with prior = ", p, "->", min_dcf)
+                    print(f"Dataset PCA{m} iteration {i + 1} ", "min_DCF for K = ", K, "with prior = ", p, "->",
+                          min_dcf)
                     DCFs.append(min_dcf)
-                plt.plot(C_values, DCFs, color=np.random.rand(3, ), label=r"$\pi_{T}=" + str(pi_T)+ ", K=" + str(K) + r", $\widetilde(\pi)$=" + str(p))
+                # f"prior:0.5, c:{c}, K:{K}"
+                # plt.plot(C_values, DCFs, color=np.random.rand(3, ), label=r"$\pi_{T}=0.5$, K=" + str(K) + r", $\widetilde(\pi)$=" + str(p))
+                np.save(f"simulations/linearSVM/balanced/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}_pT{str(pi_T).replace('.', '-')}_PCA{m}", np.array(DCFs))
 
-            plt.title(titles_Kfold[j])
-            j += 1
-            plt.legend()
-            plt.xscale('log')
-            plt.show()
+
+
+# def tuning_parameters_LinearSVMBalanced(training_data, training_labels):
+#     titles_Kfold = ['Gaussianized feature (5-fold, no PCA)', 'Guassianized feature (5-fold, PCA = 7)',
+#                     'Gaussianized feature (5-fold, PCA = 5)']
+#
+#     datasets = []
+#
+#     # training_dataPCA7 = PCA(training_data, 7)
+#     # training_dataPCA5 = PCA(training_data, 5)
+#     datasets.append(training_data)
+#     # datasets.append(training_dataPCA7)
+#     # datasets.append(training_dataPCA5)
+#     C_values = np.logspace(-2, 2, 20)
+#     # K_values = [1.0, 10.0]
+#     # priors = [0.5, 0.1, 0.9]
+#     # pi_T_values = [0.5, 0.1, 0.9]
+#     K_values = [1.0]
+#     priors = [0.5]
+#     pi_T_values = [0.5]
+#
+#     for dataset in datasets:
+#         for pi_T in pi_T_values:
+#             # plt.figure()
+#             # plt.rcParams['text.usetex'] = True
+#             hyperparameters = itertools.product(K_values, priors)
+#             for K, p in hyperparameters:
+#                 DCFs = []
+#                 for C in C_values:
+#                     llrs, evaluationLabels = k_fold(dataset, training_labels, SVM, 5, k=K, c=C, balanced=True, pi_T=pi_T, kernel_params=(1, 0),
+#                                                     kernel_type='poly')
+#                     min_dcf = compute_min_DCF(llrs, evaluationLabels, p, 1, 1)
+#                     print("min_DCF for K = ", K, "with prior = ", p, "->", min_dcf)
+#                     DCFs.append(min_dcf)
+#                 # f"prior:0.5, c:{c}, K:{K}"
+#                 # plt.plot(C_values, DCFs, color=np.random.rand(3, ), label=r"$\pi_{T}=" + str(pi_T)+ ", K=" + str(K) + r", $\widetilde(\pi)$=" + str(p))
+#             # plt.title(titles_Kfold[j])
+#             # plt.legend()
+#             # plt.xscale('log')
+#             # plt.show()
