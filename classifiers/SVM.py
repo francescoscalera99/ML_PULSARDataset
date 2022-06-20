@@ -95,13 +95,14 @@ class SVM(ClassifierClass):
         if balanced:
             pi_t_emp = np.sum(self.training_labels == 1) / self.training_labels.size
             pi_f_emp = np.sum(self.training_labels == -1) / self.training_labels.size
-            pi_t = 0.5
             c_t = self._C * pi_t / pi_t_emp
             c_f = self._C * (1 - pi_t) / pi_f_emp
             bounds = [(0, c_t) if label == 1 else (0, c_f) for label in self.training_labels]
         else:
             bounds = [(0, self._C)] * num_samples
+        print('start optimizing')
         alpha_star, _, _ = scipy.optimize.fmin_l_bfgs_b(self._neg_dual, x0=alpha0, bounds=bounds, factr=10000000.0)
+        print('end optimizing')
         coefficients = self.training_labels * alpha_star
         w_star = vcol(np.sum(coefficients * self._D, axis=1))
         return self.Model(w_star, alpha_star)
@@ -276,6 +277,7 @@ def tuning_parameters_LinearSVMBalanced(training_data, training_labels):
     K_values = [1.0, 10.0]
     priors = [0.5, 0.1, 0.9]
     pi_T_values = [0.5, 0.1, 0.9]
+
     hyperparameters = itertools.product(K_values, priors)
     j = 0
 
@@ -291,8 +293,8 @@ def tuning_parameters_LinearSVMBalanced(training_data, training_labels):
                     min_dcf = compute_min_DCF(llrs, evaluationLabels, p, 1, 1)
                     print("min_DCF for K = ", K, "with prior = ", p, "->", min_dcf)
                     DCFs.append(min_dcf)
-                # f"prior:0.5, c:{c}, K:{K}"
                 plt.plot(C_values, DCFs, color=np.random.rand(3, ), label=r"$\pi_{T}=" + str(pi_T)+ ", K=" + str(K) + r", $\widetilde(\pi)$=" + str(p))
+
             plt.title(titles_Kfold[j])
             j += 1
             plt.legend()
