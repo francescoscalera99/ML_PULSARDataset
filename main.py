@@ -155,13 +155,13 @@ def main():
     # LR_simulations(training_data, training_labels, lbd)
 
     # =============== SUPPORT VECTOR MACHINE ===============
-    # print("LINEAR SVM - TUNING PARAMETERS")
+    print("LINEAR SVM - TUNING PARAMETERS")
     # tuning_parameters_LinearSVMUnbalanced(training_data, training_labels)
-    # tuning_parameters_LinearSVMBalanced(training_data, training_labels)
+    tuning_parameters_LinearSVMBalanced(training_data, training_labels)
     # print("POLY SVM - TUNING PARAMETERS")
     # tuning_parameters_PolySVM(training_data, training_labels)
     # print("RBF SVM - TUNING PARAMETERS")
-    tuning_parameters_RBFSVM(training_data, training_labels)
+    # tuning_parameters_RBFSVM(training_data, training_labels)
     # tuning_parameters_LinearSVMBalanced(training_data, training_labels)
     # K_Linear = 1.0 #This values comes from tuning of hyperparameters
     # C_piT_Linear = [(1e-2, None), (1e-3, 0.5), (6 * 1e-3, 0.1), (7 * 1e-4, 0.9)] #These values comes from tuning of hyperparameter
