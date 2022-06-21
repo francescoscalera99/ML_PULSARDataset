@@ -37,18 +37,27 @@ def compute_normalizeDCF(optimal_bayes_decisions, prior_class_probability, Cfn, 
     return DCF / min(prior_class_probability * Cfn, (1 - prior_class_probability) * Cfp)
 
 
-def compute_min_DCF(llr, labels, prior_class_probability, Cfn, Cfp):
+def compute_min_DCF(llr, labels, prior, Cfn, Cfp):
     minDCF = np.inf
     tresholds = np.hstack(([-np.inf], llr, [np.inf]))
     tresholds.sort()
     for treshold in tresholds:
         pred = np.int32(llr > treshold)
         OBD = compute_OBD(pred, labels)
-        currentDCF = compute_normalizeDCF(OBD, prior_class_probability, Cfn, Cfp)
+        currentDCF = compute_normalizeDCF(OBD, prior, Cfn, Cfp)
         if (currentDCF < minDCF):
             minDCF = currentDCF
 
     return minDCF
+
+
+def compute_actual_DCF(llr, labels, prior, Cfn, Cfp):
+    treshold = -np.log(prior/(1-prior))
+    pred = np.int32(llr > treshold)
+    OBD = compute_OBD(pred, labels)
+    actDCF = compute_normalizeDCF(OBD, prior, Cfn, Cfp)
+
+    return actDCF
 
 
 def main():

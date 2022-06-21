@@ -30,7 +30,7 @@ class MVG(ClassifierClass):
         self.variant = kwargs['variant']
         self._score_matrix = None
 
-    def train_model(self, balanced=False, pi_T=None) -> None:
+    def train_model(self, **kwargs) -> None:
         c0, mu0 = covariance_matrix_mean(self.training_data[:, self.training_labels == 0])
         c1, mu1 = covariance_matrix_mean(self.training_data[:, self.training_labels == 1])
 

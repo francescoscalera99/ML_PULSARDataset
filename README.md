@@ -6,7 +6,7 @@
 
 
 ### Project structure
-INSERT HERE PROJECT STRUCTURE
+INSERT HERE PROJECT STRUCTURE here
 
 
 ### Credits

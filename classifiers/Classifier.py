@@ -11,7 +11,7 @@ class ClassifierClass(abc.ABC):
         self.training_labels = training_labels
 
     @abc.abstractmethod
-    def train_model(self, balanced=False, pi_T=None) -> None:
+    def train_model(self, **kwargs) -> None:
         pass
 
     @abc.abstractmethod

@@ -1,7 +1,9 @@
 import numpy as np
 from scipy.stats import norm
 
+from PCA import PCA
 from classifiers.Classifier import ClassifierClass
+from classifiers.LR import LR
 from .matrix_utils import vcol
 import matplotlib.pyplot as plt
 
@@ -136,70 +138,29 @@ def k_fold(dataset: np.ndarray,
         training_labels = np.hstack(partitions_labels[bool_indices])
         testing_data = partitions[i]
         testing_labels = np.hstack(partitions_labels[i])
+        m = kwargs['m']
+        raw = kwargs['raw']
+        if not raw:
+            dtr = gaussianize(training_data, training_data)
+            dte = gaussianize(training_data, testing_data)
+        else:
+            dtr = training_data
+            dte = testing_data
 
-        dtr_gaussianized = gaussianize(training_data, training_data)
-        dte_gaussianized = gaussianize(training_data, testing_data)
-
-        c = classifier(dtr_gaussianized, training_labels, **kwargs)
-        balance = kwargs['balanced'] or False
-        pi_T = kwargs['pi_T'] or None
-        c.train_model(balance, pi_T)
-        c.classify(dte_gaussianized, None)
+        if m is not None:
+            dtrain = PCA(dtr, dtr, m)
+            dtev = PCA(dte, dtr, m)
+        else:
+            dtrain = dtr
+            dtev = dte
+        c = classifier(dtrain, training_labels, **kwargs)
+        c.train_model(**kwargs)
+        c.classify(dtev, None)
         llrs.extend(c.get_llrs().tolist())
         labels.extend(testing_labels.tolist())
-
         bool_indices[i] = True
 
     return np.array(llrs), np.array(labels)
-
-
-# def kFold(D, L, seed=0, K=5):
-#     # 1. Split the dataset in k folds, we choose 5
-#     foldSize = int(D.shape[1] / K)
-#
-#     folds = []
-#     labels = []
-#
-#     # Generate a random seed and compute a permutation from 0 to 8929
-#     np.random.seed(seed)
-#     idx = np.random.permutation(D.shape[1])
-#
-#     for i in range(K):
-#         fold_idx = idx[(i * foldSize): ((i + 1) * (foldSize))]
-#         folds.append(D[:, fold_idx])
-#         labels.append(L[fold_idx])
-#
-#     # 2. Re-arrange folds and train the model
-#     evaluationLabels = []  # Each iteration we save here the labels for the evaluation set. At the end we have the labels in the new shuffled order
-#
-#     allKFolds = []
-#
-#     # The algorithm is trained and evaluated K times
-#     for i in range(K):
-#         # Each time we iterate, we create K-1 training folds and one evaluation set to train and evaluate the model
-#         trainingFolds = []
-#         trainingLabels = []
-#         evaluationFold = []
-#
-#         # We iterate over the folds. The i-th fold will be the evaluation one
-#         for j in range(K):
-#             if j == i:
-#                 evaluationFold.append(folds[i])
-#                 evaluationLabels.append(labels[i])
-#             else:
-#                 trainingFolds.append(folds[j])
-#                 trainingLabels.append(labels[j])
-#
-#         trainingFolds = np.hstack(trainingFolds)
-#         trainingLabels = np.hstack(trainingLabels)
-#         evaluationFold = np.hstack(evaluationFold)
-#
-#         singleKFold = [trainingLabels, trainingFolds, evaluationFold]
-#         allKFolds.append(singleKFold)
-#
-#     evaluationLabels = np.hstack(evaluationLabels)
-#
-#     return allKFolds, evaluationLabels
 
 
 def splitData_SingleFold(dataset_train, labels_train, seed=0):
@@ -213,6 +174,20 @@ def splitData_SingleFold(dataset_train, labels_train, seed=0):
     LTR = labels_train[idxTrain]
     LTEV = labels_train[idxTest]
     return (DTR, LTR), (DTEV, LTEV)
+
+
+#FIXME
+def calibrateScores(scores, evaluationLabels, lambd, prior=0.5):
+    # f(s) = as+b can be interpreted as the llr for the two class hypothesis
+    # class posterior probability: as+b+log(pi/(1-pi)) = as +b'
+    logReg = LR(scores, evaluationLabels, lbd=lambd, pi_T=prior)
+    logReg.train_model()
+    # alpha = x[0]
+    # betafirst = x[1]
+    # calibratedScores = alpha * scores + betafirst - np.log(prior/(1 - prior))
+    #
+    # return calibratedScores
+    return
 
 
 def main():
