@@ -127,8 +127,6 @@ class GMM(ClassifierClass):
             sigmas = ((second_order.T / zero_order).T
                       - (mus.reshape(*mus.shape, 1) @ mus.reshape(mus.shape[0], 1, mus.shape[1])))
 
-
-
             if self._type == 'diag':
                 # remove entries that for some reason are -0.0
                 sigmas = np.abs(sigmas)
