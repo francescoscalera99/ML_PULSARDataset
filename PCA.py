@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def PCA(dataset, m):
+def PCA(dataset, training_data, m):
     """
     Performs dimensionality reduction to #features=m on the given dataset
     :param dataset: the input dataset
@@ -10,10 +10,10 @@ def PCA(dataset, m):
     """
 
     # computing covariance matrix
-    mu = dataset.mean(1)
-    DC = dataset - mu.reshape(mu.size, 1)
+    mu = training_data.mean(1)
+    DC = training_data - mu.reshape(mu.size, 1)
     C = np.dot(DC, DC.T)
-    C = C / float(dataset.shape[1])
+    C = C / float(training_data.shape[1])
 
     # SVD decomposition
     U, _, _ = np.linalg.svd(C)
