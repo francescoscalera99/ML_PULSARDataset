@@ -6,12 +6,13 @@ from prettytable import PrettyTable
 import matplotlib.pyplot as plt
 
 from PCA import PCA
+from classifiers.GMM import GMM
 from classifiers.LR import LR
 from classifiers.MVG import MVG
 from classifiers.SVM import SVM, tuning_parameters_PolySVM, tuning_parameters_RBFSVM, \
     tuning_parameters_LinearSVMUnbalanced, tuning_parameters_LinearSVMBalanced
 from utils.plot_utils import plot_histogram, create_heatmap
-from utils.utils import load_dataset, gaussianize, splitData_SingleFold, k_fold
+from utils.utils import load_dataset, gaussianize, splitData_SingleFold, k_fold, compute_accuracy
 from utils.metrics_utils import compute_min_DCF, compute_actual_DCF
 
 
@@ -206,6 +207,19 @@ def main():
     # os.system("shutdown /s /t 1")
     # MAC
     # os.system("shutdown -h now")
+
+    (dtr, ltr), (dte, lte) = splitData_SingleFold(training_data, training_labels, seed=0)
+    gmm_classifier = GMM(dtr, ltr, type='diag')
+    g = 1
+    while g <= 16:
+        gmm_classifier.train_model(alpha=0.1, psi=0.01, G=4)
+        num_classes = len(set(training_labels))
+        priors = np.array([1 / num_classes] * num_classes)
+        predictions = gmm_classifier.classify(dte, priors)
+
+        acc, err = compute_accuracy(predictions, lte)
+        print(f"Error rate for type {'diag'} and G={1}: {round(err * 100, 2)}%")
+        g += 2
 
 
 def logpdf_GAU_ND(x, mu, C):
