@@ -1,0 +1,40 @@
++-----------------------------------------------+---------+
+|                Hyperparameters                | min DCF |
++-----------------------------------------------+---------+
+| PCA m=False, π_tilde=0.5, π_T=0.5 -> min dcf: |  0.231  |
+| PCA m=False, π_tilde=0.5, π_T=0.1 -> min dcf: |   0.18  |
+| PCA m=False, π_tilde=0.5, π_T=0.9 -> min dcf: |  0.427  |
+| PCA m=False, π_tilde=0.1, π_T=0.5 -> min dcf: |  0.774  |
+| PCA m=False, π_tilde=0.1, π_T=0.1 -> min dcf: |  0.339  |
+| PCA m=False, π_tilde=0.1, π_T=0.9 -> min dcf: |   1.0   |
+| PCA m=False, π_tilde=0.9, π_T=0.5 -> min dcf: |  0.847  |
+| PCA m=False, π_tilde=0.9, π_T=0.1 -> min dcf: |  0.804  |
+| PCA m=False, π_tilde=0.9, π_T=0.9 -> min dcf: |  0.989  |
+|  PCA m=None, π_tilde=0.5, π_T=0.5 -> min dcf: |  0.165  |
+|  PCA m=None, π_tilde=0.5, π_T=0.1 -> min dcf: |  0.203  |
+|  PCA m=None, π_tilde=0.5, π_T=0.9 -> min dcf: |  0.176  |
+|  PCA m=None, π_tilde=0.1, π_T=0.5 -> min dcf: |   0.3   |
+|  PCA m=None, π_tilde=0.1, π_T=0.1 -> min dcf: |  0.464  |
+|  PCA m=None, π_tilde=0.1, π_T=0.9 -> min dcf: |  0.336  |
+|  PCA m=None, π_tilde=0.9, π_T=0.5 -> min dcf: |  0.637  |
+|  PCA m=None, π_tilde=0.9, π_T=0.1 -> min dcf: |  0.684  |
+|  PCA m=None, π_tilde=0.9, π_T=0.9 -> min dcf: |  0.662  |
+|   PCA m=7, π_tilde=0.5, π_T=0.5 -> min dcf:   |  0.165  |
+|   PCA m=7, π_tilde=0.5, π_T=0.1 -> min dcf:   |  0.203  |
+|   PCA m=7, π_tilde=0.5, π_T=0.9 -> min dcf:   |  0.835  |
+|   PCA m=7, π_tilde=0.1, π_T=0.5 -> min dcf:   |   0.3   |
+|   PCA m=7, π_tilde=0.1, π_T=0.1 -> min dcf:   |  0.464  |
+|   PCA m=7, π_tilde=0.1, π_T=0.9 -> min dcf:   |  0.862  |
+|   PCA m=7, π_tilde=0.9, π_T=0.5 -> min dcf:   |  0.637  |
+|   PCA m=7, π_tilde=0.9, π_T=0.1 -> min dcf:   |  0.684  |
+|   PCA m=7, π_tilde=0.9, π_T=0.9 -> min dcf:   |  0.952  |
+|   PCA m=5, π_tilde=0.5, π_T=0.5 -> min dcf:   |  0.165  |
+|   PCA m=5, π_tilde=0.5, π_T=0.1 -> min dcf:   |  0.203  |
+|   PCA m=5, π_tilde=0.5, π_T=0.9 -> min dcf:   |  0.835  |
+|   PCA m=5, π_tilde=0.1, π_T=0.5 -> min dcf:   |   0.3   |
+|   PCA m=5, π_tilde=0.1, π_T=0.1 -> min dcf:   |  0.464  |
+|   PCA m=5, π_tilde=0.1, π_T=0.9 -> min dcf:   |  0.862  |
+|   PCA m=5, π_tilde=0.9, π_T=0.5 -> min dcf:   |  0.637  |
+|   PCA m=5, π_tilde=0.9, π_T=0.1 -> min dcf:   |  0.684  |
+|   PCA m=5, π_tilde=0.9, π_T=0.9 -> min dcf:   |  0.952  |
++-----------------------------------------------+---------+
