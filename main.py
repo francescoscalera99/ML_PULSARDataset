@@ -2,6 +2,9 @@ import itertools
 import os
 
 import numpy as np
+
+from classifiers.LR import tuning_lambda
+from classifiers.SVM import tuning_parameters_PolySVM, tuning_parameters_RBFSVM
 from utils.utils import load_dataset
 
 
@@ -24,7 +27,7 @@ def main():
     # MVG_simulations(training_data, training_labels)
 
     # =============== LOGISTIC REGRESSION ===============
-    # tuning_lamba(training_data, training_labels)
+    # tuning_lambda(training_data, training_labels)
     # lbd = 1e-3
     # LR_simulations(training_data, training_labels, lbd)
 
@@ -33,7 +36,7 @@ def main():
     # tuning_parameters_LinearSVMUnbalanced(training_data, training_labels)
     # tuning_parameters_LinearSVMBalanced(training_data, training_labels)
     # print("POLY SVM - TUNING PARAMETERS")
-    # tuning_parameters_PolySVM(training_data, training_labels)
+    tuning_parameters_PolySVM(training_data, training_labels)
     # print("RBF SVM - TUNING PARAMETERS")
     # tuning_parameters_RBFSVM(training_data, training_labels)
     # tuning_parameters_LinearSVMBalanced(training_data, training_labels)
@@ -55,10 +58,10 @@ def main():
 
     # =============== COMPUTING ACTUAL DCF ===============
     # MVG_simulations(training_data, training_labels, actualDCF=True, calibrateScore=False)
+    # LR_simulations(training_data, training_labels, lbd)
     # SVM_LinearSimulations(training_data, training_labels, K_Linear, C_piT_Linear, actualDCF=True, calibrateScore=False)
     # SVM_PolySimulations(training_data, training_labels, K_Poly, CPoly, pi_TPolyRBF, c, d, actualDCF=True, calibrateScore=False)
     # SVM_RBFSimulations(training_data, training_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF, actualDCF=True, calibrateScore=False)
-    # LR_simulations(training_data, training_labels, lbd)
 
     # =============== SCORE CALIBRATION ===============
     # MVG_simulations(training_data, training_labels, actualDCF=True, calibrateScore=True)
@@ -75,18 +78,18 @@ def main():
     # MAC
     # os.system("shutdown -h now")
 
-    (dtr, ltr), (dte, lte) = splitData_SingleFold(training_data, training_labels, seed=0)
-    gmm_classifier = GMM(dtr, ltr, type='diag')
-    g = 1
-    while g <= 16:
-        gmm_classifier.train_model(alpha=0.1, psi=0.01, G=4)
-        num_classes = len(set(training_labels))
-        priors = np.array([1 / num_classes] * num_classes)
-        predictions = gmm_classifier.classify(dte, priors)
-
-        acc, err = compute_accuracy(predictions, lte)
-        print(f"Error rate for type {'diag'} and G={1}: {round(err * 100, 2)}%")
-        g += 2
+    # (dtr, ltr), (dte, lte) = splitData_SingleFold(training_data, training_labels, seed=0)
+    # gmm_classifier = GMM(dtr, ltr, type='diag')
+    # g = 1
+    # while g <= 16:
+    #     gmm_classifier.train_model(alpha=0.1, psi=0.01, G=4)
+    #     num_classes = len(set(training_labels))
+    #     priors = np.array([1 / num_classes] * num_classes)
+    #     predictions = gmm_classifier.classify(dte, priors)
+    #
+    #     acc, err = compute_accuracy(predictions, lte)
+    #     print(f"Error rate for type {'diag'} and G={1}: {round(err * 100, 2)}%")
+    #     g += 2
 
 
 def logpdf_GAU_ND(x, mu, C):
@@ -96,6 +99,30 @@ def logpdf_GAU_ND(x, mu, C):
     return np.diag(
         -(M / 2) * np.log(2 * np.pi) - (1 / 2) * (detC) - (1 / 2) * np.dot(np.dot((x - mu).T, invC), (x - mu)))
 
+lbd_values = np.logspace(-5, 5, 50)
+m_values = [False, None, 7, 5]
+prior = [0.5, 0.1, 0.9]
 
+# i = 0
+# fig, axs = plt.subplots(1, 4)
+# fig.suptitle('Tuning hyperparameter λ')
+# plt.rcParams['text.usetex'] = True
+# for m in m_values:
+#   for pi in prior:
+#     DCFs = np.load(f"/content/drive/My Drive/Pulsar/tuningLambda/LR_prior_{str(pi).replace('.', '-')}_PCA{str(m)}.npy")
+#     axs[i].plot(lbd_values, DCFs, color=np.random.rand(3,), label=r"$\widetilde{\pi}=$")
+#     if m == False:
+#       axs[i].set_title(f'5-fold, Raw features')
+#     else:
+#       axs[i].set_title(f'5-fold, PCA (m={m})')
+#     axs[i].legend()
+#     axs[i].set_xlabel('λ')
+#     axs[i].set_ylabel('minDCF')
+#     axs[i].set_xscale('log')
+#   i+=1
+# fig.set_size_inches(20, 5)
+# fig.tight_layout()
+# fig.subplots_adjust(top=0.88)
+# fig.show()
 if __name__ == '__main__':
     main()
