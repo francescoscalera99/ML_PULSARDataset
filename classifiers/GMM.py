@@ -1,10 +1,5 @@
-import itertools
-
 import numpy as np
 import scipy.special as special
-import json
-
-from scipy.stats import norm
 
 from classifiers.Classifier import ClassifierClass
 from utils.matrix_utils import vrow, vcol, empirical_dataset_mean, empirical_dataset_covariance
@@ -54,9 +49,7 @@ class GMM(ClassifierClass):
         # x has shape 4 x N
         n_samples = x.shape[1]
 
-        y = []
-        for i in range(n_samples):
-            y.append(GMM._logpdf_GAU_ND_1(x[:, i], mu, C))
+        y = [GMM._logpdf_GAU_ND_1(x[:, i], mu, C) for i in range(n_samples)]
 
         return vcol(np.array(y))
 
@@ -89,9 +82,9 @@ class GMM(ClassifierClass):
         super().__init__(training_data, training_labels)
         self._scores = None
 
-        # Possible values of kwargs['type'] are from ['full', 'diag', 'tied']
-        if kwargs['type'] not in ['full', 'diag', 'tied']:
-            raise RuntimeError("Error: type can only be 'full', 'diag' or 'tied'")
+        # Possible values of kwargs['type'] are from ['full-cov', 'diag', 'tied']
+        if kwargs['type'] not in ['full-cov', 'diag', 'tied']:
+            raise RuntimeError("Error: type can only be 'full-cov', 'diag' or 'tied'")
         self._type = kwargs['type']
 
         self._model = None
@@ -101,9 +94,7 @@ class GMM(ClassifierClass):
         num_samples = dataset.shape[1]
 
         def expectation(weights: np.ndarray, means: np.ndarray, covariances: np.ndarray):
-            component_likelihoods = []
-            for i in range(num_components):
-                component_likelihoods.append(vrow(GMM._logpdf_GAU_ND(dataset, means[i], covariances[i, :, :])))
+            component_likelihoods = [vrow(GMM._logpdf_GAU_ND(dataset, means[i], covariances[i, :, :])) for i in range(num_components)]
             log_score_matrix = np.vstack(component_likelihoods)
             joint_log_densities = log_score_matrix + vcol(np.log(weights))
             marginal_log_densities = vrow(special.logsumexp(joint_log_densities, axis=0))
@@ -155,7 +146,7 @@ class GMM(ClassifierClass):
             avg_ll = avg_ll_new
             posteriors, avg_ll_new = expectation(*gmm)
             gmm = maximization(posteriors)
-        print(avg_ll_new)
+        print(f"EM estimation took {n_iter} iterations")
         return gmm
 
     def _lbg(self, dataset, desired_n_components, alpha=0.1, psi=0.01):
@@ -183,7 +174,9 @@ class GMM(ClassifierClass):
         gmm = self._em_estimation(dataset, gmm, psi)
         while num_components < desired_n_components:
             gmm = split_gmm(gmm)
+            print("Start em")
             gmm = self._em_estimation(dataset, gmm, psi)
+            print("end em")
             num_components = gmm[0].size
 
         return gmm
@@ -206,7 +199,9 @@ class GMM(ClassifierClass):
         num_classes = len(set(self.training_labels))
         for c in range(num_classes):
             dataset = self.training_data[:, self.training_labels == c]
+            print("Start lbg")
             gmm = self._lbg(dataset, desired_n_components, alpha=alpha, psi=psi)
+            print("End lbg")
             weights = vcol(gmm[0])
             self._model.add_gmm(gmm)
             score_matrix = self._model.log_pdf(dataset, c) + np.log(weights)
@@ -214,7 +209,6 @@ class GMM(ClassifierClass):
 
     def classify(self, testing_data: np.ndarray, priors: np.ndarray) -> np.ndarray:
         num_samples = testing_data.shape[1]
-        num_classes = len(set(self.training_labels))
 
         def log_likelihood(gmm):
             num_components = gmm[0].size
@@ -228,27 +222,10 @@ class GMM(ClassifierClass):
         ll0 = log_likelihood(self._model.get_gmm(0))
 
         self._scores = ll1 - ll0
-        thresh = np.log(priors[1] / priors[0])
-        predictions = np.array(self._scores > thresh).astype(int)
-
-        # MULTICLASS: compute posterior
-        # lls = []
-        # for c in range(num_classes):
-        #     lls.append(log_likelihood(self._model.get_gmm(c)))
-        #
-        # lls = np.vstack(lls)
-        #
-        # log_priors = vcol(np.log(priors))
-        # log_joint = log_priors + lls
-        #
-        # marginal_log_densities = vrow(special.logsumexp(log_joint, axis=0))
-        #
-        # log_posterior_densities = log_joint - marginal_log_densities
-        # posterior_probs = np.exp(log_posterior_densities)
-        #
-        # predictions = np.argmax(posterior_probs, axis=0)
-
-        return predictions
+        if priors is not None:
+            thresh = np.log(priors[1] / priors[0])
+            predictions = np.array(self._scores > thresh).astype(int)
+            return predictions
 
     def get_llrs(self):
         return self._scores

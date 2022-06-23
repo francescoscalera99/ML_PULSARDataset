@@ -4,7 +4,8 @@ import os
 import numpy as np
 
 from classifiers.LR import tuning_lambda
-from classifiers.SVM import tuning_parameters_PolySVM, tuning_parameters_RBFSVM
+from classifiers.SVM import tuning_parameters_PolySVM, tuning_parameters_RBFSVM, tuning_parameters_LinearSVMBalanced
+from simulations.simulations import MVG_simulations, GMM_Simulations
 from utils.utils import load_dataset
 
 
@@ -36,7 +37,7 @@ def main():
     # tuning_parameters_LinearSVMUnbalanced(training_data, training_labels)
     # tuning_parameters_LinearSVMBalanced(training_data, training_labels)
     # print("POLY SVM - TUNING PARAMETERS")
-    tuning_parameters_PolySVM(training_data, training_labels)
+    # tuning_parameters_PolySVM(training_data, training_labels)
     # print("RBF SVM - TUNING PARAMETERS")
     # tuning_parameters_RBFSVM(training_data, training_labels)
     # tuning_parameters_LinearSVMBalanced(training_data, training_labels)
@@ -55,6 +56,8 @@ def main():
     # SVM_RBFSimulations(training_data, training_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF)
 
     # =============== GAUSSIAN MIXTURE MODELS ===============
+    print("GMM SIMULATIONS")
+    GMM_Simulations(training_data, training_labels, alpha=0.1, psi=0.01)
 
     # =============== COMPUTING ACTUAL DCF ===============
     # MVG_simulations(training_data, training_labels, actualDCF=True, calibrateScore=False)
@@ -124,5 +127,7 @@ prior = [0.5, 0.1, 0.9]
 # fig.tight_layout()
 # fig.subplots_adjust(top=0.88)
 # fig.show()
+
+
 if __name__ == '__main__':
     main()

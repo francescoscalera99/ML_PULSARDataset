@@ -67,12 +67,12 @@ def k_fold(dataset: np.ndarray,
            **kwargs) \
         -> tuple[np.ndarray, np.ndarray]:
     """
-    Perform a k-fold cross-validation on the given dataset
+    Performs the k-fold cross-validation on the given dataset
 
     :param dataset: the input dataset
     :param labels: the input labels
     :param classifier: the classifier function
-    :param k: the number of partitions
+    :param nFold: the number of partitions
     :param seed: the seed for the random permutation (for debug purposes)
     :return: the error rate
     """

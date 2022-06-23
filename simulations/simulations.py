@@ -2,6 +2,7 @@ import itertools
 import numpy as np
 from prettytable import PrettyTable
 
+from classifiers.GMM import GMM
 from classifiers.LR import LR
 from classifiers.MVG import MVG
 from classifiers.SVM import SVM
@@ -131,18 +132,42 @@ def SVM_PolySimulations(training_data, training_labels, K, C, pi_T, c, d):
 
 
 def SVM_RBFSimulations(training_data, training_labels, K, C, pi_T, gamma):
-    m = [None, 7, 5]
-    priors = [0.5, 0.1, 0.9]
-    hyperparameters = itertools.product(m, priors)
+    ms = [None, 7, 5]
+    effective_priors = [0.5, 0.1, 0.9]
+    hyperparameters = itertools.product(ms, effective_priors)
 
     table = PrettyTable()
     table.field_names = ['Hyperparameters', 'min DCF']
 
     for m, pi in hyperparameters:
-        llrs, labels = k_fold(training_data, training_labels, SVM, 5, seed=0, m=m, raw=False, balanced=True, pi_T=pi_T, k=K, c=C,
-                              kernel_params=gamma, kernel_type='RBF')
+        llrs, labels = k_fold(training_data, training_labels, SVM, 5, seed=0, m=m, raw=False, balanced=True, pi_T=pi_T,
+                              k=K, c=C, kernel_params=gamma, kernel_type='RBF')
         min_dcf = compute_min_DCF(np.array(llrs), labels, pi, 1, 1)
         print(f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T}  C ={C}", "-->", round(min_dcf, 3))
         table.add_row([f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T}  C ={C}", round(min_dcf, 3)])
+
+    print(table)
+
+
+def GMM_Simulations(training_data, training_labels, alpha, psi):
+    variants = ['full-cov', 'diag', 'tied']
+    effective_priors = [0.5, 0.1, 0.9]
+    ms = [None, 7, 5]
+    raws = [True, False]
+    num_components = [2, 4]
+
+    table = PrettyTable()
+    table.field_names = ['Hyperparameters', 'min DCF']
+
+    hyperparameters = itertools.product(ms, effective_priors, variants, raws, num_components)
+    n_iter = len(variants) * len(effective_priors) * len(ms) * len(raws) * len(num_components)
+
+    for i, (m, pi, variant, raw, g) in enumerate(hyperparameters):
+        print(f"Iteration {i+1}/{n_iter}: ", end="")
+        llrs, labels = k_fold(training_data, training_labels, GMM, nFold=5, seed=0, m=m, raw=raw, type=variant,
+                              alpha=alpha, psi=psi, G=g)
+        min_dcf = compute_min_DCF(np.array(llrs), labels, pi, 1, 1)
+        print(f"PCA m={m}, raw data: {raw}, π_tilde={pi}, variant: {variant}, G={g}", "-->", round(min_dcf, 3))
+        table.add_row([f"PCA m={m}, raw data: {raw}, π_tilde={pi}, variant: {variant}, G={g}", round(min_dcf, 3)])
 
     print(table)
