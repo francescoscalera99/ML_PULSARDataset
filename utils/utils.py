@@ -1,11 +1,8 @@
 import numpy as np
-from scipy.stats import norm
 
-from PCA import PCA
+from preprocessing.preprocessing import PCA, gaussianize
 from classifiers.Classifier import ClassifierClass
-from classifiers.LR import LR
-from .matrix_utils import vcol
-import matplotlib.pyplot as plt
+
 
 def load_dataset(path: str = './') -> tuple:
     """
@@ -50,35 +47,6 @@ def compute_accuracy(predictedLabels: np.ndarray, L: np.ndarray):
 
     acc = nCorrect_labels / nSamples
     return acc, 1 - acc
-
-
-def z_normalization(dataset: np.ndarray) -> np.ndarray:
-    """
-    Computes the Z-normalization
-    :param dataset:
-    :return:
-    """
-    mean = dataset.mean(axis=1)
-    std = dataset.std(axis=1)
-    return (dataset - vcol(mean)) / vcol(std)
-
-
-def gaussianize(training_data: np.ndarray, dataset: np.ndarray) -> np.ndarray:
-    """
-    Performs the mapping from original data distribution to normal distribution, using the training set
-    :param training_data: the training partition
-    :param dataset: the data to gaussianize
-    :return: the gaussianized data
-    """
-    ranks = []
-    for j in range(dataset.shape[0]):
-        tempSum = 0
-        for i in range(training_data.shape[1]):
-            tempSum += (dataset[j, :] < training_data[j, i]).astype(int)
-        tempSum += 1
-        ranks.append(tempSum / (training_data.shape[1] + 2))
-    y = norm.ppf(ranks)
-    return y
 
 
 def evaluate_classification_errors(testing_labels: np.ndarray, predicted_labels) -> tuple[int, int]:
@@ -180,8 +148,8 @@ def splitData_SingleFold(dataset_train, labels_train, seed=0):
 def calibrateScores(scores, evaluationLabels, lambd, prior=0.5):
     # f(s) = as+b can be interpreted as the llr for the two class hypothesis
     # class posterior probability: as+b+log(pi/(1-pi)) = as +b'
-    logReg = LR(scores, evaluationLabels, lbd=lambd, pi_T=prior)
-    logReg.train_model()
+    # logReg = LR(scores, evaluationLabels, lbd=lambd, pi_T=prior)
+    # logReg.train_model()
     # alpha = x[0]
     # betafirst = x[1]
     # calibratedScores = alpha * scores + betafirst - np.log(prior/(1 - prior))
