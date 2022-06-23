@@ -56,3 +56,45 @@ def create_heatmap(dataset, labels, cmap='Reds', title=None):
     fig.tight_layout()
     fig.show()
     fig.savefig(fname=f'outputs/gauss_heatmap')
+
+
+def plot_lambda():
+    lbd_values = np.logspace(-5, 5, 50)
+    m_values = [False, None, 7, 5]
+    prior = [0.5, 0.1, 0.9]
+
+    i = 0
+    fig, axs = plt.subplots(2, 2)
+    # fig.suptitle('Tuning hyperparameter λ')
+    plt.rcParams['text.usetex'] = True
+
+    colors = ['red', 'blue', 'green']
+    for m in m_values:
+        for j, pi in enumerate(prior):
+            DCFs = np.load(
+                f"/Users/riccardo/PycharmProjects/ML_PULSARDataset/simulations/LR/LR_prior_{str(pi).replace('.', '-')}_PCA{str(m)}.npy")
+            axs[i//2, i%2].plot(lbd_values, DCFs, color=colors[j], label=r"$\widetilde{\pi}=$"+f"{pi}")
+
+            if m == False:
+                axs[i//2, i%2].set_title(f'5-fold, Raw features')
+            elif m is None:
+                axs[i//2, i%2].set_title(f'5-fold, no PCA')
+            else:
+                axs[i//2, i%2].set_title(f'5-fold, PCA (m={m})')
+
+            axs[i//2, i%2].set_xlabel('λ')
+            axs[i//2, i%2].set_ylabel('minDCF')
+            axs[i//2, i%2].set_xscale('log')
+        i += 1
+    # fig.set_size_inches(10, 10)
+    # fig.tight_layout()
+    lines_labels = [ax.get_legend_handles_labels() for ax in fig.axes]
+    lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
+    fig.legend(lines[:3], labels[:3], loc=10, prop={'size': 10})
+    fig.subplots_adjust(wspace=0.3, hspace=0.6)
+    fig.subplots_adjust(top=0.88)
+    fig.show()
+
+
+if __name__ == '__main__':
+    plot_lambda()
