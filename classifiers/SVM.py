@@ -2,9 +2,7 @@ import itertools
 
 import numpy as np
 import scipy.optimize
-from matplotlib import pyplot as plt
 
-from PCA import PCA
 from classifiers.Classifier import ClassifierClass
 from utils.matrix_utils import vrow, vcol
 from utils.metrics_utils import compute_min_DCF
@@ -226,8 +224,8 @@ def tuning_parameters_LinearSVMBalanced(training_data, training_labels):
     # pi_T_values = [0.5, 0.1, 0.9]
     # ms = [None, 7, 5]
     C_values = np.logspace(-2, 2, 20)
-    K_values = [10.0]
-    priors = [0.5]
+    K_values = [1.0, 10.0]
+    priors = [0.5, 0.1, 0.9]
     pi_T_values = [0.5, 0.1, 0.9]
     ms = [False, None, 7, 5]  # false to compute raw feature, none for not computing PCA
 
