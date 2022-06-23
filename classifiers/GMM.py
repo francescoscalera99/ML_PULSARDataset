@@ -8,6 +8,8 @@ from scipy.stats import norm
 
 from classifiers.Classifier import ClassifierClass
 from utils.matrix_utils import vrow, vcol, empirical_dataset_mean, empirical_dataset_covariance
+from utils.metrics_utils import compute_min_DCF
+from utils.utils import k_fold
 
 
 class GMM(ClassifierClass):
@@ -253,3 +255,18 @@ class GMM(ClassifierClass):
     def get_llrs(self):
         return self._scores
 
+
+def tuning_componentsGMM(training_data, training_labels, alpha=0.1, psi=0.01):
+    variants = ['full-cov', 'diag', 'tied']
+    raw = [True, False]
+    m_values = [None, 7]
+    components_values = [2, 4, 16, 32]
+
+    hyperparameters = itertools.product(variants, components_values, raw, m_values)
+    for variant, r, m in hyperparameters:
+        DCFs = []
+        for g in components_values:
+            llrs, evalutationLables = k_fold(training_data, training_labels, GMM, 5, seed=0, raw=r, m=m, type=variant, alpha=alpha, psi=psi, g=g)
+            min_dcf = compute_min_DCF(llrs, evalutationLables, 0.5, 1, 1)
+            DCFs.append(min_dcf)
+        np.save(f"GMM_rawFeature-{r}_PCA{m}_{variant}", DCFs)
