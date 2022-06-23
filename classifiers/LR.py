@@ -62,3 +62,13 @@ def tuning_lambda(training_data, training_labels):
                 min_dcf = compute_min_DCF(np.array(llrs), evaluationLabels, pi, 1, 1)
                 DCFs.append(min_dcf)
             np.save(f"LR_prior_{str(pi).replace('.', '-')}_PCA{m}", np.array(DCFs))
+
+
+def calibrateScores(scores, evaluationLabels, lambd, prior=0.5):
+    # f(s) = as+b can be interpreted as the llr for the two class hypothesis
+    # class posterior probability: as+b+log(pi/(1-pi)) = as +b'
+    logReg = LR(scores, evaluationLabels, lbd=lambd, pi_T=prior)
+    logReg.train_model()
+    logReg.classify(scores, None)
+    scores = logReg.get_llrs() - np.log(prior / 1 - prior)
+    return scores

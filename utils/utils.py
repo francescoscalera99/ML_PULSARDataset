@@ -3,7 +3,6 @@ from scipy.stats import norm
 
 from PCA import PCA
 from classifiers.Classifier import ClassifierClass
-from classifiers.LR import LR
 from .matrix_utils import vcol
 import matplotlib.pyplot as plt
 
@@ -174,20 +173,6 @@ def splitData_SingleFold(dataset_train, labels_train, seed=0):
     LTR = labels_train[idxTrain]
     LTEV = labels_train[idxTest]
     return (DTR, LTR), (DTEV, LTEV)
-
-
-#FIXME
-def calibrateScores(scores, evaluationLabels, lambd, prior=0.5):
-    # f(s) = as+b can be interpreted as the llr for the two class hypothesis
-    # class posterior probability: as+b+log(pi/(1-pi)) = as +b'
-    logReg = LR(scores, evaluationLabels, lbd=lambd, pi_T=prior)
-    logReg.train_model()
-    # alpha = x[0]
-    # betafirst = x[1]
-    # calibratedScores = alpha * scores + betafirst - np.log(prior/(1 - prior))
-    #
-    # return calibratedScores
-    return
 
 
 def main():
