@@ -1,3 +1,5 @@
+import itertools
+
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -73,18 +75,18 @@ def plot_lambda():
         for j, pi in enumerate(prior):
             DCFs = np.load(
                 f"/Users/riccardo/PycharmProjects/ML_PULSARDataset/simulations/LR/LR_prior_{str(pi).replace('.', '-')}_PCA{str(m)}.npy")
-            axs[i//2, i%2].plot(lbd_values, DCFs, color=colors[j], label=r"$\widetilde{\pi}=$"+f"{pi}")
+            axs[i // 2, i % 2].plot(lbd_values, DCFs, color=colors[j], label=r"$\widetilde{\pi}=$" + f"{pi}")
 
             if m == False:
-                axs[i//2, i%2].set_title(f'5-fold, Raw features')
+                axs[i // 2, i % 2].set_title(f'5-fold, Raw features')
             elif m is None:
-                axs[i//2, i%2].set_title(f'5-fold, no PCA')
+                axs[i // 2, i % 2].set_title(f'5-fold, no PCA')
             else:
-                axs[i//2, i%2].set_title(f'5-fold, PCA (m={m})')
+                axs[i // 2, i % 2].set_title(f'5-fold, PCA (m={m})')
 
-            axs[i//2, i%2].set_xlabel('λ')
-            axs[i//2, i%2].set_ylabel('minDCF')
-            axs[i//2, i%2].set_xscale('log')
+            axs[i // 2, i % 2].set_xlabel('λ')
+            axs[i // 2, i % 2].set_ylabel('minDCF')
+            axs[i // 2, i % 2].set_xscale('log')
         i += 1
     # fig.set_size_inches(10, 10)
     # fig.tight_layout()
@@ -96,5 +98,69 @@ def plot_lambda():
     fig.show()
 
 
+def plot_tuningPolySVM():
+    C_values = np.logspace(-3, 3, 20)
+    m_values = [False, None, 7, 5]
+    K_values = [0.0, 1.0]
+    c_values = [0, 1, 10, 15]
+
+    i = 0
+    fig, axs = plt.subplots(1, 4)
+    fig.suptitle('Poly SVM')
+    for m in m_values:
+        hyperparameters = itertools.product(K_values, c_values)
+        for K, c in hyperparameters:
+            DCFs = np.load(
+                f"/Users/francesco.scalera/PycharmProjects/ML_PULSARDataset/simulations/polySVM/K{str(K).replace('.', '-')}_c{str(c).replace('.', '-')}_PCA{str(m)}.npy")
+            axs[i].plot(C_values, DCFs, color=np.random.rand(3, ), label=f"K={K}, c={c}")
+            if (m == False):
+                axs[i].set_title(f'5-fold, Raw features')
+            else:
+                axs[i].set_title(f'5-fold, PCA (m = {m})')
+            axs[i].legend()
+            axs[i].set_xlabel('C')
+            axs[i].set_ylabel('minDCF')
+            axs[i].set_xscale('log')
+        i += 1
+    fig.set_size_inches(20, 5)
+    fig.tight_layout()
+    fig.subplots_adjust(top=0.88)
+    fig.show()
+
+
+C_values = np.logspace(-3, 3, 20)
+m_values = [False, None, 7]
+K_values = [0.0, 1.0]
+gamma_values = [1e-2, 1e-3, 1e-4]
+
+
+def plot_tuningRBFSVM():
+    i = 0
+    fig, axs = plt.subplots(1, 3)
+    fig.suptitle('RBF SVM')
+
+    for m in m_values:
+        hyperparameters = itertools.product(K_values, gamma_values)
+        for K, gamma in hyperparameters:
+            DCFs = np.load(f"/Users/francesco.scalera/PycharmProjects/ML_PULSARDataset/simulations/RBF/RBF_K{str(K).replace('.', '-')}_c{str(gamma).replace('.', '-')}_PCA{str(m)}.npy")
+            axs[i].plot(C_values, DCFs, color=np.random.rand(3, ), label=f"K={K}, gamma={gamma}")
+            if (m == False):
+                axs[i].set_title(f'5-fold, Raw features')
+            else:
+                axs[i].set_title(f'5-fold, PCA (m = {m})')
+            axs[i].legend()
+            axs[i].set_xlabel('C')
+            axs[i].set_ylabel('minDCF')
+            axs[i].set_xscale('log')
+        i += 1
+
+    fig.set_size_inches(15, 5)
+    fig.tight_layout()
+    fig.subplots_adjust(top=0.88)
+    fig.show()
+
+
 if __name__ == '__main__':
-    plot_lambda()
+    # plot_lambda()
+    plot_tuningPolySVM()
+    plot_tuningRBFSVM()
