@@ -167,7 +167,38 @@ def plot_tuningRBFSVM():
     fig.show()
 
 
+def plot_tuningLinearSVMUnbalanced():
+    C_values = np.logspace(-3, 3, 20)
+    m_values = [False, None, 7, 5]
+    K_values = [1.0, 10.0]
+    priors = [0.5, 0.1, 0.9]
+
+    i = 0
+    fig, axs = plt.subplots(1, 4, sharey='row')
+    colors = distinctipy.get_colors(6, pastel_factor=0.7)
+    for m in m_values:
+        hyperparameters = itertools.product(K_values, priors)
+        for j, (K, p) in enumerate(hyperparameters):
+            DCFs = np.load(
+                f"../simulations/linearSVM/unbalanced/new/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}_PCA{str(m)}.npy")
+            axs[i].plot(C_values, DCFs, color=colors[j], label=f"K={K}, prior={p}")
+            if (m == False):
+                axs[i].set_title(f'5-fold, Raw features')
+            else:
+                axs[i].set_title(f'5-fold, PCA (m = {m})')
+            axs[i].legend()
+            axs[i].set_xlabel('C')
+            axs[i].set_ylabel('minDCF')
+            axs[i].set_xscale('log')
+            axs[i].yaxis.set_tick_params(labelbottom=True)
+        i += 1
+    fig.set_size_inches(20, 5)
+    fig.tight_layout()
+    fig.subplots_adjust(top=0.88)
+    fig.show()
+
 if __name__ == '__main__':
     # plot_lambda()
-    plot_tuningPolySVM()
-    plot_tuningRBFSVM()
+    # plot_tuningPolySVM()
+    # plot_tuningRBFSVM()
+    plot_tuningLinearSVMUnbalanced()
