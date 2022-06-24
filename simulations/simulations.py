@@ -3,7 +3,7 @@ import numpy as np
 from prettytable import PrettyTable
 
 from classifiers.GMM import GMM
-from classifiers.LR import LR
+from classifiers.LR import LR, calibrateScores
 from classifiers.MVG import MVG
 from classifiers.SVM import SVM
 from utils.metrics_utils import compute_actual_DCF, compute_min_DCF
@@ -83,38 +83,40 @@ def LR_simulations(training_data, training_labels, lbd, calibrateScore=False, ac
     print(table)
 
 
-def SVM_LinearBalancedSimulations(training_data, training_labels, K, C_piT, calibrateScore=False, actualDCF=False):
-    m = [None, 7, 5]
+def SVM_LinearUnbalancedSimulations(training_data, training_labels, K, C, calibratedScore=False, actualDCF=False):
+
+    m = [False, None, 7, 5]
     priors = [0.5, 0.1, 0.9]
 
-    hyperparameters = itertools.product(m, C_piT, priors)
+    hyperparameters = itertools.product(m, C, priors)
 
     table = PrettyTable()
     table.field_names = ['Hyperparameters', 'min DCF']
 
-    for m, (C, pi_T), pi in hyperparameters:
-        if pi_T == None:
-            llrs, labels = k_fold(training_data, training_labels, SVM, 5, seed=0, balanced=False, m=m, raw=False, pi_T=pi_T, k=K, c=C,
+    for m, C, pi in hyperparameters:
+        if m == False:
+            llrs, labels = k_fold(training_data, training_labels, SVM, 5, seed=0, balanced=False, m=None, raw=True, pi_T=None, k=K, c=C,
                                   kernel_params=(1, 0), kernel_type='poly')
         else:
-            llrs, labels = k_fold(training_data, training_labels, SVM, 5, seed=0, balanced=True, m=m, raw=False, pi_T=pi_T, k=K, c=C,
+            llrs, labels = k_fold(training_data, training_labels, SVM, 5, seed=0, balanced=False, m=m, raw=False,
+                                  pi_T=None, k=K, c=C,
                                   kernel_params=(1, 0), kernel_type='poly')
         if actualDCF:
-            if calibrateScore:
-                score = scoreCalibration(llrs, labels)
+            if calibratedScore:
+                score = calibrateScores(llrs, labels)
             else:
                 score = llrs
             actDCF = compute_actual_DCF(score, labels, pi, 1, 1)
-            table.add_row([f"PCA m={m}, π_tilde={pi}, π_T={pi_T}  C ={C}", round(actDCF, 3)])
+            table.add_row([f"PCA m={m}, π_tilde={pi},  C ={C}", round(actDCF, 3)])
         min_dcf = compute_min_DCF(np.array(llrs), labels, pi, 1, 1)
-        print(f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T}  C ={C}", "-->", round(min_dcf, 3))
-        table.add_row([f"PCA m={m}, π_tilde={pi}, π_T={pi_T}  C ={C}", round(min_dcf, 3)])
+        print(f"PCA m={m}, data: gaussianized, π_tilde={pi}, C ={C}", "-->", round(min_dcf, 3))
+        table.add_row([f"PCA m={m}, π_tilde={pi}, C ={C}", round(min_dcf, 3)])
 
     print(table)
 
 
 def SVM_PolySimulations(training_data, training_labels, K, C, pi_T, c, d):
-    m = [None, 7, 5]
+    m = [False, None, 7, 5]
     priors = [0.5, 0.1, 0.9]
 
     hyperparameters = itertools.product(m, priors)
