@@ -1,3 +1,5 @@
+import itertools
+
 import numpy as np
 import scipy.special as special
 
@@ -239,7 +241,18 @@ def tuning_componentsGMM(training_data, training_labels, alpha=0.1, psi=0.01):
     m_values = [None, 7]
     components_values = [2, 4, 16, 32]
 
-    hyperparameters = itertools.product(variants, components_values, raw, m_values)
+    # len(hyperparameters): 12
+    # FOR EACH TUPLE IN hyperparameters WE PERFORM 4 INNER ITERATIONS
+    hyperparameters = list(itertools.product(variants, raw, m_values))
+    # SPLIT HYPERPARAMETERS IN 6 PARTITIONS OF 2 TUPLES -> 8 INNER ITERATIONS OVERALL
+
+    # ELENA: hyperparameters[:2]
+    # CICCIO: hyperparameters[2:4]
+    # TODO: hyperparameters[4:6]
+    # TODO: hyperparameters[6:8]
+    # TODO: hyperparameters[8:10]
+    # TODO: hyperparameters[10:]
+
     for variant, r, m in hyperparameters:
         DCFs = []
         for g in components_values:
