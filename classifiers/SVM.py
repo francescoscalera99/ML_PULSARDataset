@@ -189,14 +189,14 @@ def tuning_parameters_RBFSVM(training_data, training_labels):
 
 
 def tuning_parameters_LinearSVMUnbalanced(training_data, training_labels):
-    # C_values = np.logspace(-2, 2, 20)
-    # K_values = [1.0, 10.0]
-    # priors = [0.5, 0.1, 0.9]
-    # ms = [False, None, 7, 5]
     C_values = np.logspace(-2, 2, 20)
-    K_values = [10.0]
-    priors = [0.9]
-    ms = [5]
+    K_values = [1.0, 10.0]
+    priors = [0.5, 0.1, 0.9]
+    ms = [False, None, 7, 5]
+    # C_values = np.logspace(-2, 2, 20)
+    # K_values = [10.0]
+    # priors = [0.9]
+    # ms = [5]
 
     hyperparameters = itertools.product(ms, K_values, priors)
     for m, K, p in hyperparameters:
@@ -219,38 +219,47 @@ def tuning_parameters_LinearSVMUnbalanced(training_data, training_labels):
 
 
 def tuning_parameters_LinearSVMBalanced(training_data, training_labels):
-    # K_values = [1.0, 10.0]
-    # priors = [0.5, 0.1, 0.9]
-    # pi_T_values = [0.5, 0.1, 0.9]
-    # ms = [None, 7, 5]
-    C_values = np.logspace(-2, 2, 20)
     K_values = [1.0, 10.0]
     priors = [0.5, 0.1, 0.9]
     pi_T_values = [0.5, 0.1, 0.9]
-    ms = [False, None, 7, 5]  # false to compute raw feature, none for not computing PCA
+    ms = [False, None, 7, 5]
+    C_values = np.logspace(-2, 2, 20)
+    h = list(itertools.product(ms, pi_T_values, K_values, priors))
+    # K_values = [10.0]
+    # priors = [0.5]
+    # pi_T_values = [0.5, 0.1, 0.9]
+    # ms = [False, None, 7, 5]  # false to compute raw feature, none for not computing PCA
 
-    for m in ms:
-        for pi_T in pi_T_values:
-            hyperparameters = itertools.product(K_values, priors)
-            for K, p in hyperparameters:
-                DCFs = []
-                for i, C in enumerate(C_values):
-                    if m == False:
-                        llrs, evaluationLabels = k_fold(training_data, training_labels, SVM, 5, m=None, raw=True, k=K,
-                                                        c=C, balanced=True, pi_T=pi_T,
-                                                        kernel_params=(1, 0), kernel_type='poly')
-                    else:
-                        llrs, evaluationLabels = k_fold(training_data, training_labels, SVM, 5, m=m, raw=False, k=K,
-                                                        c=C, balanced=True, pi_T=pi_T,
-                                                        kernel_params=(1, 0), kernel_type='poly')
-                    min_dcf = compute_min_DCF(llrs, evaluationLabels, p, 1, 1)
-                    print(f"Dataset PCA{m} iteration {i + 1} ", "min_DCF for K = ", K, "with prior = ", p, "pi_T = ",
-                          pi_T, "->",
-                          min_dcf)
-                    DCFs.append(min_dcf)
-                np.save(
-                    f"K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}_pT{str(pi_T).replace('.', '-')}_PCA{m}",
-                    np.array(DCFs))
+    # m, piT, k, p
+
+    already_done = [(None, 0.5, 10, 0.9),
+                    (None, 0.5, 10, 0.1),
+                    (None, 0.5, 10, 0.5),
+                    (None, 0.5, 1, 0.9),
+                    (None, 0.5, 1, 0.1),
+                    (None, 0.5, 1, 0.5)]
+    o = [t for t in h if t not in already_done]
+
+    for i, (m, pi_T, K, p) in enumerate(o):
+        print(f"iteration {i+1}/66")
+        DCFs = []
+        for i, C in enumerate(C_values):
+            if m == False:
+                llrs, evaluationLabels = k_fold(training_data, training_labels, SVM, 5, m=None, raw=True, k=K,
+                                                c=C, balanced=True, pi_T=pi_T,
+                                                kernel_params=(1, 0), kernel_type='poly')
+            else:
+                llrs, evaluationLabels = k_fold(training_data, training_labels, SVM, 5, m=m, raw=False, k=K,
+                                                c=C, balanced=True, pi_T=pi_T,
+                                                kernel_params=(1, 0), kernel_type='poly')
+            min_dcf = compute_min_DCF(llrs, evaluationLabels, p, 1, 1)
+            print(f"Dataset PCA{m} iteration {i + 1} ", "min_DCF for K = ", K, "with prior = ", p, "pi_T = ",
+                  pi_T, "->",
+                  min_dcf)
+            DCFs.append(min_dcf)
+        np.save(
+            f"simulations/linearSVM/balanced/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}_pT{str(pi_T).replace('.', '-')}_PCA{m}",
+            np.array(DCFs))
 
 # def tuning_parameters_LinearSVMBalanced(training_data, training_labels):
 #     titles_Kfold = ['Gaussianized feature (5-fold, no PCA)', 'Guassianized feature (5-fold, PCA = 7)',

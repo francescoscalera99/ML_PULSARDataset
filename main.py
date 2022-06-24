@@ -33,9 +33,9 @@ def main():
     # LR_simulations(training_data, training_labels, lbd)
 
     # =============== SUPPORT VECTOR MACHINE ===============
-    # print("LINEAR SVM - TUNING PARAMETERS")
+    print("LINEAR SVM - TUNING PARAMETERS")
     # tuning_parameters_LinearSVMUnbalanced(training_data, training_labels)
-    # tuning_parameters_LinearSVMBalanced(training_data, training_labels)
+    tuning_parameters_LinearSVMBalanced(training_data, training_labels)
     # print("POLY SVM - TUNING PARAMETERS")
     # tuning_parameters_PolySVM(training_data, training_labels)
     # print("RBF SVM - TUNING PARAMETERS")
@@ -102,9 +102,6 @@ def logpdf_GAU_ND(x, mu, C):
     return np.diag(
         -(M / 2) * np.log(2 * np.pi) - (1 / 2) * (detC) - (1 / 2) * np.dot(np.dot((x - mu).T, invC), (x - mu)))
 
-lbd_values = np.logspace(-5, 5, 50)
-m_values = [False, None, 7, 5]
-prior = [0.5, 0.1, 0.9]
 
 # i = 0
 # fig, axs = plt.subplots(1, 4)
