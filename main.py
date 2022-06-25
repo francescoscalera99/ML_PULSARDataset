@@ -51,13 +51,13 @@ def main():
     # C_LinearUnb = 1
     # SVM_LinearUnbalancedSimulations(training_data, training_labels, K_LinearUnb, C_LinearUnb)
 
-    print(" ---------- SVM POLY SIMULATION ----------")
-    K_Poly = 1.0
-    pi_TPolyRBF = 0.5
-    CPoly = 1e-2
-    c = 15
-    d = 2
-    SVM_PolySimulations(training_data, training_labels, K_Poly, CPoly, pi_TPolyRBF, c, d)
+    # print(" ---------- SVM POLY SIMULATION ----------")
+    # K_Poly = 1.0
+    # pi_TPolyRBF = 0.5
+    # CPoly = 1e-2
+    # c = 15
+    # d = 2
+    # SVM_PolySimulations(training_data, training_labels, K_Poly, CPoly, pi_TPolyRBF, c, d)
 
     # print(" ---------- SVM RBF SIMULATION ----------")
     # K_RBF = 0
@@ -66,7 +66,8 @@ def main():
     # SVM_RBFSimulations(training_data, training_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF)
 
     # =============== GAUSSIAN MIXTURE MODELS ===============
-    # tuning_componentsGMM(training_data, training_labels)
+    print("GMM TUNING")
+    tuning_componentsGMM(training_data, training_labels, psi=0.1)
     # print("GMM SIMULATIONS")
     # GMM_Simulations(training_data, training_labels, alpha=0.1, psi=0.01)
 
