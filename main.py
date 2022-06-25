@@ -3,9 +3,11 @@ import os
 
 import numpy as np
 
+from classifiers.GMM import tuning_componentsGMM
 from classifiers.LR import tuning_lambda
 from classifiers.SVM import tuning_parameters_PolySVM, tuning_parameters_RBFSVM, tuning_parameters_LinearSVMBalanced
-from simulations.simulations import MVG_simulations, GMM_Simulations
+from simulations.simulations import MVG_simulations, GMM_Simulations, SVM_LinearUnbalancedSimulations, \
+    SVM_PolySimulations, SVM_RBFSimulations
 from utils.utils import load_dataset
 
 
@@ -29,48 +31,57 @@ def main():
 
     # =============== LOGISTIC REGRESSION ===============
     # tuning_lambda(training_data, training_labels)
-    # lbd = 1e-3
+    # lbd = 1e-1
     # LR_simulations(training_data, training_labels, lbd)
 
     # =============== SUPPORT VECTOR MACHINE ===============
-    print("LINEAR SVM - TUNING PARAMETERS")
+    # print("LINEAR SVM - TUNING PARAMETERS")
     # tuning_parameters_LinearSVMUnbalanced(training_data, training_labels)
-    tuning_parameters_LinearSVMBalanced(training_data, training_labels)
+    # tuning_parameters_LinearSVMBalanced(training_data, training_labels)
     # print("POLY SVM - TUNING PARAMETERS")
     # tuning_parameters_PolySVM(training_data, training_labels)
     # print("RBF SVM - TUNING PARAMETERS")
     # tuning_parameters_RBFSVM(training_data, training_labels)
-    # tuning_parameters_LinearSVMBalanced(training_data, training_labels)
-    # K_Linear = 1.0 #This values comes from tuning of hyperparameters
-    # C_piT_Linear = [(1e-2, None), (1e-3, 0.5), (6 * 1e-3, 0.1), (7 * 1e-4, 0.9)] #These values comes from tuning of hyperparameter
-    # SVM_LinearSimulations(training_data, training_labels, K_Linear, C_piT_Linear)
-    # K_Poly = 1.0
-    # pi_TPolyRBF = 0.5
-    # CPoly = 5*1e-1
-    # c = 15
-    # d = 2
-    # SVM_PolySimulations(training_data, training_labels, K_Poly, CPoly, pi_TPolyRBF, c, d)
-    # K_RBF = 1.0
+    # tuning_parameters_LinearSVMUnBalanced(training_data, training_labels)
+
+    # C_piT_LinearBalanced = [(1e-2, None), (1e-3, 0.5), (6 * 1e-3, 0.1), (7 * 1e-4, 0.9)] #These values comes from tuning of hyperparameter
+
+    # print(" ---------- SVM LINEAR UNBALANCED SIMULATION ----------")
+    # K_LinearUnb = 1.0  # This values comes from tuning of hyperparameters
+    # C_LinearUnb = 1
+    # SVM_LinearUnbalancedSimulations(training_data, training_labels, K_LinearUnb, C_LinearUnb)
+
+    print(" ---------- SVM POLY SIMULATION ----------")
+    K_Poly = 1.0
+    pi_TPolyRBF = 0.5
+    CPoly = 1e-2
+    c = 15
+    d = 2
+    SVM_PolySimulations(training_data, training_labels, K_Poly, CPoly, pi_TPolyRBF, c, d)
+
+    # print(" ---------- SVM RBF SIMULATION ----------")
+    # K_RBF = 0
     # gamma_RBF = 1e-3
     # C_RBF = 1e-1
     # SVM_RBFSimulations(training_data, training_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF)
 
     # =============== GAUSSIAN MIXTURE MODELS ===============
-    print("GMM SIMULATIONS")
-    GMM_Simulations(training_data, training_labels, alpha=0.1, psi=0.01)
+    # tuning_componentsGMM(training_data, training_labels)
+    # print("GMM SIMULATIONS")
+    # GMM_Simulations(training_data, training_labels, alpha=0.1, psi=0.01)
 
     # =============== COMPUTING ACTUAL DCF ===============
     # MVG_simulations(training_data, training_labels, actualDCF=True, calibrateScore=False)
     # LR_simulations(training_data, training_labels, lbd)
-    # SVM_LinearSimulations(training_data, training_labels, K_Linear, C_piT_Linear, actualDCF=True, calibrateScore=False)
-    # SVM_PolySimulations(training_data, training_labels, K_Poly, CPoly, pi_TPolyRBF, c, d, actualDCF=True, calibrateScore=False)
-    # SVM_RBFSimulations(training_data, training_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF, actualDCF=True, calibrateScore=False)
+    # SVM_LinearSimulations(training_data, training_labels, K_Linear, C_piT_Linear, actualDCF=True, calibratedScore=False)
+    # SVM_PolySimulations(training_data, training_labels, K_Poly, CPoly, pi_TPolyRBF, c, d, actualDCF=True, calibratedScore=False)
+    # SVM_RBFSimulations(training_data, training_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF, actualDCF=True, calibratedScore=False)
 
     # =============== SCORE CALIBRATION ===============
     # MVG_simulations(training_data, training_labels, actualDCF=True, calibrateScore=True)
-    # SVM_LinearSimulations(training_data, training_labels, K_Linear, C_piT_Linear, actualDCF=True, calibrateScore=True)
-    # SVM_PolySimulations(training_data, training_labels, K_Poly, CPoly, pi_TPolyRBF, c, d, actualDCF=True, calibrateScore=True)
-    # SVM_RBFSimulations(training_data, training_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF, actualDCF=True, calibrateScore=True)
+    # SVM_LinearSimulations(training_data, training_labels, K_Linear, C_piT_Linear, actualDCF=True, calibratedScore=True)
+    # SVM_PolySimulations(training_data, training_labels, K_Poly, CPoly, pi_TPolyRBF, c, d, actualDCF=True, calibratedScore=True)
+    # SVM_RBFSimulations(training_data, training_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF, actualDCF=True, calibratedScore=True)
     # LR_simulations(training_data, training_labels, lbd, , actualDCF=True, calibrateScore=False)
 
     # =============== EXPERIMENTAL RESULT ===============

@@ -54,12 +54,13 @@ def tuning_lambda(training_data, training_labels):
     for m in m_values:
         for pi in priors:
             DCFs = []
-            for lbd in lbd_values:
+            for (i,lbd) in enumerate(lbd_values):
                 if m == False:
                     llrs, evaluationLabels = k_fold(training_data, training_labels, LR, 5, m=None, raw=True, seed=0, lbd=lbd, pi_T=0.5)
                 else:
                     llrs, evaluationLabels = k_fold(training_data, training_labels, LR, 5, m=m, raw=False, seed=0, lbd=lbd, pi_T=0.5)
                 min_dcf = compute_min_DCF(np.array(llrs), evaluationLabels, pi, 1, 1)
+                print(f"{i} data:PCA{m}, lbd={lbd}, pi={pi} -> min DCF", min_dcf)
                 DCFs.append(min_dcf)
             np.save(f"LR_prior_{str(pi).replace('.', '-')}_PCA{m}", np.array(DCFs))
 

@@ -138,14 +138,13 @@ class SVM(ClassifierClass):
 
 
 def tuning_parameters_PolySVM(training_data, training_labels):
-    m_values = [False, None, 7, 5]
+    m_values = [7, 5]
     C_values = np.logspace(-3, 3, 20)
     K_values = [0.0, 1.0]
     c_values = [0, 1, 10, 15]
 
-    hyperparameters = itertools.product(c_values, K_values)
-
     for m in m_values:
+        hyperparameters = itertools.product(c_values, K_values)
         for c, K in hyperparameters:
             DCFs = []
             for i, C in enumerate(C_values):
@@ -158,19 +157,19 @@ def tuning_parameters_PolySVM(training_data, training_labels):
                                                     balanced=True, pi_T=0.5,
                                                     kernel_params=(2, c), kernel_type='poly')
                 min_dcf = compute_min_DCF(llrs, evaluationLabels, 0.5, 1, 1)
-                print(i + 1, "min_DCF for C = ", C, "with c = ", c, "and K =", K, "->", min_dcf)
+                print(i + 1, f"PCA{m} min_DCF for C ={C} with c ={c} and K ={K}-> {min_dcf}")
                 DCFs.append(min_dcf)
-            np.save(f"K{str(K).replace('.', '-')}_c{str(c).replace('.', '-')}_PCA5", np.array(DCFs))
+            np.save(f"K{str(K).replace('.', '-')}_c{str(c).replace('.', '-')}_PCA{str(m)}", np.array(DCFs))
 
 
 def tuning_parameters_RBFSVM(training_data, training_labels):
-    m_values = [None, 7, 5]
+    m_values = [False, None, 7, 5]
     C_values = np.logspace(-3, 3, 20)
     K_values = [0.0, 1.0]
     gamma_values = [1e-2, 1e-3, 1e-4]
 
-    hyperparameters = itertools.product(gamma_values, K_values)
     for m in m_values:
+        hyperparameters = itertools.product(gamma_values, K_values)
         for gamma, K in hyperparameters:
             DCFs = []
             for (i, C) in enumerate(C_values):
@@ -185,7 +184,7 @@ def tuning_parameters_RBFSVM(training_data, training_labels):
                 min_dcf = compute_min_DCF(llrs, evaluationLabels, 0.5, 1, 1)
                 print(i + 1, "min_DCF for C = ", C, "with gamma = ", gamma, "and K =", K, "->", min_dcf)
                 DCFs.append(min_dcf)
-            np.save(f"RBF_K{str(K).replace('.', '-')}_c{str(gamma).replace('.', '-')}_PCA{str(m)}", np.array(DCFs))
+            np.save(f"RBF_K{str(K).replace('.', '-')}_gamma{str(gamma).replace('.', '-')}_PCA{str(m)}", np.array(DCFs))
 
 
 def tuning_parameters_LinearSVMUnbalanced(training_data, training_labels):

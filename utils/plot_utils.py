@@ -74,7 +74,7 @@ def plot_lambda():
     for m in m_values:
         for j, pi in enumerate(prior):
             DCFs = np.load(
-                f"/Users/riccardo/PycharmProjects/ML_PULSARDataset/simulations/LR/LR_prior_{str(pi).replace('.', '-')}_PCA{str(m)}.npy")
+                f"../simulations/LR/LR_prior_{str(pi).replace('.', '-')}_PCA{str(m)}.npy")
             axs[i // 2, i % 2].plot(lbd_values, DCFs, color=colors[j], label=r"$\widetilde{\pi}=$" + f"{pi}")
 
             if m == False:
@@ -201,4 +201,5 @@ if __name__ == '__main__':
     # plot_lambda()
     # plot_tuningPolySVM()
     # plot_tuningRBFSVM()
-    plot_tuningLinearSVMUnbalanced()
+    # plot_tuningLinearSVMUnbalanced()
+    pass

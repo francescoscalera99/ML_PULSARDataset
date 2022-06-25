@@ -150,7 +150,6 @@ class GMM(ClassifierClass):
             avg_ll = avg_ll_new
             posteriors, avg_ll_new = expectation(*gmm)
             gmm = maximization(posteriors)
-        print(f"EM estimation took {n_iter} iterations")
         return gmm
 
     def _lbg(self, dataset, desired_n_components, alpha=0.1, psi=0.01):
@@ -178,9 +177,7 @@ class GMM(ClassifierClass):
         gmm = self._em_estimation(dataset, gmm, psi)
         while num_components < desired_n_components:
             gmm = split_gmm(gmm)
-            print("Start em")
             gmm = self._em_estimation(dataset, gmm, psi)
-            print("end em")
             num_components = gmm[0].size
 
         return gmm
@@ -203,9 +200,7 @@ class GMM(ClassifierClass):
         num_classes = len(set(self.training_labels))
         for c in range(num_classes):
             dataset = self.training_data[:, self.training_labels == c]
-            print("Start lbg")
             gmm = self._lbg(dataset, desired_n_components, alpha=alpha, psi=psi)
-            print("End lbg")
             weights = vcol(gmm[0])
             self._model.add_gmm(gmm)
             score_matrix = self._model.log_pdf(dataset, c) + np.log(weights)
@@ -253,10 +248,10 @@ def tuning_componentsGMM(training_data, training_labels, alpha=0.1, psi=0.01):
     # TODO: hyperparameters[8:10]
     # TODO: hyperparameters[10:]
 
-    for variant, r, m in hyperparameters:
+    for variant, r, m in hyperparameters[2:4]:
         DCFs = []
         for g in components_values:
-            llrs, evalutationLables = k_fold(training_data, training_labels, GMM, 5, seed=0, raw=r, m=m, type=variant, alpha=alpha, psi=psi, g=g)
+            llrs, evalutationLables = k_fold(training_data, training_labels, GMM, 5, seed=0, raw=r, m=m, type=variant, alpha=alpha, psi=psi, G=g)
             min_dcf = compute_min_DCF(llrs, evalutationLables, 0.5, 1, 1)
             DCFs.append(min_dcf)
         np.save(f"GMM_rawFeature-{r}_PCA{m}_{variant}", DCFs)
