@@ -132,7 +132,7 @@ def SVM_PolySimulations(training_data, training_labels, K, C, pi_T, c, d):
             llrs, evaluationLabels = k_fold(training_data, training_labels, SVM, 5, seed=0, m=m, raw=False, k=K, c=C,
                                             balanced=True, pi_T=pi_T,
                                             kernel_params=(d, c), kernel_type='poly')
-        min_dcf = compute_min_DCF(llrs, evaluationLabels, 0.5, 1, 1)
+        min_dcf = compute_min_DCF(llrs, evaluationLabels, pi, 1, 1)
         print(f"PCA m={m}, π_tilde={pi}, pi_T = 0.5, C ={C} K={K}, c={c}, d={d}", "-->",
               round(min_dcf, 3))
         table.add_row(
