@@ -255,7 +255,7 @@ def tuning_componentsGMM(training_data, training_labels, alpha=0.1, psi=0.01):
     variants = ['full-cov', 'diag', 'tied']
     raw = [True, False]
     m_values = [None, 7]
-    components_values = [2, 4, 16, 32]
+    components_values = [2, 4, 8, 16, 32]
 
     # len(hyperparameters): 12
     # FOR EACH TUPLE IN hyperparameters WE PERFORM 4 INNER ITERATIONS
@@ -278,4 +278,4 @@ def tuning_componentsGMM(training_data, training_labels, alpha=0.1, psi=0.01):
             min_dcf = compute_min_DCF(llrs, evalutationLables, 0.5, 1, 1)
             DCFs.append(min_dcf)
             i += 1
-        np.save(f"GMM_rawFeature-{r}_PCA{m}_{variant}", DCFs)
+        np.save(f"simulations/GMM/GMM_rawFeature-{r}_PCA{m}_{variant}", DCFs)
