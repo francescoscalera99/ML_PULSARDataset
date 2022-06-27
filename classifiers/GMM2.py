@@ -3,7 +3,7 @@ import itertools
 import numpy as np
 import scipy.special as special
 
-from Classifier import ClassifierClass
+from classifiers.Classifier import ClassifierClass
 from utils.matrix_utils import vrow, vcol, empirical_dataset_mean, empirical_dataset_covariance
 
 from utils.metrics_utils import compute_min_DCF
