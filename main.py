@@ -3,7 +3,7 @@ import os
 
 import numpy as np
 
-from classifiers.GMM import tuning_componentsGMM
+from classifiers.GMM import tuning_componentsGMM, testGMM
 from classifiers.LR import tuning_lambda
 from classifiers.SVM import tuning_parameters_PolySVM, tuning_parameters_RBFSVM, tuning_parameters_LinearSVMBalanced
 from preprocessing.preprocessing import PCA
@@ -11,6 +11,15 @@ from simulations.simulations import MVG_simulations, GMM_Simulations, SVM_Linear
     SVM_PolySimulations, SVM_RBFSimulations
 from utils.plot_utils import create_scatterplots
 from utils.utils import load_dataset
+
+
+def get_same_distrib_partition(dtr, ltr, perc=0.1, num_samples=1000):
+    idx = np.random.permutation(dtr.shape[1])
+    idx_t = idx[:num_samples]
+    dtr2 = dtr[:, idx_t]
+    ltr2 = ltr[idx_t]
+
+    return dtr2, ltr2
 
 
 def main():
@@ -71,8 +80,11 @@ def main():
     # SVM_RBFSimulations(training_data, training_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF)
 
     # =============== GAUSSIAN MIXTURE MODELS ===============
-    # print("GMM TUNING")
-    # tuning_componentsGMM(training_data, training_labels, psi=0.1)
+    # print("GMM")
+    # training_data, training_labels = get_same_distrib_partition(training_data, training_labels)
+    # testGMM(training_data, training_labels, 16)
+    print("GMM TUNING")
+    tuning_componentsGMM(training_data, training_labels, psi=0.1)
     # print("GMM SIMULATIONS")
     # GMM_Simulations(training_data, training_labels, alpha=0.1, psi=0.01)
 
@@ -135,7 +147,7 @@ def find_already_done():
             done.append((m, pi_T, K, p))
         except FileNotFoundError:
             pass
-    print(done)
+    print(len(done))
 
 # i = 0
 # fig, axs = plt.subplots(1, 4)
