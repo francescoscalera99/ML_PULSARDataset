@@ -279,4 +279,4 @@ def tuning_componentsGMM(training_data, training_labels, alpha=0.1, psi=0.01):
             min_dcf = compute_min_DCF(llrs, evalutationLables, 0.5, 1, 1)
             DCFs.append(min_dcf)
             i += 1
-        # np.save(f"GMM_rawFeature-{r}_PCA{m}_{variant}", DCFs)
+        np.save(f"GMM_rawFeature-{r}_PCA{m}_{variant}", DCFs)
