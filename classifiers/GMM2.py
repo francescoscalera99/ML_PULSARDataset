@@ -271,9 +271,6 @@ def tuning_componentsGMM(training_data, training_labels, alpha=0.1, psi=0.01):
     for variant, r, m in hyperparameters[0:2]:
         DCFs = []
         for g in components_values:
-            if i != 2:
-                i += 1
-                continue
             print(f"Inner iteration {i+1}/{2*len(components_values)}")
             llrs, evalutationLables = k_fold(training_data, training_labels, GMM, 5, seed=0, raw=r, m=m, type=variant, alpha=alpha, psi=psi, G=g)
             min_dcf = compute_min_DCF(llrs, evalutationLables, 0.5, 1, 1)
