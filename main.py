@@ -3,7 +3,7 @@ import os
 
 import numpy as np
 
-from classifiers.GMM import tuning_componentsGMM, testGMM
+from classifiers.GMM2 import tuning_componentsGMM
 from classifiers.LR import tuning_lambda
 from classifiers.SVM import tuning_parameters_PolySVM, tuning_parameters_RBFSVM, tuning_parameters_LinearSVMBalanced
 from preprocessing.preprocessing import PCA
