@@ -222,9 +222,52 @@ def plot_tuningLinearSVMUnbalanced():
     fig.show()
 
 
+def plot_tuning_LinearSVMBalanced():
+    C_values = np.logspace(-3, 3, 20)
+    m_values = [False, None, 7, 5]
+    pi_T_values = [0.5, 0.1, 0.9]
+    K_values = [1.0, 10.0]
+    prior = [0.5, 0.1, 0.9]
+
+    i = 0
+    fig, axs = plt.subplots(4, 3, sharey='all')
+    plt.rcParams['text.usetex'] = True
+    colors = distinctipy.get_colors(6, pastel_factor=0.7)
+
+    for m in m_values:
+        j = 0
+        for pi_T in pi_T_values:
+            hyperparameters = itertools.product(K_values, prior)
+            for idx, (K, pi) in enumerate(hyperparameters):
+                DCFs = np.load(
+                    f"../simulations/linearSVM/balanced/K{str(K).replace('.', '-')}_p{str(pi).replace('.', '-')}_pT{str(pi_T).replace('.', '-')}_PCA{str(m)}.npy")
+                axs[i, j].plot(C_values, DCFs, color=colors[idx], label=f"K={K}" + r"$\widetilde{\pi}$ = " + f"{pi}")
+                print("error not here 1")
+                if (m == False):
+                    axs[i, j].set_title(rf'5-fold, Raw features, $\pi_T={pi_T}$')
+                    print("error not here 2")
+                else:
+                    axs[i, j].set_title(rf'5-fold, PCA $(m = {m})$, $\pi_T={pi_T}$')
+                    print("error not here 2")
+                axs[i, j].legend()
+                axs[i, j].set_xlabel(r'$C$')
+                axs[i, j].set_ylabel(r'$minDCF$')
+                axs[i, j].set_xscale('log')
+                print("error not here 3")
+                axs[i, j].yaxis.set_tick_params(labelbottom=True)
+            j += 1
+        i += 1
+
+    fig.set_size_inches(20, 20)
+    fig.tight_layout()
+    fig.subplots_adjust(top=0.88)
+    fig.show()
+
+
 if __name__ == '__main__':
     # plot_lambda()
     # plot_tuningPolySVM()
     # plot_tuningRBFSVM()
     # plot_tuningLinearSVMUnbalanced()
+    plot_tuning_LinearSVMBalanced()
     pass
