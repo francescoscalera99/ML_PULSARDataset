@@ -223,9 +223,10 @@ class GMM(ClassifierClass):
             ll0 = log_likelihood(self._model.get_gmm(0))
 
             self._scores = ll1 - ll0
-            thresh = np.log(priors[1] / priors[0])
-            predictions = np.array(self._scores > thresh).astype(int)
-
+            if priors is not None:
+                thresh = np.log(priors[1] / priors[0])
+                predictions = np.array(self._scores > thresh).astype(int)
+                return predictions
         else:
             lls = []
             for c in range(num_classes):
@@ -240,10 +241,11 @@ class GMM(ClassifierClass):
 
             log_posterior_densities = log_joint - marginal_log_densities
             posterior_probs = np.exp(log_posterior_densities)
+            self._scores = posterior_probs
+            if priors is not None:
+                predictions = np.argmax(posterior_probs, axis=0)
+                return predictions
 
-            predictions = np.argmax(posterior_probs, axis=0)
-
-        return predictions
 
     def get_llrs(self):
         return self._scores
