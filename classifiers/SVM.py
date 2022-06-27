@@ -249,13 +249,16 @@ def tuning_parameters_LinearSVMBalanced(training_data, training_labels):
     other = [t for t in h if t not in already_done]
 
     # len(other): 57
-    # divide in 6 parts:
-    # IO: other[:10]
-    # CICCIO: other[10:20]
-    # other[20:30]
-    # other[30:40]
-    # other[40:50]
-    # other[50:]
+    # divide in 9 parts:
+    # IO: other[:6]
+    # CICCIO: other[6:12]
+    # other[12:18]
+    # other[18:24]
+    # other[24:30]
+    # other[30:36]
+    # other[36:42]
+    # other[42:48]
+    # other[48:57]
 
     for i, (m, pi_T, K, p) in enumerate(other):
         print(f"iteration {i+1}/{len(other)}")
