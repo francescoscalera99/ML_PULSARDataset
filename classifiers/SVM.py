@@ -231,16 +231,34 @@ def tuning_parameters_LinearSVMBalanced(training_data, training_labels):
 
     # m, piT, k, p
 
-    already_done = [(None, 0.5, 10, 0.9),
-                    (None, 0.5, 10, 0.1),
-                    (None, 0.5, 10, 0.5),
-                    (None, 0.5, 1, 0.9),
-                    (None, 0.5, 1, 0.1),
-                    (None, 0.5, 1, 0.5)]
-    o = [t for t in h if t not in already_done]
+    already_done = [(False, 0.5, 1.0, 0.5),
+                    (False, 0.5, 1.0, 0.1),
+                    (False, 0.5, 1.0, 0.9),
+                    (False, 0.5, 10.0, 0.5),
+                    (False, 0.5, 10.0, 0.1),
+                    (False, 0.5, 10.0, 0.9),
+                    (False, 0.1, 1.0, 0.5),
+                    (False, 0.1, 1.0, 0.1),
+                    (False, 0.1, 1.0, 0.9),
+                    (None, 0.5, 1.0, 0.5),
+                    (None, 0.5, 1.0, 0.1),
+                    (None, 0.5, 1.0, 0.9),
+                    (None, 0.5, 10.0, 0.5),
+                    (None, 0.5, 10.0, 0.1),
+                    (None, 0.5, 10.0, 0.9)]
+    other = [t for t in h if t not in already_done]
 
-    for i, (m, pi_T, K, p) in enumerate(o):
-        print(f"iteration {i+1}/66")
+    # len(other): 57
+    # divide in 6 parts:
+    # IO: other[:10]
+    # CICCIO: other[10:20]
+    # other[20:30]
+    # other[30:40]
+    # other[40:50]
+    # other[50:]
+
+    for i, (m, pi_T, K, p) in enumerate(other):
+        print(f"iteration {i+1}/{len(other)}")
         DCFs = []
         for i, C in enumerate(C_values):
             if m == False:
@@ -259,6 +277,7 @@ def tuning_parameters_LinearSVMBalanced(training_data, training_labels):
         np.save(
             f"simulations/linearSVM/balanced/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}_pT{str(pi_T).replace('.', '-')}_PCA{m}",
             np.array(DCFs))
+
 
 # def tuning_parameters_LinearSVMBalanced(training_data, training_labels):
 #     titles_Kfold = ['Gaussianized feature (5-fold, no PCA)', 'Guassianized feature (5-fold, PCA = 7)',

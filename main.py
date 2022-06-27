@@ -6,8 +6,10 @@ import numpy as np
 from classifiers.GMM import tuning_componentsGMM
 from classifiers.LR import tuning_lambda
 from classifiers.SVM import tuning_parameters_PolySVM, tuning_parameters_RBFSVM, tuning_parameters_LinearSVMBalanced
+from preprocessing.preprocessing import PCA
 from simulations.simulations import MVG_simulations, GMM_Simulations, SVM_LinearUnbalancedSimulations, \
     SVM_PolySimulations, SVM_RBFSimulations
+from utils.plot_utils import create_scatterplots
 from utils.utils import load_dataset
 
 
@@ -26,6 +28,9 @@ def main():
     # plot_histogram(training_data, training_labels, titles)
     # create_heatmap(training_data, training_labels)
 
+    # create_scatterplots(training_data, training_labels)
+    # data = PCA(training_data, training_data, 7)
+    # create_scatterplots(training_data, training_labels)
     # =============== MULTIVARIATE GAUSSIAN CLASSIFIER ===============
     # MVG_simulations(training_data, training_labels)
 
@@ -66,8 +71,8 @@ def main():
     # SVM_RBFSimulations(training_data, training_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF)
 
     # =============== GAUSSIAN MIXTURE MODELS ===============
-    print("GMM TUNING")
-    tuning_componentsGMM(training_data, training_labels, psi=0.1)
+    # print("GMM TUNING")
+    # tuning_componentsGMM(training_data, training_labels, psi=0.1)
     # print("GMM SIMULATIONS")
     # GMM_Simulations(training_data, training_labels, alpha=0.1, psi=0.01)
 
@@ -114,6 +119,23 @@ def logpdf_GAU_ND(x, mu, C):
     return np.diag(
         -(M / 2) * np.log(2 * np.pi) - (1 / 2) * (detC) - (1 / 2) * np.dot(np.dot((x - mu).T, invC), (x - mu)))
 
+
+def find_already_done():
+    K_values = [1.0, 10.0]
+    priors = [0.5, 0.1, 0.9]
+    pi_T_values = [0.5, 0.1, 0.9]
+    ms = [False, None, 7, 5]
+    C_values = np.logspace(-2, 2, 20)
+    done = []
+    import os
+    print(os.path.abspath("."))
+    for m, pi_T,  K, p in itertools.product(ms, pi_T_values, K_values, priors):
+        try:
+            np.load(f"simulations/linearSVM/balanced/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}_pT{str(pi_T).replace('.', '-')}_PCA{m}.npy")
+            done.append((m, pi_T, K, p))
+        except FileNotFoundError:
+            pass
+    print(done)
 
 # i = 0
 # fig, axs = plt.subplots(1, 4)

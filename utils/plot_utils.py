@@ -60,6 +60,30 @@ def create_heatmap(dataset, labels, cmap='Reds', title=None):
     fig.savefig(fname=f'outputs/gauss_heatmap')
 
 
+def create_scatterplots(training_data, training_labels):
+    num_features = training_data.shape[0]
+    num_classes = len(set(training_labels))
+    colors = ['red', 'blue']
+
+    titles = ['1. Mean of the integrated profile',
+              '2. Standard deviation of the integrated profile',
+              '3. Excess kurtosis of the integrated profile',
+              '4. Excess kurtosis of the integrated profile',
+              '5. Mean of the DM-SNR curve',
+              '6. Standard deviation of the DM-SNR curve',
+              '7. Excess kurtosis of the DM-SNR curve',
+              '8. Skewness of the DM-SNR curve']
+
+    for i, j in itertools.combinations(range(num_features), 2):
+        for k in range(num_classes):
+            plt.scatter(training_data[i, training_labels == k], training_data[j, training_labels == k], color=colors[k],
+                        label=f"Class {int(k)}")
+        plt.xlabel(titles[i])
+        plt.ylabel(titles[j])
+        plt.legend()
+        plt.show()
+
+
 def plot_lambda():
     lbd_values = np.logspace(-5, 5, 50)
     m_values = [False, None, 7, 5]
@@ -196,6 +220,7 @@ def plot_tuningLinearSVMUnbalanced():
     fig.tight_layout()
     fig.subplots_adjust(top=0.88)
     fig.show()
+
 
 if __name__ == '__main__':
     # plot_lambda()
