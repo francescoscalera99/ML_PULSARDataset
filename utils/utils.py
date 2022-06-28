@@ -101,7 +101,6 @@ def k_fold(dataset: np.ndarray,
     llrs = []
     labels = []
     for i in range(nFold):
-        print(f"Fold {i+1}/{nFold}")
         bool_indices[i] = False
         training_data = np.hstack(partitions[bool_indices])
         training_labels = np.hstack(partitions_labels[bool_indices])
