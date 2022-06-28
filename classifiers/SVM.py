@@ -192,10 +192,6 @@ def tuning_parameters_LinearSVMUnbalanced(training_data, training_labels):
     K_values = [1.0, 10.0]
     priors = [0.5, 0.1, 0.9]
     ms = [False, None, 7, 5]
-    # C_values = np.logspace(-2, 2, 20)
-    # K_values = [10.0]
-    # priors = [0.9]
-    # ms = [5]
 
     hyperparameters = itertools.product(ms, K_values, priors)
     for m, K, p in hyperparameters:
@@ -223,45 +219,9 @@ def tuning_parameters_LinearSVMBalanced(training_data, training_labels):
     pi_T_values = [0.5, 0.1, 0.9]
     ms = [False, None, 7, 5]
     C_values = np.logspace(-2, 2, 20)
-    h = list(itertools.product(ms, pi_T_values, K_values, priors))
-    # K_values = [10.0]
-    # priors = [0.5]
-    # pi_T_values = [0.5, 0.1, 0.9]
-    # ms = [False, None, 7, 5]  # false to compute raw feature, none for not computing PCA
+    h = itertools.product(ms, pi_T_values, K_values, priors)
 
-    # m, piT, k, p
-
-    already_done = [(False, 0.5, 1.0, 0.5),
-                    (False, 0.5, 1.0, 0.1),
-                    (False, 0.5, 1.0, 0.9),
-                    (False, 0.5, 10.0, 0.5),
-                    (False, 0.5, 10.0, 0.1),
-                    (False, 0.5, 10.0, 0.9),
-                    (False, 0.1, 1.0, 0.5),
-                    (False, 0.1, 1.0, 0.1),
-                    (False, 0.1, 1.0, 0.9),
-                    (None, 0.5, 1.0, 0.5),
-                    (None, 0.5, 1.0, 0.1),
-                    (None, 0.5, 1.0, 0.9),
-                    (None, 0.5, 10.0, 0.5),
-                    (None, 0.5, 10.0, 0.1),
-                    (None, 0.5, 10.0, 0.9)]
-    other = [t for t in h if t not in already_done]
-
-    # len(other): 57
-    # divide in 9 parts:
-    # IO: other[:6]
-    # CICCIO: other[6:12]
-    # IO: other[12:18]
-    # CICCIO: other[18:24]
-    # IO: other[24:30]
-    # CICCIO: other[30:36]
-    # IO: other[36:42]
-    # CICCIO: other[42:48]
-    # IO: other[48:57]
-
-    for i, (m, pi_T, K, p) in enumerate(other):
-        print(f"iteration {i+1}/{len(other)}")
+    for i, (m, pi_T, K, p) in enumerate(h):
         DCFs = []
         for i, C in enumerate(C_values):
             if m == False:
@@ -280,43 +240,3 @@ def tuning_parameters_LinearSVMBalanced(training_data, training_labels):
         np.save(
             f"simulations/linearSVM/balanced/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}_pT{str(pi_T).replace('.', '-')}_PCA{m}",
             np.array(DCFs))
-
-
-# def tuning_parameters_LinearSVMBalanced(training_data, training_labels):
-#     titles_Kfold = ['Gaussianized feature (5-fold, no PCA)', 'Guassianized feature (5-fold, PCA = 7)',
-#                     'Gaussianized feature (5-fold, PCA = 5)']
-#
-#     datasets = []
-#
-#     # training_dataPCA7 = PCA(training_data, 7)
-#     # training_dataPCA5 = PCA(training_data, 5)
-#     datasets.append(training_data)
-#     # datasets.append(training_dataPCA7)
-#     # datasets.append(training_dataPCA5)
-#     C_values = np.logspace(-2, 2, 20)
-#     # K_values = [1.0, 10.0]
-#     # priors = [0.5, 0.1, 0.9]
-#     # pi_T_values = [0.5, 0.1, 0.9]
-#     K_values = [1.0]
-#     priors = [0.5]
-#     pi_T_values = [0.5]
-#
-#     for dataset in datasets:
-#         for pi_T in pi_T_values:
-#             # plt.figure()
-#             # plt.rcParams['text.usetex'] = True
-#             hyperparameters = itertools.product(K_values, priors)
-#             for K, p in hyperparameters:
-#                 DCFs = []
-#                 for C in C_values:
-#                     llrs, evaluationLabels = k_fold(dataset, training_labels, SVM, 5, k=K, c=C, balanced=True, pi_T=pi_T, kernel_params=(1, 0),
-#                                                     kernel_type='poly')
-#                     min_dcf = compute_min_DCF(llrs, evaluationLabels, p, 1, 1)
-#                     print("min_DCF for K = ", K, "with prior = ", p, "->", min_dcf)
-#                     DCFs.append(min_dcf)
-#                 # f"prior:0.5, c:{c}, K:{K}"
-#                 # plt.plot(C_values, DCFs, color=np.random.rand(3, ), label=r"$\pi_{T}=" + str(pi_T)+ ", K=" + str(K) + r", $\widetilde(\pi)$=" + str(p))
-#             # plt.title(titles_Kfold[j])
-#             # plt.legend()
-#             # plt.xscale('log')
-#             # plt.show()

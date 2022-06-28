@@ -8,7 +8,7 @@ from classifiers.LR import tuning_lambda
 from classifiers.SVM import tuning_parameters_PolySVM, tuning_parameters_RBFSVM, tuning_parameters_LinearSVMBalanced
 from preprocessing.preprocessing import PCA
 from simulations.simulations import MVG_simulations, GMM_Simulations, SVM_LinearUnbalancedSimulations, \
-    SVM_PolySimulations, SVM_RBFSimulations
+    SVM_PolySimulations, SVM_RBFSimulations, SVM_LinearBalancedSimulations
 from utils.plot_utils import create_scatterplots
 from utils.utils import load_dataset
 
@@ -58,12 +58,15 @@ def main():
     # tuning_parameters_RBFSVM(training_data, training_labels)
     # tuning_parameters_LinearSVMUnBalanced(training_data, training_labels)
 
-    # C_piT_LinearBalanced = [(1e-2, None), (1e-3, 0.5), (6 * 1e-3, 0.1), (7 * 1e-4, 0.9)] #These values comes from tuning of hyperparameter
-
     # print(" ---------- SVM LINEAR UNBALANCED SIMULATION ----------")
     # K_LinearUnb = 1.0  # This values comes from tuning of hyperparameters
     # C_LinearUnb = 1
     # SVM_LinearUnbalancedSimulations(training_data, training_labels, K_LinearUnb, C_LinearUnb)
+
+    print(" ---------- SVM LINEAR BALANCED SIMULATION ----------")
+    K_LinearB = 1.0  # This values comes from tuning of hyperparameters
+    C_LinearB = 8*10^-2
+    SVM_LinearBalancedSimulations(training_data, training_labels, K_LinearB, C_LinearB)
 
     # print(" ---------- SVM POLY SIMULATION ----------")
     # K_Poly = 1.0
@@ -83,8 +86,8 @@ def main():
     # print("GMM")
     # training_data, training_labels = get_same_distrib_partition(training_data, training_labels)
     # testGMM(training_data, training_labels, 16)
-    print("GMM TUNING")
-    tuning_componentsGMM(training_data, training_labels, psi=0.1)
+    # print("GMM TUNING")
+    # tuning_componentsGMM(training_data, training_labels, psi=0.1)
     # print("GMM SIMULATIONS")
     # GMM_Simulations(training_data, training_labels, alpha=0.1, psi=0.01)
 
@@ -148,28 +151,6 @@ def find_already_done():
         except FileNotFoundError:
             pass
     print(len(done))
-
-# i = 0
-# fig, axs = plt.subplots(1, 4)
-# fig.suptitle('Tuning hyperparameter λ')
-# plt.rcParams['text.usetex'] = True
-# for m in m_values:
-#   for pi in prior:
-#     DCFs = np.load(f"/content/drive/My Drive/Pulsar/tuningLambda/LR_prior_{str(pi).replace('.', '-')}_PCA{str(m)}.npy")
-#     axs[i].plot(lbd_values, DCFs, color=np.random.rand(3,), label=r"$\widetilde{\pi}=$")
-#     if m == False:
-#       axs[i].set_title(f'5-fold, Raw features')
-#     else:
-#       axs[i].set_title(f'5-fold, PCA (m={m})')
-#     axs[i].legend()
-#     axs[i].set_xlabel('λ')
-#     axs[i].set_ylabel('minDCF')
-#     axs[i].set_xscale('log')
-#   i+=1
-# fig.set_size_inches(20, 5)
-# fig.tight_layout()
-# fig.subplots_adjust(top=0.88)
-# fig.show()
 
 
 if __name__ == '__main__':
