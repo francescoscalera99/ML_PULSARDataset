@@ -8,7 +8,7 @@ from classifiers.LR import tuning_lambda
 from classifiers.SVM import tuning_parameters_PolySVM, tuning_parameters_RBFSVM, tuning_parameters_LinearSVMBalanced
 from preprocessing.preprocessing import PCA
 from simulations.simulations import MVG_simulations, GMM_Simulations, SVM_LinearUnbalancedSimulations, \
-    SVM_PolySimulations, SVM_RBFSimulations, SVM_LinearBalancedSimulations
+    SVM_PolySimulations, SVM_RBFSimulations, SVM_LinearBalancedSimulations, LR_simulations
 from utils.plot_utils import create_scatterplots
 from utils.utils import load_dataset
 
@@ -58,15 +58,15 @@ def main():
     # tuning_parameters_RBFSVM(training_data, training_labels)
     # tuning_parameters_LinearSVMUnBalanced(training_data, training_labels)
 
-    # print(" ---------- SVM LINEAR UNBALANCED SIMULATION ----------")
-    # K_LinearUnb = 1.0  # This values comes from tuning of hyperparameters
-    # C_LinearUnb = 1
-    # SVM_LinearUnbalancedSimulations(training_data, training_labels, K_LinearUnb, C_LinearUnb)
+    print(" ---------- SVM LINEAR UNBALANCED SIMULATION ----------")
+    K_LinearUnb = 1.0  # This values comes from tuning of hyperparameters
+    C_LinearUnb = 1
+    SVM_LinearUnbalancedSimulations(training_data, training_labels, K_LinearUnb, C_LinearUnb)
 
-    print(" ---------- SVM LINEAR BALANCED SIMULATION ----------")
-    K_LinearB = 1.0  # This values comes from tuning of hyperparameters
-    C_LinearB = 8e-2
-    SVM_LinearBalancedSimulations(training_data, training_labels, K_LinearB, C_LinearB)
+    # print(" ---------- SVM LINEAR BALANCED SIMULATION ----------")
+    # K_LinearB = 1.0  # This values comes from tuning of hyperparameters
+    # C_LinearB = 8*10^-2
+    # SVM_LinearBalancedSimulations(training_data, training_labels, K_LinearB, C_LinearB)
 
     # print(" ---------- SVM POLY SIMULATION ----------")
     # K_Poly = 1.0
@@ -87,19 +87,19 @@ def main():
     # training_data, training_labels = get_same_distrib_partition(training_data, training_labels)
     # testGMM(training_data, training_labels, 16)
     # print("GMM TUNING")
-    # tuning_componentsGMM(training_data, training_labels, psi=0.1)
+    # tuning_componentsGMM(training_data, training_labels, psi=0.01)
     # print("GMM SIMULATIONS")
     # GMM_Simulations(training_data, training_labels, alpha=0.1, psi=0.01)
 
     # =============== COMPUTING ACTUAL DCF ===============
     # MVG_simulations(training_data, training_labels, actualDCF=True, calibrateScore=False)
-    # LR_simulations(training_data, training_labels, lbd)
+    # LR_simulations(training_data, training_labels, lbd, actualDCF=True)
     # SVM_LinearSimulations(training_data, training_labels, K_Linear, C_piT_Linear, actualDCF=True, calibratedScore=False)
     # SVM_PolySimulations(training_data, training_labels, K_Poly, CPoly, pi_TPolyRBF, c, d, actualDCF=True, calibratedScore=False)
     # SVM_RBFSimulations(training_data, training_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF, actualDCF=True, calibratedScore=False)
 
     # =============== SCORE CALIBRATION ===============
-    MVG_simulations(training_data, training_labels, actualDCF=True, calibrateScore=True)
+    # MVG_simulations(training_data, training_labels, actualDCF=True, calibrateScore=True)
     # SVM_LinearSimulations(training_data, training_labels, K_Linear, C_piT_Linear, actualDCF=True, calibratedScore=True)
     # SVM_PolySimulations(training_data, training_labels, K_Poly, CPoly, pi_TPolyRBF, c, d, actualDCF=True, calibratedScore=True)
     # SVM_RBFSimulations(training_data, training_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF, actualDCF=True, calibratedScore=True)
