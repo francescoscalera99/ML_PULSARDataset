@@ -39,15 +39,15 @@ from utils.utils import k_fold
 
 def MVG_simulations(training_data, training_labels, calibrateScore=False, actualDCF=False):
     variants = ['full-cov', 'diag', 'tied']
-    m = [7, 5, 4]
+    ms = [7, 5, 4]
     pis = [0.1, 0.5, 0.9]
 
-    hyperparameters = itertools.product(variants, m, pis)
+    hyperparameters = itertools.product(variants, ms, pis)
     table = PrettyTable()
     table.field_names = ['Hyperparameters', 'min DCF']
 
     for i, (variant, m, pi) in enumerate(hyperparameters):
-        print(f"Iteration {i + 1}/27")
+        print(f"Iteration {i + 1}/{len(variants)*len(ms)*len(pis)}")
         llrs, labels = k_fold(training_data, training_labels, MVG, 5, seed=0, m=m, raw=True, variant=variant)
         if actualDCF:
             act_dcf = compute_actual_DCF(llrs, labels, pi, 1, 1)
@@ -66,7 +66,8 @@ def LR_simulations(training_data, training_labels, lbd, calibratedScore=False, a
     table = PrettyTable()
     table.field_names = ['Hyperparameters', 'min DCF']
 
-    for m, pi, pi_T in hyperparameters:
+    for i, (m, pi, pi_T) in enumerate(hyperparameters):
+        print(f"Iteration {i + 1}/{len(m_values)*len(pis)*len(pis_T)}")
         if m == False:  # raw features
             llrs, labels = k_fold(training_data, training_labels, LR, 5, m=None, raw=True, seed=0, lbd=lbd, pi_T=pi_T)
         else:
@@ -83,18 +84,21 @@ def LR_simulations(training_data, training_labels, lbd, calibratedScore=False, a
             table.add_row([f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T} -> min dcf:", round(min_dcf, 3)])
 
     print(table)
+    with open("results/LR_actual.txt", 'w') as f:
+        f.write(str(table))
 
 
 def SVM_LinearUnbalancedSimulations(training_data, training_labels, K, C, calibratedScore=False, actualDCF=False):
-    m = [False, None, 7, 5]
+    ms = [False, None, 7, 5]
     priors = [0.5, 0.1, 0.9]
 
-    hyperparameters = itertools.product(m, priors)
+    hyperparameters = itertools.product(ms, priors)
 
     table = PrettyTable()
     table.field_names = ['Hyperparameters', 'min DCF']
 
-    for m, pi in hyperparameters:
+    for i, (m, pi) in enumerate(hyperparameters):
+        print(f"Iteration {i+1}/{len(ms)*len(priors)}")
         if m == False:
             llrs, labels = k_fold(training_data, training_labels, SVM, 5, seed=0, balanced=False, m=None, raw=True,
                                   pi_T=None, k=K, c=C,
@@ -115,6 +119,8 @@ def SVM_LinearUnbalancedSimulations(training_data, training_labels, K, C, calibr
         table.add_row([f"PCA m={m}, π_tilde={pi}, C ={C}", round(min_dcf, 3)])
 
     print(table)
+    with open("results/SVM_linear_unbalanced_ACT.txt", 'w') as f:
+        f.write(str(table))
 
 
 def SVM_LinearBalancedSimulations(training_data, training_labels, K, C, calibratedScore=False, actualDCF=False):
