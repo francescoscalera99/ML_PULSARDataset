@@ -52,8 +52,9 @@ def MVG_simulations(training_data, training_labels, calibrateScore=False, actual
         if actualDCF:
             act_dcf = compute_actual_DCF(llrs, labels, pi, 1, 1)
             table.add_row([f"Raw features, PCA m={m}, variant={variant}, π_tilde={pi} -> min dcf", round(act_dcf, 3)])
-        min_dcf = compute_min_DCF(np.array(llrs), labels, pi, 1, 1)
-        table.add_row([f"Raw features, PCA m={m}, variant={variant}, π_tilde={pi} -> min dcf", round(min_dcf, 3)])
+        else:
+            min_dcf = compute_min_DCF(np.array(llrs), labels, pi, 1, 1)
+            table.add_row([f"Raw features, PCA m={m}, variant={variant}, π_tilde={pi} -> min dcf", round(min_dcf, 3)])
     print(table)
 
 
