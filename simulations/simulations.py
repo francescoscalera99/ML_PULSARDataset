@@ -51,8 +51,10 @@ def MVG_simulations(training_data, training_labels, calibrateScore=False, actual
         llrs, labels = k_fold(training_data, training_labels, MVG, 5, seed=0, m=m, raw=True, variant=variant)
         if actualDCF:
             act_dcf = compute_actual_DCF(llrs, labels, pi, 1, 1)
-        min_dcf = compute_min_DCF(np.array(llrs), labels, pi, 1, 1)
-        table.add_row([f"Raw features, PCA m={m}, variant={variant}, π_tilde={pi} -> min dcf", round(min_dcf, 3)])
+            table.add_row([f"Raw features, PCA m={m}, variant={variant}, π_tilde={pi} -> min dcf", round(act_dcf, 3)])
+        else:
+            min_dcf = compute_min_DCF(np.array(llrs), labels, pi, 1, 1)
+            table.add_row([f"Raw features, PCA m={m}, variant={variant}, π_tilde={pi} -> min dcf", round(min_dcf, 3)])
     print(table)
 
 
@@ -114,9 +116,10 @@ def SVM_LinearUnbalancedSimulations(training_data, training_labels, K, C, calibr
                 score = llrs
             actDCF = compute_actual_DCF(score, labels, pi, 1, 1)
             table.add_row([f"PCA m={m}, π_tilde={pi},  C ={C}", round(actDCF, 3)])
-        min_dcf = compute_min_DCF(np.array(llrs), labels, pi, 1, 1)
-        print(f"PCA m={m} π_tilde={pi}, C ={C}, K{K} --> ", round(min_dcf, 3))
-        table.add_row([f"PCA m={m}, π_tilde={pi}, C ={C}", round(min_dcf, 3)])
+        else:
+            min_dcf = compute_min_DCF(np.array(llrs), labels, pi, 1, 1)
+            print(f"PCA m={m} π_tilde={pi}, C ={C}, K{K} --> ", round(min_dcf, 3))
+            table.add_row([f"PCA m={m}, π_tilde={pi}, C ={C}", round(min_dcf, 3)])
 
     print(table)
     with open("results/SVM_linear_unbalanced_ACT.txt", 'w') as f:
@@ -149,14 +152,15 @@ def SVM_LinearBalancedSimulations(training_data, training_labels, K, C, calibrat
                 score = llrs
             actDCF = compute_actual_DCF(score, labels, pi, 1, 1)
             table.add_row([f"PCA m={m}, piT_={pi_T} π_tilde={pi},  C ={C}", round(actDCF, 3)])
-        min_dcf = compute_min_DCF(np.array(llrs), labels, pi, 1, 1)
-        print(f"PCA m={m} pi_T={pi_T} π_tilde={pi}, C ={C}, K{K} --> ", round(min_dcf, 3))
-        table.add_row([f"PCA m={m}, pi_T={pi_T}, π_tilde={pi}, C ={C}", round(min_dcf, 3)])
+        else:
+            min_dcf = compute_min_DCF(np.array(llrs), labels, pi, 1, 1)
+            print(f"PCA m={m} pi_T={pi_T} π_tilde={pi}, C ={C}, K{K} --> ", round(min_dcf, 3))
+            table.add_row([f"PCA m={m}, pi_T={pi_T}, π_tilde={pi}, C ={C}", round(min_dcf, 3)])
 
     print(table)
 
 
-def SVM_PolySimulations(training_data, training_labels, K, C, pi_T, c, d):
+def SVM_PolySimulations(training_data, training_labels, K, C, pi_T, c, d, actualDCF=False, calibratedScore=False):
     m = [False, None, 7, 5]
     priors = [0.5, 0.1, 0.9]
 
@@ -174,15 +178,22 @@ def SVM_PolySimulations(training_data, training_labels, K, C, pi_T, c, d):
                                             balanced=True, pi_T=pi_T,
                                             kernel_params=(d, c), kernel_type='poly')
         min_dcf = compute_min_DCF(llrs, evaluationLabels, pi, 1, 1)
-        print(f"PCA m={m}, π_tilde={pi}, pi_T = 0.5, C ={C} K={K}, c={c}, d={d}", "-->",
-              round(min_dcf, 3))
-        table.add_row(
-            [f"PCA m={m}, π_tilde={pi}, pi_T = 0.5, C ={C} K={K}, c={c}, d={d}", round(min_dcf, 3)])
+        if actualDCF:
+            act_DCF = compute_actual_DCF(np.array(llrs), evaluationLabels, pi, 1, 1)
+            print(f"PCA m={m}, π_tilde={pi}, pi_T = 0.5, C ={C} K={K}, c={c}, d={d}", "--> actualDCF: ",
+                  round(act_DCF, 3))
+            table.add_row(
+                [f"PCA m={m}, π_tilde={pi}, pi_T = 0.5, C ={C} K={K}, c={c}, d={d}", round(act_DCF, 3)])
+        else:
+            print(f"PCA m={m}, π_tilde={pi}, pi_T = 0.5, C ={C} K={K}, c={c}, d={d}", "-->",
+                  round(min_dcf, 3))
+            table.add_row(
+                [f"PCA m={m}, π_tilde={pi}, pi_T = 0.5, C ={C} K={K}, c={c}, d={d}", round(min_dcf, 3)])
 
     print(table)
 
 
-def SVM_RBFSimulations(training_data, training_labels, K, C, pi_T, gamma):
+def SVM_RBFSimulations(training_data, training_labels, K, C, pi_T, gamma, actualDCF=False, calibratedScore=False):
     ms = [None, 7, 5]
     effective_priors = [0.5, 0.1, 0.9]
     hyperparameters = itertools.product(ms, effective_priors)
@@ -199,9 +210,14 @@ def SVM_RBFSimulations(training_data, training_labels, K, C, pi_T, gamma):
             llrs, labels = k_fold(training_data, training_labels, SVM, 5, seed=0, m=m, raw=False, balanced=True,
                                   pi_T=pi_T,
                                   k=K, c=C, kernel_params=gamma, kernel_type='RBF')
-        min_dcf = compute_min_DCF(np.array(llrs), labels, pi, 1, 1)
-        print(f"PCA m={m}, π_tilde={pi}, π_T={pi_T}  C ={C}", "-->", round(min_dcf, 3))
-        table.add_row([f"PCA m={m}, π_tilde={pi}, π_T={pi_T}  C ={C}", round(min_dcf, 3)])
+        if actualDCF:
+            act_DCF = compute_actual_DCF(np.array(llrs), labels, pi, 1, 1)
+            print(f"PCA m={m}, π_tilde={pi}, π_T={pi_T}  C ={C}", "-->", round(act_DCF, 3))
+            table.add_row([f"PCA m={m}, π_tilde={pi}, π_T={pi_T}  C ={C}", round(act_DCF, 3)])
+        else:
+            min_dcf = compute_min_DCF(np.array(llrs), labels, pi, 1, 1)
+            print(f"PCA m={m}, π_tilde={pi}, π_T={pi_T}  C ={C}", "-->", round(min_dcf, 3))
+            table.add_row([f"PCA m={m}, π_tilde={pi}, π_T={pi_T}  C ={C}", round(min_dcf, 3)])
 
     print(table)
 
