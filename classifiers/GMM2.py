@@ -9,6 +9,9 @@ from utils.matrix_utils import vrow, vcol, empirical_dataset_mean, empirical_dat
 from utils.metrics_utils import compute_min_DCF
 from utils.utils import k_fold
 
+import warnings
+warnings.filterwarnings('error')
+
 
 class GMM(ClassifierClass):
     class Model(ClassifierClass.Model):
@@ -120,21 +123,24 @@ class GMM(ClassifierClass):
             # *************** values _{g, t+1} ***************
             new_gmm = []
             for g in range(num_components):
-                mu = vcol(first_order[g, :] / zero_order[g])
+                try:
+                    mu = vcol(first_order[g, :] / zero_order[g])
 
-                sigma = second_order[g, :, :] / zero_order[g] - mu @ mu.T
-                # HERE GO DIAG, TIED ECC
+                    sigma = second_order[g, :, :] / zero_order[g] - mu @ mu.T
+                    # HERE GO DIAG, TIED ECC
 
-                if self._type == 'diag':
-                    sigma = np.abs(sigma * np.eye(sigma.shape[-1]))
+                    if self._type == 'diag':
+                        sigma = np.abs(sigma * np.eye(sigma.shape[-1]))
 
-                # EIGENVALUE CONSTRAINING
-                u, s, v = np.linalg.svd(sigma)
-                s[s < psi] = psi
-                sigma = u @ (s.reshape(s.size, 1) * v)
+                    # EIGENVALUE CONSTRAINING
+                    u, s, v = np.linalg.svd(sigma)
+                    s[s < psi] = psi
+                    sigma = u @ (s.reshape(s.size, 1) * v)
 
-                w = zero_order[g] / zero_order.sum()
-                new_gmm.append((w, mu, sigma))
+                    w = zero_order[g] / zero_order.sum()
+                    new_gmm.append((w, mu, sigma))
+                except RuntimeWarning:
+                    print('here')
 
             if self._type == 'tied':
                 s = np.zeros_like(new_gmm[0][2])
@@ -254,7 +260,7 @@ class GMM(ClassifierClass):
 def tuning_componentsGMM(training_data, training_labels, alpha=0.1, psi=0.01):
     variants = ['full-cov', 'diag', 'tied']
     raw = [True, False]
-    m_values = [None, 7]
+    m_values = [7]
     components_values = [2, 4, 8, 16, 32]
 
     # len(hyperparameters): 12
@@ -262,18 +268,21 @@ def tuning_componentsGMM(training_data, training_labels, alpha=0.1, psi=0.01):
     hyperparameters = list(itertools.product(variants, raw, m_values))
     # SPLIT HYPERPARAMETERS IN 6 PARTITIONS OF 2 TUPLES -> 8 INNER ITERATIONS OVERALL
 
-    # ELENA: hyperparameters[:2]
+    # IO: hyperparameters[0:1]
+    # IO: hyperparameters[1:2]
     # CICCIO: hyperparameters[2:4]
     # TODO: hyperparameters[4:6]
     # TODO: hyperparameters[6:8]
     # TODO: hyperparameters[8:10]
     # TODO: hyperparameters[10:]
 
+    curr_hyp = hyperparameters[:1]
+
     i = 0
-    for variant, r, m in hyperparameters[0:2]:
+    for variant, r, m in curr_hyp:
         DCFs = []
         for g in components_values:
-            print(f"Inner iteration {i+1}/{2*len(components_values)}")
+            print(f"Inner iteration {i+1}/{len(curr_hyp)*len(components_values)}")
             llrs, evalutationLables = k_fold(training_data, training_labels, GMM, 5, seed=0, raw=r, m=m, type=variant, alpha=alpha, psi=psi, G=g)
             min_dcf = compute_min_DCF(llrs, evalutationLables, 0.5, 1, 1)
             DCFs.append(min_dcf)

@@ -178,7 +178,7 @@ def plot_tuningRBFSVM():
             if (m == False):
                 axs[i].set_title(f'5-fold, Raw features')
             else:
-                axs[i].set_title(f'5-fold, PCA (m = {m})')
+                axs[i].set_title(rf'5-fold, PCA ($m = {m}$)')
             axs[i].legend()
             axs[i].set_xlabel(r'$C$')
             axs[i].set_ylabel(r'$minDCF$')
@@ -198,6 +198,16 @@ def plot_tuningLinearSVMUnbalanced():
     priors = [0.5, 0.1, 0.9]
 
     i = 0
+
+    plt.rcParams.update({
+        "text.usetex": True,
+        "font.family": "sans-serif",
+        "font.sans-serif": ["Computer Modern Serif"],
+        "axes.titlesize": 17,
+        "axes.labelsize": 15,
+        "legend.fontsize": 12
+    })
+
     fig, axs = plt.subplots(1, 4, sharey='row')
     colors = distinctipy.get_colors(6, pastel_factor=0.7)
     for m in m_values:
@@ -205,21 +215,23 @@ def plot_tuningLinearSVMUnbalanced():
         for j, (K, p) in enumerate(hyperparameters):
             DCFs = np.load(
                 f"../simulations/linearSVM/unbalanced/new/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}_PCA{str(m)}.npy")
-            axs[i].plot(C_values, DCFs, color=colors[j], label=f"K={K}, prior={p}")
-            if (m == False):
-                axs[i].set_title(f'5-fold, Raw features')
+            axs[i].plot(C_values, DCFs, color=colors[j], label=r"$K=" + str(K) + r",\;\widetilde{\pi}=" + str(p) + r"$")
+            if m is None:
+                axs[i].set_title(rf'Gaussianized features, $\pi_T=0.5$')
+            elif m == False:
+                axs[i].set_title(rf'Raw features, $\pi_T=0.5$')
             else:
-                axs[i].set_title(f'5-fold, PCA (m = {m})')
+                axs[i].set_title(rf'Gaussianized features, PCA ($m = {m}$), $\pi_T=0.5$')
             axs[i].legend()
-            axs[i].set_xlabel('C')
-            axs[i].set_ylabel('minDCF')
+            axs[i].set_xlabel('$C$')
+            axs[i].set_ylabel('$minDCF$')
             axs[i].set_xscale('log')
             axs[i].yaxis.set_tick_params(labelbottom=True)
         i += 1
     fig.set_size_inches(20, 5)
     fig.tight_layout()
-    fig.subplots_adjust(top=0.88)
     fig.show()
+
 
 
 def plot_tuning_LinearSVMBalanced():
@@ -229,9 +241,18 @@ def plot_tuning_LinearSVMBalanced():
     K_values = [1.0, 10.0]
     prior = [0.5, 0.1, 0.9]
 
+    plt.rcParams.update({
+        "text.usetex": True,
+        "font.family": "sans-serif",
+        "font.sans-serif": ["Computer Modern Serif"],
+        "axes.titlesize": 22,
+        "axes.labelsize": 18,
+        "legend.fontsize": 15
+    })
+
     i = 0
     fig, axs = plt.subplots(4, 3, sharey='all')
-    plt.rcParams['text.usetex'] = True
+
     colors = distinctipy.get_colors(6, pastel_factor=0.7)
 
     for m in m_values:
@@ -241,26 +262,23 @@ def plot_tuning_LinearSVMBalanced():
             for idx, (K, pi) in enumerate(hyperparameters):
                 DCFs = np.load(
                     f"../simulations/linearSVM/balanced/K{str(K).replace('.', '-')}_p{str(pi).replace('.', '-')}_pT{str(pi_T).replace('.', '-')}_PCA{str(m)}.npy")
-                axs[i, j].plot(C_values, DCFs, color=colors[idx], label=f"K={K}" + r"$\widetilde{\pi}$ = " + f"{pi}")
-                print("error not here 1")
-                if (m == False):
-                    axs[i, j].set_title(rf'5-fold, Raw features, $\pi_T={pi_T}$')
-                    print("error not here 2")
+                axs[i, j].plot(C_values, DCFs, color=colors[idx], label=rf"$K={K}$,\;" + r"$\widetilde{\pi}=$" + f"{pi}")
+                if m is None:
+                    axs[i, j].set_title('Gaussianized features, no PCA' + rf', $\pi_T={pi_T}$')
+                elif m == False:
+                    axs[i, j].set_title('Raw features, no PCA, ' + rf'$\pi_T={pi_T}$')
                 else:
-                    axs[i, j].set_title(rf'5-fold, PCA $(m = {m})$, $\pi_T={pi_T}$')
-                    print("error not here 2")
+                    axs[i, j].set_title('Gaussianized features, PCA ' + rf'($m = {m}$), $\pi_T={pi_T}$')
                 axs[i, j].legend()
                 axs[i, j].set_xlabel(r'$C$')
                 axs[i, j].set_ylabel(r'$minDCF$')
                 axs[i, j].set_xscale('log')
-                print("error not here 3")
                 axs[i, j].yaxis.set_tick_params(labelbottom=True)
             j += 1
         i += 1
 
     fig.set_size_inches(20, 20)
     fig.tight_layout()
-    fig.subplots_adjust(top=0.88)
     fig.show()
 
 
@@ -268,6 +286,6 @@ if __name__ == '__main__':
     # plot_lambda()
     # plot_tuningPolySVM()
     # plot_tuningRBFSVM()
-    # plot_tuningLinearSVMUnbalanced()
-    plot_tuning_LinearSVMBalanced()
+    plot_tuningLinearSVMUnbalanced()
+    # plot_tuning_LinearSVMBalanced()
     pass

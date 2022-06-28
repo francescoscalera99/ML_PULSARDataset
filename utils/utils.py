@@ -128,6 +128,7 @@ def k_fold(dataset: np.ndarray,
         llrs.extend(c.get_llrs().tolist())
         labels.extend(testing_labels.tolist())
         bool_indices[i] = True
+        del c
 
     return np.array(llrs), np.array(labels)
 
