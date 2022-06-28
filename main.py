@@ -8,7 +8,7 @@ from classifiers.LR import tuning_lambda
 from classifiers.SVM import tuning_parameters_PolySVM, tuning_parameters_RBFSVM, tuning_parameters_LinearSVMBalanced
 from preprocessing.preprocessing import PCA
 from simulations.simulations import MVG_simulations, GMM_Simulations, SVM_LinearUnbalancedSimulations, \
-    SVM_PolySimulations, SVM_RBFSimulations
+    SVM_PolySimulations, SVM_RBFSimulations, SVM_LinearBalancedSimulations
 from utils.plot_utils import create_scatterplots
 from utils.utils import load_dataset
 
@@ -51,19 +51,22 @@ def main():
     # =============== SUPPORT VECTOR MACHINE ===============
     # print("LINEAR SVM - TUNING PARAMETERS")
     # tuning_parameters_LinearSVMUnbalanced(training_data, training_labels)
-    # tuning_parameters_LinearSVMBalanced(training_data, training_labels)
+    tuning_parameters_LinearSVMBalanced(training_data, training_labels)
     # print("POLY SVM - TUNING PARAMETERS")
     # tuning_parameters_PolySVM(training_data, training_labels)
     # print("RBF SVM - TUNING PARAMETERS")
     # tuning_parameters_RBFSVM(training_data, training_labels)
     # tuning_parameters_LinearSVMUnBalanced(training_data, training_labels)
 
-    # C_piT_LinearBalanced = [(1e-2, None), (1e-3, 0.5), (6 * 1e-3, 0.1), (7 * 1e-4, 0.9)] #These values comes from tuning of hyperparameter
-
     # print(" ---------- SVM LINEAR UNBALANCED SIMULATION ----------")
     # K_LinearUnb = 1.0  # This values comes from tuning of hyperparameters
     # C_LinearUnb = 1
     # SVM_LinearUnbalancedSimulations(training_data, training_labels, K_LinearUnb, C_LinearUnb)
+
+    # print(" ---------- SVM LINEAR BALANCED SIMULATION ----------")
+    K_LinearB = 1.0  # This values comes from tuning of hyperparameters
+    C_LinearB = 8*10^-2
+    SVM_LinearBalancedSimulations(training_data, training_labels, K_LinearB, C_LinearB)
 
     # print(" ---------- SVM POLY SIMULATION ----------")
     # K_Poly = 1.0
