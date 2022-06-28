@@ -52,8 +52,8 @@ def compute_min_DCF(llr, labels, prior, Cfn, Cfp):
 
 
 def compute_actual_DCF(llr, labels, prior, Cfn, Cfp):
-    treshold = -np.log(prior/(1-prior))
-    pred = np.int32(llr > treshold)
+    threshold = -np.log(prior/(1-prior))
+    pred = np.int32(llr > threshold)
     OBD = compute_OBD(pred, labels)
     actDCF = compute_normalizeDCF(OBD, prior, Cfn, Cfp)
 

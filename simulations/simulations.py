@@ -49,6 +49,8 @@ def MVG_simulations(training_data, training_labels, calibrateScore=False, actual
     for i, (variant, m, pi) in enumerate(hyperparameters):
         print(f"Iteration {i + 1}/27")
         llrs, labels = k_fold(training_data, training_labels, MVG, 5, seed=0, m=m, raw=True, variant=variant)
+        if actualDCF:
+            act_dcf = compute_actual_DCF(llrs, labels, pi, 1, 1)
         min_dcf = compute_min_DCF(np.array(llrs), labels, pi, 1, 1)
         table.add_row([f"Raw features, PCA m={m}, variant={variant}, π_tilde={pi} -> min dcf", round(min_dcf, 3)])
     print(table)
