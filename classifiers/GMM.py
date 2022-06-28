@@ -50,7 +50,6 @@ class GMM(ClassifierClass):
                                f"mu.shape = {mu.shape}\n"
                                f"C.shape = {C.shape}")
 
-        # x has shape 4 x N
         n_samples = x.shape[1]
 
         y = [GMM._logpdf_GAU_ND_1(x[:, i], mu, C) for i in range(n_samples)]
@@ -81,6 +80,14 @@ class GMM(ClassifierClass):
 
         r = (const + det_sigma + quadratic_term)
         return -0.5 * r[0]
+
+    @staticmethod
+    def _constrain_covariances_eigs(sigmas, psi):
+        u, s, v = np.linalg.svd(sigmas)
+        s[s < psi] = psi
+        ret = u @ (s.reshape(*s.shape, 1) * v)
+        # _, s, _ = np.linalg.svd(sigmas)
+        return ret
 
     def __init__(self, training_data, training_labels, **kwargs):
         super().__init__(training_data, training_labels)
@@ -124,18 +131,14 @@ class GMM(ClassifierClass):
 
             if self._type == 'diag':
                 # remove entries that for some reason are -0.0
-                sigmas = np.abs(sigmas)
-                sigmas = sigmas * np.eye(sigmas.shape[-1])
+                sigmas = np.abs(sigmas * np.eye(sigmas.shape[-1]))
             elif self._type == 'tied':
                 zo2 = vcol(zero_order)
                 tied = (zo2.reshape(*zo2.shape, 1) * sigmas).sum(axis=0) / num_samples
                 sigmas = np.stack([tied] * num_components)
 
             # EIGENVALUE CONSTRAINING - WITH BROADCASTING
-            u, s, v = np.linalg.svd(sigmas)
-            s[s < psi] = psi
-            sigmas = u @ (s.reshape(*s.shape, 1) * v)
-            _, s, _ = np.linalg.svd(sigmas)
+            sigmas = GMM._constrain_covariances_eigs(sigmas, psi)
             # ws: (G,)
             ws = vcol(zero_order / zero_order.sum())
             return ws, mus, sigmas
@@ -171,10 +174,9 @@ class GMM(ClassifierClass):
 
         mu0 = vrow(empirical_dataset_mean(dataset))
         c0 = empirical_dataset_covariance(dataset)
-        c0 = c0.reshape(1, *c0.shape)
+        c0 = GMM._constrain_covariances_eigs(c0.reshape(1, *c0.shape), psi)
         num_components = 1
         gmm = (np.array([1.0]), mu0, c0)
-        gmm = self._em_estimation(dataset, gmm, psi)
         while num_components < desired_n_components:
             gmm = split_gmm(gmm)
             gmm = self._em_estimation(dataset, gmm, psi)
@@ -236,17 +238,7 @@ def tuning_componentsGMM(training_data, training_labels, alpha=0.1, psi=0.01):
     m_values = [None, 7]
     components_values = [1, 2, 4, 8, 16, 32]
 
-    # len(hyperparameters): 12
-    # FOR EACH TUPLE IN hyperparameters WE PERFORM 4 INNER ITERATIONS
     hyperparameters = list(itertools.product(variants, raw, m_values))
-    # SPLIT HYPERPARAMETERS IN 6 PARTITIONS OF 2 TUPLES -> 8 INNER ITERATIONS OVERALL
-
-    # ELENA: hyperparameters[:2]
-    # CICCIO: hyperparameters[2:4]
-    # TODO: hyperparameters[4:6]
-    # TODO: hyperparameters[6:8]
-    # TODO: hyperparameters[8:10]
-    # TODO: hyperparameters[10:]
 
     curr_hyp = hyperparameters[:1]
 
@@ -258,5 +250,5 @@ def tuning_componentsGMM(training_data, training_labels, alpha=0.1, psi=0.01):
             llrs, evalutationLables = k_fold(training_data, training_labels, GMM, 5, seed=0, raw=r, m=m, type=variant, alpha=alpha, psi=psi, G=g)
             min_dcf = compute_min_DCF(llrs, evalutationLables, 0.5, 1, 1)
             DCFs.append(min_dcf)
-        i += 1
-        np.save(f"GMM_rawFeature-{r}_PCA{m}_{variant}", DCFs)
+            i += 1
+        np.save(f"simulations/GMM/GMM_rawFeature-{r}_PCA{m}_{variant}", DCFs)

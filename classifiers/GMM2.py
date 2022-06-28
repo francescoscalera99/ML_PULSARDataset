@@ -54,7 +54,6 @@ class GMM(ClassifierClass):
                                f"mu.shape = {mu.shape}\n"
                                f"C.shape = {C.shape}")
 
-        # x has shape 4 x N
         n_samples = x.shape[1]
 
         y = [GMM._logpdf_GAU_ND_1(x[:, i], mu, C) for i in range(n_samples)]
@@ -85,6 +84,13 @@ class GMM(ClassifierClass):
 
         r = (const + det_sigma + quadratic_term)
         return -0.5 * r[0]
+
+    @staticmethod
+    def _constrain_covariances_eigs(sigma, psi):
+        u, s, v = np.linalg.svd(sigma)
+        s[s < psi] = psi
+        ret = u @ (s.reshape(s.size, 1) * v)
+        return ret
 
     def __init__(self, training_data, training_labels, **kwargs):
         super().__init__(training_data, training_labels)
@@ -123,24 +129,18 @@ class GMM(ClassifierClass):
             # *************** values _{g, t+1} ***************
             new_gmm = []
             for g in range(num_components):
-                try:
-                    mu = vcol(first_order[g, :] / zero_order[g])
+                mu = vcol(first_order[g, :] / zero_order[g])
 
-                    sigma = second_order[g, :, :] / zero_order[g] - mu @ mu.T
-                    # HERE GO DIAG, TIED ECC
+                sigma = second_order[g, :, :] / zero_order[g] - mu @ mu.T
+                # HERE GO DIAG, TIED ECC
 
-                    if self._type == 'diag':
-                        sigma = np.abs(sigma * np.eye(sigma.shape[-1]))
+                if self._type == 'diag':
+                    sigma = np.abs(sigma * np.eye(sigma.shape[-1]))
 
-                    # EIGENVALUE CONSTRAINING
-                    u, s, v = np.linalg.svd(sigma)
-                    s[s < psi] = psi
-                    sigma = u @ (s.reshape(s.size, 1) * v)
-
-                    w = zero_order[g] / zero_order.sum()
-                    new_gmm.append((w, mu, sigma))
-                except RuntimeWarning:
-                    print('here')
+                # EIGENVALUE CONSTRAINING
+                sigma = GMM._constrain_covariances_eigs(sigma, psi)
+                w = zero_order[g] / zero_order.sum()
+                new_gmm.append((w, mu, sigma))
 
             if self._type == 'tied':
                 s = np.zeros_like(new_gmm[0][2])
@@ -177,10 +177,9 @@ class GMM(ClassifierClass):
 
         mu0 = vcol(empirical_dataset_mean(dataset))
         c0 = empirical_dataset_covariance(dataset)
-        # c0 = c0.reshape(1, *c0.shape)
+        c0 = GMM._constrain_covariances_eigs(c0, psi)
         num_components = 1
         gmm = [(1, mu0, c0)]
-        gmm = self._em_estimation(dataset, gmm, psi)
         while num_components < desired_n_components:
             gmm = split_gmm(gmm)
             gmm = self._em_estimation(dataset, gmm, psi)
@@ -252,7 +251,6 @@ class GMM(ClassifierClass):
                 predictions = np.argmax(posterior_probs, axis=0)
                 return predictions
 
-
     def get_llrs(self):
         return self._scores
 
@@ -263,18 +261,7 @@ def tuning_componentsGMM(training_data, training_labels, alpha=0.1, psi=0.01):
     m_values = [7]
     components_values = [2, 4, 8, 16, 32]
 
-    # len(hyperparameters): 12
-    # FOR EACH TUPLE IN hyperparameters WE PERFORM 4 INNER ITERATIONS
     hyperparameters = list(itertools.product(variants, raw, m_values))
-    # SPLIT HYPERPARAMETERS IN 6 PARTITIONS OF 2 TUPLES -> 8 INNER ITERATIONS OVERALL
-
-    # IO: hyperparameters[0:1]
-    # IO: hyperparameters[1:2]
-    # CICCIO: hyperparameters[2:4]
-    # TODO: hyperparameters[4:6]
-    # TODO: hyperparameters[6:8]
-    # TODO: hyperparameters[8:10]
-    # TODO: hyperparameters[10:]
 
     curr_hyp = hyperparameters[:1]
 
