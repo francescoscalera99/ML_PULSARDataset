@@ -86,7 +86,7 @@ def LR_simulations(training_data, training_labels, lbd, calibratedScore=False, a
             table.add_row([f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T} -> min dcf:", round(min_dcf, 3)])
 
     print(table)
-    with open("results/LR_actual.txt", 'w') as f:
+    with open("results/LR_actDCF.txt", 'w') as f:
         f.write(str(table))
 
 
