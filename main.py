@@ -65,7 +65,7 @@ def main():
 
     print(" ---------- SVM LINEAR BALANCED SIMULATION ----------")
     K_LinearB = 1.0  # This values comes from tuning of hyperparameters
-    C_LinearB = 8*10^-2
+    C_LinearB = 8e-2
     SVM_LinearBalancedSimulations(training_data, training_labels, K_LinearB, C_LinearB)
 
     # print(" ---------- SVM POLY SIMULATION ----------")
@@ -99,7 +99,7 @@ def main():
     # SVM_RBFSimulations(training_data, training_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF, actualDCF=True, calibratedScore=False)
 
     # =============== SCORE CALIBRATION ===============
-    # MVG_simulations(training_data, training_labels, actualDCF=True, calibrateScore=True)
+    MVG_simulations(training_data, training_labels, actualDCF=True, calibrateScore=True)
     # SVM_LinearSimulations(training_data, training_labels, K_Linear, C_piT_Linear, actualDCF=True, calibratedScore=True)
     # SVM_PolySimulations(training_data, training_labels, K_Poly, CPoly, pi_TPolyRBF, c, d, actualDCF=True, calibratedScore=True)
     # SVM_RBFSimulations(training_data, training_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF, actualDCF=True, calibratedScore=True)
