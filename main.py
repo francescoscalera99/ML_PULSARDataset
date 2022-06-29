@@ -1,9 +1,8 @@
 import itertools
-import os
 
 import numpy as np
 
-from classifiers.GMM import tuning_componentsGMM
+from classifiers.GMM2 import tuning_componentsGMM
 from classifiers.LR import tuning_lambda
 from classifiers.SVM import tuning_parameters_PolySVM, tuning_parameters_RBFSVM, tuning_parameters_LinearSVMBalanced
 from preprocessing.preprocessing import PCA
@@ -58,14 +57,14 @@ def main():
     # tuning_parameters_RBFSVM(training_data, training_labels)
     # tuning_parameters_LinearSVMUnBalanced(training_data, training_labels)
 
-    print(" ---------- SVM LINEAR UNBALANCED SIMULATION ----------")
-    K_LinearUnb = 1.0  # This values comes from tuning of hyperparameters
-    C_LinearUnb = 1
-    SVM_LinearUnbalancedSimulations(training_data, training_labels, K_LinearUnb, C_LinearUnb)
+    # print(" ---------- SVM LINEAR UNBALANCED SIMULATION ----------")
+    # K_LinearUnb = 1.0  # This values comes from tuning of hyperparameters
+    # C_LinearUnb = 1
+    # SVM_LinearUnbalancedSimulations(training_data, training_labels, K_LinearUnb, C_LinearUnb)
 
     # print(" ---------- SVM LINEAR BALANCED SIMULATION ----------")
     # K_LinearB = 1.0  # This values comes from tuning of hyperparameters
-    # C_LinearB = 8*10^-2
+    # C_LinearB = 2e-2
     # SVM_LinearBalancedSimulations(training_data, training_labels, K_LinearB, C_LinearB)
 
     # print(" ---------- SVM POLY SIMULATION ----------")
@@ -86,8 +85,8 @@ def main():
     # print("GMM")
     # training_data, training_labels = get_same_distrib_partition(training_data, training_labels)
     # testGMM(training_data, training_labels, 16)
-    # print("GMM TUNING")
-    # tuning_componentsGMM(training_data, training_labels, psi=0.01)
+    print("GMM TUNING")
+    tuning_componentsGMM(training_data, training_labels, psi=0.01)
     # print("GMM SIMULATIONS")
     # GMM_Simulations(training_data, training_labels, alpha=0.1, psi=0.01)
 
