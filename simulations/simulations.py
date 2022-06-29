@@ -158,6 +158,8 @@ def SVM_LinearBalancedSimulations(training_data, training_labels, K, C, calibrat
             table.add_row([f"PCA m={m}, pi_T={pi_T}, π_tilde={pi}, C ={C}", round(min_dcf, 3)])
 
     print(table)
+    with open("results/SVM_linear_balanced_ACT.txt", 'w') as f:
+        f.write(str(table))
 
 
 def SVM_PolySimulations(training_data, training_labels, K, C, pi_T, c, d, actualDCF=False, calibratedScore=False):
