@@ -259,12 +259,12 @@ class GMM(ClassifierClass):
 def tuning_componentsGMM(training_data, training_labels, alpha=0.1, psi=0.01):
     variants = ['full-cov', 'diag', 'tied']
     raw = [True, False]
-    m_values = [7]
-    components_values = [2, 4, 8, 16, 32]
+    m_values = [None, 7]
+    components_values = [1, 64, 128, 256]
 
     hyperparameters = list(itertools.product(variants, raw, m_values))
 
-    curr_hyp = hyperparameters[:1]
+    curr_hyp = hyperparameters[0:6]
 
     i = 0
     for variant, r, m in curr_hyp:
