@@ -260,7 +260,7 @@ def tuning_componentsGMM(training_data, training_labels, alpha=0.1, psi=0.01):
     variants = ['full-cov', 'diag', 'tied']
     raw = [True, False]
     m_values = [None, 7]
-    components_values = [1, 64, 128, 256]
+    components_values = [2**i for i in range(9)]
 
     hyperparameters = list(itertools.product(variants, raw, m_values))
 
