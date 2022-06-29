@@ -107,10 +107,10 @@ class GMM(ClassifierClass):
         num_components = len(gmm0)
         num_samples = dataset.shape[1]
 
-        def expectation(gmm_):
-            component_likelihoods = [vrow(GMM._logpdf_GAU_ND(dataset, gmm_[g][1], gmm_[g][2])) for g in range(num_components)]
+        def expectation(gmm_arg):
+            component_likelihoods = [vrow(GMM._logpdf_GAU_ND(dataset, gmm_arg[g][1], gmm_arg[g][2])) for g in range(num_components)]
             log_score_matrix = np.vstack(component_likelihoods)
-            weights = [gmm[g][0] for g in range(num_components)]
+            weights = [gmm_arg[g][0] for g in range(num_components)]
             joint_log_densities = log_score_matrix + vcol(np.log(weights))
             marginal_log_densities = vrow(special.logsumexp(joint_log_densities, axis=0))
             log_posterior_densities = joint_log_densities - marginal_log_densities
@@ -151,15 +151,16 @@ class GMM(ClassifierClass):
                 new_gmm = [(new_gmm[g][0], new_gmm[g][1], s) for g in range(num_components)]
             return new_gmm
 
-        avg_ll = None
-        avg_ll_new = None
+        avg_ll_new = avg_ll = None
 
         gmm = gmm0
         n_iter = 0
-        while avg_ll is None or (avg_ll_new - avg_ll) > 1e-6:
+        while True:
             n_iter += 1
             avg_ll = avg_ll_new
             posteriors, avg_ll_new = expectation(gmm)
+            if (avg_ll_new - avg_ll) > 1e-6:
+                break
             gmm = maximization(posteriors)
         return gmm
 
