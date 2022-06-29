@@ -9,8 +9,8 @@ from utils.matrix_utils import vrow, vcol, empirical_dataset_mean, empirical_dat
 from utils.metrics_utils import compute_min_DCF
 from utils.utils import k_fold
 
-import warnings
-warnings.filterwarnings('error')
+# import warnings
+# warnings.filterwarnings('error')
 
 
 class GMM(ClassifierClass):
