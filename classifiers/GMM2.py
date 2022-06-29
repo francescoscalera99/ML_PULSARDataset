@@ -159,7 +159,7 @@ class GMM(ClassifierClass):
             n_iter += 1
             avg_ll = avg_ll_new
             posteriors, avg_ll_new = expectation(gmm)
-            if (avg_ll_new - avg_ll) > 1e-6:
+            if avg_ll is None or (avg_ll_new - avg_ll) > 1e-6:
                 break
             gmm = maximization(posteriors)
         return gmm
