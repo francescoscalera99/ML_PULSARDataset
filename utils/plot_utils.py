@@ -5,6 +5,7 @@ import distinctipy
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from matplotlib import ticker
 
 
 def plot_histogram(array, labels, titles, nbins: int = 10) -> None:
@@ -253,7 +254,7 @@ def plot_tuning_LinearSVMBalanced():
 
     i = 0
     fig, axs = plt.subplots(4, 3, sharey='all')
-
+    axs.tick_params(axis='both', which='major', fontsize=40)
     colors = distinctipy.get_colors(6, pastel_factor=0.7)
 
     for m in m_values:
@@ -287,12 +288,48 @@ def plot_tuningGMM():
     variants = ['full-cov', 'diag', 'tied']
     raw = [True, False]
     m_values = [None, 7]
-    components_values = [str(2**i) for i in range(9)]
+    components_values = [rf"${2**i}$" for i in range(9)]
 
-    for variant, r, m in itertools.product(variants, raw, m_values):
-        DCFs = np.load(f"../simulations/GMM/GMM_rawFeature-{r}_PCA{m}_{variant}.npy")
-        plt.bar(components_values, DCFs)
-        plt.show()
+    # the datasets are
+    # * raw, no PCA
+    # * raw, PCA7
+    # * gau, no PCA
+    # * gau, PCA7
+
+    # in each figure, given PCA and variant, we will have raw and gaussian for every value of G
+    # => in each plot there are 8*2 = 16 bars
+    # we will have 6 plots
+
+    plt.rcParams.update({
+        "text.usetex": True,
+        "font.family": "sans-serif",
+        "font.sans-serif": ["Computer Modern Serif"],
+        "axes.titlesize": 22,
+        "xtick.labelsize": 30,
+        "ytick.labelsize": 20,
+        "legend.fontsize": 15
+    })
+
+    n = len(raw)  # Number of bars to plot
+    w = .3  # With of each column
+    x = np.arange(len(components_values))  # Center position of group on x axis
+    y = np.arange(0.0, 1.1, 0.2)
+    print(y)
+
+    fig, axs = plt.subplots(2, 3)
+    fig.set_size_inches(27, 18)
+
+    for j, (variant, m) in enumerate(itertools.product(variants, m_values)):
+        for i, r in enumerate(raw):
+            DCFs = np.load(f"../simulations/GMM/old2/GMM_rawFeature-{r}_PCA{m}_{variant}.npy")
+            position = x + (w * (1 - n) / 2) + i * w
+            axs[j//3, j%3].bar(position, DCFs, width=w, edgecolor='black')
+        axs[j//3, j%3].set_xticks(x, components_values)
+        axs[j//3, j%3].set_yticks(y)
+
+    plt.tight_layout()
+    plt.show()
+        # plt.gca().yaxis.set_major_formatter(ticker.FormatStrFormatter('$%.2f'))
 
 
 if __name__ == '__main__':

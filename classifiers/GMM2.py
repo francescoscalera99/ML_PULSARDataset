@@ -261,18 +261,21 @@ def tuning_componentsGMM(training_data, training_labels, alpha=0.1, psi=0.01):
     raw = [True, False]
     m_values = [None, 7]
     components_values = [2**i for i in range(9)]
+    pis = [0.1, 0.9]
 
-    hyperparameters = list(itertools.product(variants, raw, m_values))
+    hyperparameters = list(itertools.product(variants, raw, m_values, pis))
 
-    curr_hyp = hyperparameters[0:6]
+    # CICCIO: 12:24
+    curr_hyp = hyperparameters[0:12]
 
     i = 0
-    for variant, r, m in curr_hyp:
+    for variant, r, m, p in curr_hyp:
         DCFs = []
         for g in components_values:
             print(f"Inner iteration {i+1}/{len(curr_hyp)*len(components_values)}")
-            llrs, evalutationLables = k_fold(training_data, training_labels, GMM, 5, seed=0, raw=r, m=m, type=variant, alpha=alpha, psi=psi, G=g)
-            min_dcf = compute_min_DCF(llrs, evalutationLables, 0.5, 1, 1)
+            llrs, evalutationLabels = k_fold(training_data, training_labels, GMM, 5, seed=0, raw=r, m=m, type=variant,
+                                             alpha=alpha, psi=psi, G=g)
+            min_dcf = compute_min_DCF(llrs, evalutationLabels, p, 1, 1)
             DCFs.append(min_dcf)
             i += 1
-        np.save(f"simulations/GMM/GMM_rawFeature-{r}_PCA{m}_{variant}", DCFs)
+        np.save(f"simulations/GMM/GMM_rawFeature-{r}_PCA{m}_{variant}_pi{str(p).replace('.', '-')}", DCFs)
