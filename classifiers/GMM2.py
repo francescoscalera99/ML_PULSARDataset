@@ -265,7 +265,8 @@ def tuning_componentsGMM(training_data, training_labels, alpha=0.1, psi=0.01):
 
     hyperparameters = list(itertools.product(variants, raw, m_values, pis))
 
-    curr_hyp = hyperparameters[0:6]
+    # CICCIO: 12:24
+    curr_hyp = hyperparameters[0:12]
 
     i = 0
     for variant, r, m, p in curr_hyp:
