@@ -1,4 +1,6 @@
 import itertools
+import os
+
 import distinctipy
 import numpy as np
 import matplotlib.pyplot as plt
@@ -233,7 +235,6 @@ def plot_tuningLinearSVMUnbalanced():
     fig.show()
 
 
-
 def plot_tuning_LinearSVMBalanced():
     C_values = np.logspace(-3, 3, 20)
     m_values = [False, None, 7, 5]
@@ -282,10 +283,23 @@ def plot_tuning_LinearSVMBalanced():
     fig.show()
 
 
+def plot_tuningGMM():
+    variants = ['full-cov', 'diag', 'tied']
+    raw = [True, False]
+    m_values = [None, 7]
+    components_values = [str(2**i) for i in range(9)]
+
+    for variant, r, m in itertools.product(variants, raw, m_values):
+        DCFs = np.load(f"../simulations/GMM/GMM_rawFeature-{r}_PCA{m}_{variant}.npy")
+        plt.bar(components_values, DCFs)
+        plt.show()
+
+
 if __name__ == '__main__':
     # plot_lambda()
     # plot_tuningPolySVM()
     # plot_tuningRBFSVM()
-    plot_tuningLinearSVMUnbalanced()
+    # plot_tuningLinearSVMUnbalanced()
     # plot_tuning_LinearSVMBalanced()
+    plot_tuningGMM()
     pass

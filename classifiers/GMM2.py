@@ -159,7 +159,7 @@ class GMM(ClassifierClass):
             n_iter += 1
             avg_ll = avg_ll_new
             posteriors, avg_ll_new = expectation(gmm)
-            if avg_ll is None or (avg_ll_new - avg_ll) > 1e-6:
+            if avg_ll is not None and (avg_ll_new - avg_ll) > 1e-6:
                 break
             gmm = maximization(posteriors)
         return gmm
@@ -264,7 +264,7 @@ def tuning_componentsGMM(training_data, training_labels, alpha=0.1, psi=0.01):
 
     hyperparameters = list(itertools.product(variants, raw, m_values))
 
-    curr_hyp = hyperparameters[0:6]
+    curr_hyp = hyperparameters[0:1]
 
     i = 0
     for variant, r, m in curr_hyp:
