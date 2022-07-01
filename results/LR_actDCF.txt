@@ -1,5 +1,5 @@
 +----------------------------------------------------------------------+---------+
-|                           Hyperparameters                            | min DCF |
+|                           Hyperparameters                            | act DCF |
 +----------------------------------------------------------------------+---------+
 | PCA m=False, data: gaussianized, π_tilde=0.5, π_T=0.5 -> actual dcf: |  0.314  |
 | PCA m=False, data: gaussianized, π_tilde=0.5, π_T=0.1 -> actual dcf: |  0.912  |

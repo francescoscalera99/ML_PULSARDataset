@@ -1,8 +1,9 @@
 +-----------------------------------------------------------------+---------+
-|                         Hyperparameters                         | min DCF |
+|                         Hyperparameters                         | act DCF |
 +-----------------------------------------------------------------+---------+
 | Raw features, PCA m=7, variant=full-cov, π_tilde=0.1 -> min dcf |  0.377  |
 | Raw features, PCA m=7, variant=full-cov, π_tilde=0.1 -> min dcf |   0.3   |
+
 | Raw features, PCA m=7, variant=full-cov, π_tilde=0.5 -> min dcf |   0.18  |
 | Raw features, PCA m=7, variant=full-cov, π_tilde=0.5 -> min dcf |  0.171  |
 | Raw features, PCA m=7, variant=full-cov, π_tilde=0.9 -> min dcf |  1.011  |
