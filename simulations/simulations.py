@@ -2,7 +2,7 @@ import itertools
 import numpy as np
 from prettytable import PrettyTable
 
-from classifiers.GMM import GMM
+from classifiers.GMM2 import GMM
 from classifiers.LR import LR, calibrateScores
 from classifiers.MVG import MVG
 from classifiers.SVM import SVM
@@ -158,7 +158,7 @@ def SVM_LinearBalancedSimulations(training_data, training_labels, K, C, calibrat
             table.add_row([f"PCA m={m}, pi_T={pi_T}, π_tilde={pi}, C ={C}", round(min_dcf, 3)])
 
     print(table)
-    with open("results/SVM_linear_balanced_ACT.txt", 'w') as f:
+    with open("results/SVM_linear_balanced_ACT_2.txt", 'w') as f:
         f.write(str(table))
 
 
