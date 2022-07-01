@@ -264,7 +264,8 @@ def plot_tuning_LinearSVMBalanced():
             for idx, (K, pi) in enumerate(hyperparameters):
                 DCFs = np.load(
                     f"../simulations/linearSVM/balanced/K{str(K).replace('.', '-')}_p{str(pi).replace('.', '-')}_pT{str(pi_T).replace('.', '-')}_PCA{str(m)}.npy")
-                axs[i, j].plot(C_values, DCFs, color=colors[idx], label=rf"$K={K}$,\;" + r"$\widetilde{\pi}=$" + f"{pi}")
+                axs[i, j].plot(C_values, DCFs, color=colors[idx],
+                               label=rf"$K={K}$,\;" + r"$\widetilde{\pi}=$" + f"{pi}")
                 if m is None:
                     axs[i, j].set_title('Gaussianized features, no PCA' + rf', $\pi_T={pi_T}$')
                 elif m == False:
@@ -288,7 +289,8 @@ def plot_tuningGMM():
     variants = ['full-cov', 'diag', 'tied']
     raw = [True, False]
     m_values = [None, 7]
-    components_values = [rf"${2**i}$" for i in range(9)]
+    pis = [0.1, 0.5, 0.9]
+    components_values = [rf"${2 ** i}$" for i in range(9)]
 
     # the datasets are
     # * raw, no PCA
@@ -321,15 +323,60 @@ def plot_tuningGMM():
 
     for j, (variant, m) in enumerate(itertools.product(variants, m_values)):
         for i, r in enumerate(raw):
-            DCFs = np.load(f"../simulations/GMM/old2/GMM_rawFeature-{r}_PCA{m}_{variant}.npy")
+            DCFs = np.load(f"simulations/GMM/GMM_rawFeature-{r}_PCA{m}_{variant}.npy")
             position = x + (w * (1 - n) / 2) + i * w
-            axs[j//3, j%3].bar(position, DCFs, width=w, edgecolor='black')
-        axs[j//3, j%3].set_xticks(x, components_values)
-        axs[j//3, j%3].set_yticks(y)
+            axs[j // 3, j % 3].bar(position, DCFs, width=w, edgecolor='black')
+        axs[j // 3, j % 3].set_xticks(x, components_values)
+        axs[j // 3, j % 3].set_yticks(y)
 
     plt.tight_layout()
     plt.show()
-        # plt.gca().yaxis.set_major_formatter(ticker.FormatStrFormatter('$%.2f'))
+    # plt.gca().yaxis.set_major_formatter(ticker.FormatStrFormatter('$%.2f'))
+
+
+def plot_tuningGMM2():
+    variants = ['full-cov', 'diag', 'tied']
+    raw = [True, False]
+    m_values = [None, 7]
+    pis = [0.5, 0.1, 0.9]
+    components_values = [2 ** i for i in range(9)]
+    plt.rcParams.update({
+        "text.usetex": True,
+        "font.family": "sans-serif",
+        "font.sans-serif": ["Computer Modern Serif"],
+        # "axes.titlesize": 22,
+        "xtick.labelsize": 15,
+        "ytick.labelsize": 15,
+        "legend.fontsize": 12
+    })
+
+    fig, axs = plt.subplots(3, 2)
+    fig.set_size_inches(15, 10)
+    colors = distinctipy.get_colors(6, pastel_factor=0.7)
+    y = np.arange(0.0, 1.1, 0.2)
+
+    for i, (variant, m) in enumerate(itertools.product(variants, m_values)):
+        for j, (p, r) in enumerate(itertools.product(pis, raw)):
+            pp = '' if p == 0.5 else "_pi"+str(p).replace('.', '-')
+            DCFs = np.load(f"../simulations/GMM/GMM_rawFeature-{r}_PCA{m}_{variant}{pp}.npy")
+            label = r"$\widetilde{\pi}=$" + f"{p}, {'raw' if r else 'gau'}"
+            axs[i//2, i % 2].plot(components_values, DCFs, label=label, color=colors[j])
+            axs[i//2, i % 2].set_xscale('log', base=2)
+            axs[i//2, i % 2].set_xticks(components_values)
+            axs[i//2, i % 2].set_yticks(y)
+            if i // 2 == 2:
+                axs[i//2, i % 2].set_xlabel("Number of components")
+
+            v = 'tied full-cov' if variant == 'tied' else variant
+
+            pca = f"PCA ($m={m}$)" if m is not None else "no PCA"
+            axs[i // 2, i % 2].set_title(rf"{v}, {pca}", size=20)
+
+        axs[i//2, i % 2].legend(loc='upper right', framealpha=0.5)
+
+    fig.tight_layout()
+    plt.show()
+
 
 
 if __name__ == '__main__':
@@ -338,5 +385,7 @@ if __name__ == '__main__':
     # plot_tuningRBFSVM()
     # plot_tuningLinearSVMUnbalanced()
     # plot_tuning_LinearSVMBalanced()
-    plot_tuningGMM()
+
+    print(os.path.abspath("../simulations/GMM/GMM_rawFeature-False_PCA7_diag.npy"))
+    plot_tuningGMM2()
     pass
