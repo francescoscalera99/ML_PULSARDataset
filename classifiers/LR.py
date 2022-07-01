@@ -65,11 +65,13 @@ def tuning_lambda(training_data, training_labels):
             np.save(f"LR_prior_{str(pi).replace('.', '-')}_PCA{m}", np.array(DCFs))
 
 
-def calibrateScores(scores, evaluationLabels, lambd, prior=0.5):
+def calibrateScores(scores, evaluationLabels, lambd, pi_T=0.5):
     # f(s) = as+b can be interpreted as the llr for the two class hypothesis
     # class posterior probability: as+b+log(pi/(1-pi)) = as +b'
-    logReg = LR(scores, evaluationLabels, lbd=lambd, pi_T=prior)
-    logReg.train_model()
-    logReg.classify(scores, None)
-    scores = logReg.get_llrs() - np.log(prior / 1 - prior)
+    calibratedScore, calibratedEvalLabels = k_fold(scores, evaluationLabels, LR, 5, seed = 0, lbd=lambd, pi_T=pi_T)
+    # logReg = LR(scores, evaluationLabels, lbd=lambd, pi_T=prior)
+    # logReg.train_model()
+    # logReg.classify(scores, None)
+    calibratedScore = calibratedScore - np.log(prior / 1 - prior)
+    # scores = logReg.get_llrs() - np.log(prior / 1 - prior)
     return scores
