@@ -10,50 +10,31 @@ from utils.metrics_utils import compute_actual_DCF, compute_min_DCF
 from utils.utils import k_fold
 
 
-# def MVG_simulations(training_data, training_labels, calibrateScore=False, actualDCF=False):
-#     variants = ['full-cov', 'diag', 'tied']
-#     m = [False, None, 7, 5, 4]
-#     pis = [0.1, 0.5, 0.9]
-#
-#     hyperparameters = itertools.product(variants, m, pis)
-#     table = PrettyTable()
-#     table.field_names = ['Hyperparameters', 'min DCF']
-#
-#     for variant, m, pi in hyperparameters:
-#         if m == False:  # raw features
-#             llrs, labels = k_fold(training_data, training_labels, MVG, 5, seed=0, m=None, raw=True, variant=variant)
-#         else:
-#             llrs, labels = k_fold(training_data, training_labels, MVG, 5, seed=0, m=m, raw=False, variant=variant)
-#         if actualDCF:
-#             if calibrateScore:
-#                 score = scoreCalibration(llrs, labels)
-#             else:
-#                 score = llrs
-#             actDCF = compute_actual_DCF(score, labels, pi, 1, 1)
-#             table.add_row([f"PCA m={m}, variant={variant}, π_tilde={pi} -> actual dcf", round(actDCF, 3)])
-#         else:
-#             min_dcf = compute_min_DCF(np.array(llrs), labels, pi, 1, 1)
-#             table.add_row([f"PCA m={m}, variant={variant}, π_tilde={pi} -> min dcf", round(min_dcf, 3)])
-#     print(table)
-
-
-def MVG_simulations(training_data, training_labels, calibrateScore=False, actualDCF=False):
+def MVG_simulations(training_data, training_labels, calibratedScore=False, actualDCF=False):
     variants = ['full-cov', 'diag', 'tied']
     ms = [7, 5, 4]
     pis = [0.1, 0.5, 0.9]
 
     hyperparameters = itertools.product(variants, ms, pis)
     table = PrettyTable()
-    table.field_names = ['Hyperparameters', 'min DCF']
+    if actualDCF:
+        table.field_names = ['Hyperparameters', 'act DCF']
+    else:
+        table.field_names = ['Hyperparameters', 'min DCF']
 
     for i, (variant, m, pi) in enumerate(hyperparameters):
-        print(f"Iteration {i + 1}/{len(variants)*len(ms)*len(pis)}")
-        llrs, labels = k_fold(training_data, training_labels, MVG, 5, seed=0, m=m, raw=True, variant=variant)
+        print(f"Iteration {i + 1}/{len(variants) * len(ms) * len(pis)}")
+        llrs, evaluationLabels = k_fold(training_data, training_labels, MVG, 5, seed=0, m=m, raw=True, variant=variant)
         if actualDCF:
-            act_dcf = compute_actual_DCF(llrs, labels, pi, 1, 1)
+            if calibratedScore:
+                score, labels = calibrateScores(llrs, evaluationLabels, 1e-3, pi, 0.5)
+            else:
+                score = llrs
+                labels = evaluationLabels
+            act_dcf = compute_actual_DCF(score, labels, pi, 1, 1)
             table.add_row([f"Raw features, PCA m={m}, variant={variant}, π_tilde={pi} -> min dcf", round(act_dcf, 3)])
         else:
-            min_dcf = compute_min_DCF(np.array(llrs), labels, pi, 1, 1)
+            min_dcf = compute_min_DCF(np.array(llrs), evaluationLabels, pi, 1, 1)
             table.add_row([f"Raw features, PCA m={m}, variant={variant}, π_tilde={pi} -> min dcf", round(min_dcf, 3)])
     print(table)
 
@@ -66,27 +47,33 @@ def LR_simulations(training_data, training_labels, lbd, calibratedScore=False, a
     hyperparameters = itertools.product(m_values, pis, pis_T)
 
     table = PrettyTable()
-    table.field_names = ['Hyperparameters', 'min DCF']
+    if actualDCF:
+        table.field_names = ['Hyperparameters', 'act DCF']
+    else:
+        table.field_names = ['Hyperparameters', 'min DCF']
 
     for i, (m, pi, pi_T) in enumerate(hyperparameters):
-        print(f"Iteration {i + 1}/{len(m_values)*len(pis)*len(pis_T)}")
+        print(f"Iteration {i + 1}/{len(m_values) * len(pis) * len(pis_T)}")
         if m == False:  # raw features
-            llrs, labels = k_fold(training_data, training_labels, LR, 5, m=None, raw=True, seed=0, lbd=lbd, pi_T=pi_T)
+            llrs, evaluationLabels = k_fold(training_data, training_labels, LR, 5, m=None, raw=True, seed=0, lbd=lbd,
+                                            pi_T=pi_T)
         else:
-            llrs, labels = k_fold(training_data, training_labels, LR, 5, m=m, raw=False, seed=0, lbd=lbd, pi_T=pi_T)
+            llrs, evaluationLabels = k_fold(training_data, training_labels, LR, 5, m=m, raw=False, seed=0, lbd=lbd,
+                                            pi_T=pi_T)
         if actualDCF:
             if calibratedScore:
-                score = calibrateScores(llrs, labels)
+                score, labels = calibrateScores(llrs, evaluationLabels, 1e-3, pi, 0.5)
             else:
                 score = llrs
+                labels = evaluationLabels
             actDCF = compute_actual_DCF(score, labels, pi, 1, 1)
-            table.add_row([f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T} -> actual dcf:", round(actDCF, 3)])
+            table.add_row([f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T}", round(actDCF, 3)])
         else:
-            min_dcf = compute_min_DCF(np.array(llrs), labels, pi, 1, 1)
-            table.add_row([f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T} -> min dcf:", round(min_dcf, 3)])
+            min_dcf = compute_min_DCF(np.array(llrs), evaluationLabels, pi, 1, 1)
+            table.add_row([f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T}", round(min_dcf, 3)])
 
     print(table)
-    with open("results/LR_actDCF.txt", 'w') as f:
+    with open(f"results/LR_ACT-{actualDCF}_calibrated-{calibratedScore}.txt", 'w') as f:
         f.write(str(table))
 
 
@@ -97,32 +84,38 @@ def SVM_LinearUnbalancedSimulations(training_data, training_labels, K, C, calibr
     hyperparameters = itertools.product(ms, priors)
 
     table = PrettyTable()
-    table.field_names = ['Hyperparameters', 'min DCF']
+    if actualDCF:
+        table.field_names = ['Hyperparameters', 'act DCF']
+    else:
+        table.field_names = ['Hyperparameters', 'min DCF']
 
     for i, (m, pi) in enumerate(hyperparameters):
-        print(f"Iteration {i+1}/{len(ms)*len(priors)}")
+        print(f"Iteration {i + 1}/{len(ms) * len(priors)}")
         if m == False:
-            llrs, labels = k_fold(training_data, training_labels, SVM, 5, seed=0, balanced=False, m=None, raw=True,
-                                  pi_T=None, k=K, c=C,
-                                  kernel_params=(1, 0), kernel_type='poly')
+            llrs, evaluationLabels = k_fold(training_data, training_labels, SVM, 5, seed=0, balanced=False, m=None,
+                                            raw=True,
+                                            pi_T=None, k=K, c=C,
+                                            kernel_params=(1, 0), kernel_type='poly')
         else:
-            llrs, labels = k_fold(training_data, training_labels, SVM, 5, seed=0, balanced=False, m=m, raw=False,
-                                  pi_T=None, k=K, c=C,
-                                  kernel_params=(1, 0), kernel_type='poly')
+            llrs, evaluationLabels = k_fold(training_data, training_labels, SVM, 5, seed=0, balanced=False, m=m,
+                                            raw=False,
+                                            pi_T=None, k=K, c=C,
+                                            kernel_params=(1, 0), kernel_type='poly')
         if actualDCF:
             if calibratedScore:
-                score = calibrateScores(llrs, labels)
+                score, labels = calibrateScores(llrs, evaluationLabels, 1e-3, pi, 0.5)
             else:
                 score = llrs
+                labels = evaluationLabels
             actDCF = compute_actual_DCF(score, labels, pi, 1, 1)
             table.add_row([f"PCA m={m}, π_tilde={pi},  C ={C}", round(actDCF, 3)])
         else:
-            min_dcf = compute_min_DCF(np.array(llrs), labels, pi, 1, 1)
+            min_dcf = compute_min_DCF(np.array(llrs), evaluationLabels, pi, 1, 1)
             print(f"PCA m={m} π_tilde={pi}, C ={C}, K{K} --> ", round(min_dcf, 3))
             table.add_row([f"PCA m={m}, π_tilde={pi}, C ={C}", round(min_dcf, 3)])
 
     print(table)
-    with open("results/SVM_linear_unbalanced_ACT.txt", 'w') as f:
+    with open(f"results/SVM_linear_unbalanced_ACT-{actualDCF}_calibrated-{calibratedScore}.txt", 'w') as f:
         f.write(str(table))
 
 
@@ -134,31 +127,37 @@ def SVM_LinearBalancedSimulations(training_data, training_labels, K, C, calibrat
     hyperparameters = itertools.product(m, priors, pi_T_values)
 
     table = PrettyTable()
-    table.field_names = ['Hyperparameters', 'min DCF']
+    if actualDCF:
+        table.field_names = ['Hyperparameters', 'act DCF']
+    else:
+        table.field_names = ['Hyperparameters', 'min DCF']
 
     for m, pi, pi_T in hyperparameters:
         if m == False:
-            llrs, labels = k_fold(training_data, training_labels, SVM, 5, seed=0, balanced=True, m=None, raw=True,
-                                  pi_T=pi_T, k=K, c=C,
-                                  kernel_params=(1, 0), kernel_type='poly')
+            llrs, evaluationLabels = k_fold(training_data, training_labels, SVM, 5, seed=0, balanced=True, m=None,
+                                            raw=True,
+                                            pi_T=pi_T, k=K, c=C,
+                                            kernel_params=(1, 0), kernel_type='poly')
         else:
-            llrs, labels = k_fold(training_data, training_labels, SVM, 5, seed=0, balanced=True, m=m, raw=False,
-                                  pi_T=pi_T, k=K, c=C,
-                                  kernel_params=(1, 0), kernel_type='poly')
+            llrs, evaluationLabels = k_fold(training_data, training_labels, SVM, 5, seed=0, balanced=True, m=m,
+                                            raw=False,
+                                            pi_T=pi_T, k=K, c=C,
+                                            kernel_params=(1, 0), kernel_type='poly')
         if actualDCF:
             if calibratedScore:
-                score = calibrateScores(llrs, labels)
+                score, labels = calibrateScores(llrs, evaluationLabels, 1e-3, pi, 0.5)
             else:
                 score = llrs
+                labels = evaluationLabels
             actDCF = compute_actual_DCF(score, labels, pi, 1, 1)
             table.add_row([f"PCA m={m}, piT_={pi_T} π_tilde={pi},  C ={C}", round(actDCF, 3)])
         else:
-            min_dcf = compute_min_DCF(np.array(llrs), labels, pi, 1, 1)
+            min_dcf = compute_min_DCF(np.array(llrs), evaluationLabels, pi, 1, 1)
             print(f"PCA m={m} pi_T={pi_T} π_tilde={pi}, C ={C}, K{K} --> ", round(min_dcf, 3))
             table.add_row([f"PCA m={m}, pi_T={pi_T}, π_tilde={pi}, C ={C}", round(min_dcf, 3)])
 
     print(table)
-    with open("results/SVM_linear_balanced_ACT_2.txt", 'w') as f:
+    with open(f"results/SVM_linear_balanced_ACT-{actualDCF}_calibrated{calibratedScore}.txt", 'w') as f:
         f.write(str(table))
 
 
@@ -167,8 +166,12 @@ def SVM_PolySimulations(training_data, training_labels, K, C, pi_T, c, d, actual
     priors = [0.5, 0.1, 0.9]
 
     hyperparameters = itertools.product(m, priors)
+
     table = PrettyTable()
-    table.field_names = ['Hyperparameters', 'min DCF']
+    if actualDCF:
+        table.field_names = ['Hyperparameters', 'act DCF']
+    else:
+        table.field_names = ['Hyperparameters', 'min DCF']
 
     for m, pi in hyperparameters:
         if m == False:
@@ -179,14 +182,17 @@ def SVM_PolySimulations(training_data, training_labels, K, C, pi_T, c, d, actual
             llrs, evaluationLabels = k_fold(training_data, training_labels, SVM, 5, seed=0, m=m, raw=False, k=K, c=C,
                                             balanced=True, pi_T=pi_T,
                                             kernel_params=(d, c), kernel_type='poly')
-        min_dcf = compute_min_DCF(llrs, evaluationLabels, pi, 1, 1)
         if actualDCF:
-            act_DCF = compute_actual_DCF(np.array(llrs), evaluationLabels, pi, 1, 1)
-            print(f"PCA m={m}, π_tilde={pi}, pi_T = 0.5, C ={C} K={K}, c={c}, d={d}", "--> actualDCF: ",
-                  round(act_DCF, 3))
+            if calibratedScore:
+                score, labels = calibrateScores(llrs, evaluationLabels, 1e-3, pi, 0.5)
+            else:
+                score = llrs
+                labels = evaluationLabels
+            act_DCF = compute_actual_DCF(score, labels, pi, 1, 1)
             table.add_row(
                 [f"PCA m={m}, π_tilde={pi}, pi_T = 0.5, C ={C} K={K}, c={c}, d={d}", round(act_DCF, 3)])
         else:
+            min_dcf = compute_min_DCF(llrs, evaluationLabels, pi, 1, 1)
             print(f"PCA m={m}, π_tilde={pi}, pi_T = 0.5, C ={C} K={K}, c={c}, d={d}", "-->",
                   round(min_dcf, 3))
             table.add_row(
@@ -201,30 +207,38 @@ def SVM_RBFSimulations(training_data, training_labels, K, C, pi_T, gamma, actual
     hyperparameters = itertools.product(ms, effective_priors)
 
     table = PrettyTable()
-    table.field_names = ['Hyperparameters', 'min DCF']
+    if actualDCF:
+        table.field_names = ['Hyperparameters', 'act DCF']
+    else:
+        table.field_names = ['Hyperparameters', 'min DCF']
 
     for m, pi in hyperparameters:
         if m == False:
-            llrs, labels = k_fold(training_data, training_labels, SVM, 5, seed=0, m=None, raw=True, balanced=True,
-                                  pi_T=pi_T,
-                                  k=K, c=C, kernel_params=gamma, kernel_type='RBF')
+            llrs, evaluationLabels = k_fold(training_data, training_labels, SVM, 5, seed=0, m=None, raw=True,
+                                            balanced=True,
+                                            pi_T=pi_T,
+                                            k=K, c=C, kernel_params=gamma, kernel_type='RBF')
         else:
-            llrs, labels = k_fold(training_data, training_labels, SVM, 5, seed=0, m=m, raw=False, balanced=True,
-                                  pi_T=pi_T,
-                                  k=K, c=C, kernel_params=gamma, kernel_type='RBF')
+            llrs, evaluationLabels = k_fold(training_data, training_labels, SVM, 5, seed=0, m=m, raw=False,
+                                            balanced=True,
+                                            pi_T=pi_T,
+                                            k=K, c=C, kernel_params=gamma, kernel_type='RBF')
         if actualDCF:
-            act_DCF = compute_actual_DCF(np.array(llrs), labels, pi, 1, 1)
-            print(f"PCA m={m}, π_tilde={pi}, π_T={pi_T}  C ={C}", "-->", round(act_DCF, 3))
+            if calibratedScore:
+                score, labels = calibrateScores(llrs, evaluationLabels, 1e-3, pi, 0.5)
+            else:
+                score = llrs
+                labels = evaluationLabels
+            act_DCF = compute_actual_DCF(score, labels, pi, 1, 1)
             table.add_row([f"PCA m={m}, π_tilde={pi}, π_T={pi_T}  C ={C}", round(act_DCF, 3)])
         else:
-            min_dcf = compute_min_DCF(np.array(llrs), labels, pi, 1, 1)
-            print(f"PCA m={m}, π_tilde={pi}, π_T={pi_T}  C ={C}", "-->", round(min_dcf, 3))
+            min_dcf = compute_min_DCF(np.array(llrs), evaluationLabels, pi, 1, 1)
             table.add_row([f"PCA m={m}, π_tilde={pi}, π_T={pi_T}  C ={C}", round(min_dcf, 3)])
 
     print(table)
 
 
-def GMM_Simulations(training_data, training_labels, alpha, psi):
+def GMM_Simulations(training_data, training_labels, alpha, psi, actualDCF=False, calibratedScore=False):
     variants = ['full-cov', 'diag', 'tied']
     effective_priors = [0.5, 0.1, 0.9]
     ms = [None, 7, 5]
@@ -232,7 +246,10 @@ def GMM_Simulations(training_data, training_labels, alpha, psi):
     num_components = [2, 4]
 
     table = PrettyTable()
-    table.field_names = ['Hyperparameters', 'min DCF']
+    if actualDCF:
+        table.field_names = ['Hyperparameters', 'act DCF']
+    else:
+        table.field_names = ['Hyperparameters', 'min DCF']
 
     hyperparameters = itertools.product(ms, effective_priors, variants, raws, num_components)
     n_iter = len(variants) * len(effective_priors) * len(ms) * len(raws) * len(num_components)

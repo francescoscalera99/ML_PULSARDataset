@@ -44,7 +44,7 @@ def main():
 
     # =============== LOGISTIC REGRESSION ===============
     # tuning_lambda(training_data, training_labels)
-    # lbd = 1e-1
+    lbd = 1e-1
     # LR_simulations(training_data, training_labels, lbd)
 
     # =============== SUPPORT VECTOR MACHINE ===============
@@ -58,35 +58,34 @@ def main():
     # tuning_parameters_LinearSVMUnBalanced(training_data, training_labels)
 
     # print(" ---------- SVM LINEAR UNBALANCED SIMULATION ----------")
-    # K_LinearUnb = 1.0  # This values comes from tuning of hyperparameters
-    # C_LinearUnb = 1
+    K_LinearUnb = 1.0  # This values comes from tuning of hyperparameters
+    C_LinearUnb = 1
     # SVM_LinearUnbalancedSimulations(training_data, training_labels, K_LinearUnb, C_LinearUnb)
 
     # print(" ---------- SVM LINEAR BALANCED SIMULATION ----------")
-    # K_LinearB = 1.0  # This values comes from tuning of hyperparameters
-    # C_LinearB = 2e-2
+    K_LinearB = 1.0  # This values comes from tuning of hyperparameters
+    C_LinearB = 2e-2
     # SVM_LinearBalancedSimulations(training_data, training_labels, K_LinearB, C_LinearB)
 
     # print(" ---------- SVM POLY SIMULATION ----------")
-    # K_Poly = 1.0
-    # pi_TPolyRBF = 0.5
-    # CPoly = 1e-2
-    # c = 15
-    # d = 2
+    K_Poly = 1.0
+    pi_TPolyRBF = 0.5
+    CPoly = 1e-2
+    c = 15
+    d = 2
     # SVM_PolySimulations(training_data, training_labels, K_Poly, CPoly, pi_TPolyRBF, c, d)
 
     # print(" ---------- SVM RBF SIMULATION ----------")
-    # K_RBF = 0
-    # gamma_RBF = 1e-3
-    # C_RBF = 1e-1
+    K_RBF = 0
+    gamma_RBF = 1e-3
+    C_RBF = 1e-1
     # SVM_RBFSimulations(training_data, training_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF)
 
     # =============== GAUSSIAN MIXTURE MODELS ===============
     # print("GMM")
     # training_data, training_labels = get_same_distrib_partition(training_data, training_labels)
     # testGMM(training_data, training_labels, 16)
-    print("GMM TUNING")
-    tuning_componentsGMM(training_data, training_labels, psi=0.01)
+    # tuning_componentsGMM(training_data, training_labels, psi=0.01)
     # print("GMM SIMULATIONS")
     # GMM_Simulations(training_data, training_labels, alpha=0.1, psi=0.01)
 
@@ -98,11 +97,18 @@ def main():
     # SVM_RBFSimulations(training_data, training_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF, actualDCF=True, calibratedScore=False)
 
     # =============== SCORE CALIBRATION ===============
-    # MVG_simulations(training_data, training_labels, actualDCF=True, calibrateScore=True)
-    # SVM_LinearSimulations(training_data, training_labels, K_Linear, C_piT_Linear, actualDCF=True, calibratedScore=True)
+    # print("============== MVG - SCORE CALIBRATION =============== ")
+    # MVG_simulations(training_data, training_labels, actualDCF=True, calibratedScore=True)
+    # print("============== SVM LINEAR UNBALANCED - SCORE CALIBRATION ===============")
+    # SVM_LinearUnbalancedSimulations(training_data, training_labels, K_LinearUnb, C_LinearUnb, actualDCF=True, calibratedScore=True )
+    # print("============== SVM LINEAR BALANCED - SCORE CALIBRATION ===============")
+    # SVM_LinearBalancedSimulations(training_data, training_labels, K_LinearB, C_LinearB, actualDCF=True, calibratedScore=True)
+    # print("============== SVM POLY - SCORE CALIBRATION ===============")
     # SVM_PolySimulations(training_data, training_labels, K_Poly, CPoly, pi_TPolyRBF, c, d, actualDCF=True, calibratedScore=True)
+    # print("============== SVM RBF BALANCED - SCORE CALIBRATION ===============")
     # SVM_RBFSimulations(training_data, training_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF, actualDCF=True, calibratedScore=True)
-    # LR_simulations(training_data, training_labels, lbd, , actualDCF=True, calibrateScore=False)
+    # print("============== LR - SCORE CALIBRATION ===============")
+    # LR_simulations(training_data, training_labels, lbd, actualDCF=True, calibratedScore=True)
 
     # =============== EXPERIMENTAL RESULT ===============
 

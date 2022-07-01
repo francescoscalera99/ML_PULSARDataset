@@ -70,5 +70,5 @@ def calibrateScores(scores, evaluationLabels, lambd, prior, pi_T=0.5):
     # f(s) = as+b can be interpreted as the llr for the two class hypothesis
     # class posterior probability: as+b+log(pi/(1-pi)) = as +b'
     calibratedScore, calibratedEvaluationLabels = k_fold(vrow(scores), evaluationLabels, LR, 5, m=None, raw=True, seed=0, lbd=lambd, pi_T=pi_T)
-    calibratedScore = calibratedScore - np.log((prior)/(1 - prior))
+    calibratedScore = calibratedScore - np.log(prior / (1 - prior))
     return calibratedScore, calibratedEvaluationLabels
