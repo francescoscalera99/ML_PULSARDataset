@@ -1,5 +1,7 @@
 import numpy as np
 
+from utils.utils import k_fold
+
 
 def build_confusion_matrix(testing_labels: np.ndarray, predicted_labels: np.ndarray) -> np.ndarray:
     if testing_labels.size != predicted_labels.size:
@@ -45,7 +47,7 @@ def compute_min_DCF(llr, labels, prior, Cfn, Cfp):
         pred = np.int32(llr > treshold)
         OBD = compute_OBD(pred, labels)
         currentDCF = compute_normalizeDCF(OBD, prior, Cfn, Cfp)
-        if (currentDCF < minDCF):
+        if currentDCF < minDCF:
             minDCF = currentDCF
 
     return minDCF
@@ -58,6 +60,23 @@ def compute_actual_DCF(llr, labels, prior, Cfn, Cfp):
     actDCF = compute_normalizeDCF(OBD, prior, Cfn, Cfp)
 
     return actDCF
+
+
+def bayes_error_plots(training_data, training_labels, classifier, Cfn=1, Cfp=1, **kwargs):
+    effPriorLogOdds = np.linspace(-3, 3, 21)
+    effPrior = 1 / (1 + np.exp(-effPriorLogOdds))
+
+    actDCFs = []
+    minDCFs = []
+
+    score, labels = k_fold(training_data, training_labels, classifier, nFold=5, seed=0, **kwargs)
+    for e in effPrior:
+        actDCFs.append(compute_actual_DCF(score, labels, e, Cfn, Cfp))
+        minDCFs.append(compute_min_DCF(score, labels, e, Cfn, Cfp))
+
+    np.save(f"../results/bayesErrorPlot/{classifier.__name__}_actDCF", np.array(actDCFs))
+    np.save(f"../results/bayesErrorPlot/{classifier.__name__}_minDCF", np.array(minDCFs))
+    return actDCFs, minDCFs
 
 
 def main():
