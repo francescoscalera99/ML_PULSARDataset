@@ -1,0 +1,40 @@
++-------------------------------------------------------------------+---------+
+|                          Hyperparameters                          | min DCF |
++-------------------------------------------------------------------+---------+
+|  PCA m=None, raw data: True, π_tilde=0.5, variant: full-cov, G=16 |  0.137  |
+| PCA m=None, raw data: False, π_tilde=0.5, variant: full-cov, G=16 |  0.138  |
+|    PCA m=None, raw data: True, π_tilde=0.5, variant: diag, G=16   |  0.182  |
+|   PCA m=None, raw data: False, π_tilde=0.5, variant: diag, G=16   |  0.163  |
+|    PCA m=None, raw data: True, π_tilde=0.5, variant: tied, G=16   |  0.141  |
+|   PCA m=None, raw data: False, π_tilde=0.5, variant: tied, G=16   |  0.154  |
+|  PCA m=None, raw data: True, π_tilde=0.1, variant: full-cov, G=16 |  0.226  |
+| PCA m=None, raw data: False, π_tilde=0.1, variant: full-cov, G=16 |  0.243  |
+|    PCA m=None, raw data: True, π_tilde=0.1, variant: diag, G=16   |  0.296  |
+|   PCA m=None, raw data: False, π_tilde=0.1, variant: diag, G=16   |  0.285  |
+|    PCA m=None, raw data: True, π_tilde=0.1, variant: tied, G=16   |  0.286  |
+|   PCA m=None, raw data: False, π_tilde=0.1, variant: tied, G=16   |   0.24  |
+|  PCA m=None, raw data: True, π_tilde=0.9, variant: full-cov, G=16 |  0.586  |
+| PCA m=None, raw data: False, π_tilde=0.9, variant: full-cov, G=16 |  0.619  |
+|    PCA m=None, raw data: True, π_tilde=0.9, variant: diag, G=16   |  0.657  |
+|   PCA m=None, raw data: False, π_tilde=0.9, variant: diag, G=16   |  0.577  |
+|    PCA m=None, raw data: True, π_tilde=0.9, variant: tied, G=16   |  0.664  |
+|   PCA m=None, raw data: False, π_tilde=0.9, variant: tied, G=16   |  0.693  |
+|   PCA m=7, raw data: True, π_tilde=0.5, variant: full-cov, G=16   |  0.163  |
+|   PCA m=7, raw data: False, π_tilde=0.5, variant: full-cov, G=16  |  0.133  |
+|     PCA m=7, raw data: True, π_tilde=0.5, variant: diag, G=16     |  0.183  |
+|     PCA m=7, raw data: False, π_tilde=0.5, variant: diag, G=16    |  0.136  |
+|     PCA m=7, raw data: True, π_tilde=0.5, variant: tied, G=16     |  0.171  |
+|     PCA m=7, raw data: False, π_tilde=0.5, variant: tied, G=16    |  0.153  |
+|   PCA m=7, raw data: True, π_tilde=0.1, variant: full-cov, G=16   |   0.26  |
+|   PCA m=7, raw data: False, π_tilde=0.1, variant: full-cov, G=16  |  0.241  |
+|     PCA m=7, raw data: True, π_tilde=0.1, variant: diag, G=16     |   0.33  |
+|     PCA m=7, raw data: False, π_tilde=0.1, variant: diag, G=16    |  0.279  |
+|     PCA m=7, raw data: True, π_tilde=0.1, variant: tied, G=16     |   0.3   |
+|     PCA m=7, raw data: False, π_tilde=0.1, variant: tied, G=16    |  0.242  |
+|   PCA m=7, raw data: True, π_tilde=0.9, variant: full-cov, G=16   |  0.642  |
+|   PCA m=7, raw data: False, π_tilde=0.9, variant: full-cov, G=16  |  0.578  |
+|     PCA m=7, raw data: True, π_tilde=0.9, variant: diag, G=16     |  0.714  |
+|     PCA m=7, raw data: False, π_tilde=0.9, variant: diag, G=16    |  0.587  |
+|     PCA m=7, raw data: True, π_tilde=0.9, variant: tied, G=16     |  0.714  |
+|     PCA m=7, raw data: False, π_tilde=0.9, variant: tied, G=16    |  0.693  |
++-------------------------------------------------------------------+---------+
