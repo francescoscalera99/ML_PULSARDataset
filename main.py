@@ -82,14 +82,9 @@ def main():
     # SVM_RBFSimulations(training_data, training_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF)
 
     # =============== GAUSSIAN MIXTURE MODELS ===============
-    # print("GMM")
-    # training_data, training_labels = get_same_distrib_partition(training_data, training_labels)
-    # testGMM(training_data, training_labels, 16)
     # tuning_componentsGMM(training_data, training_labels, psi=0.01)
     g = 16
-    # print("GMM SIMULATIONS")
-    print("============== GMM - SIMULATION ===============")
-    GMM_Simulations(training_data, training_labels, g, alpha=0.1, psi=0.01)
+    # GMM_Simulations(training_data, training_labels, g, alpha=0.1, psi=0.01)
 
     # =============== COMPUTING ACTUAL DCF ===============
     # MVG_simulations(training_data, training_labels, actualDCF=True, calibrateScore=False)
@@ -97,8 +92,7 @@ def main():
     # SVM_LinearSimulations(training_data, training_labels, K_Linear, C_piT_Linear, actualDCF=True, calibratedScore=False)
     # SVM_PolySimulations(training_data, training_labels, K_Poly, CPoly, pi_TPolyRBF, c, d, actualDCF=True, calibratedScore=False)
     # SVM_RBFSimulations(training_data, training_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF, actualDCF=True, calibratedScore=False)
-    print("============== GMM - ACTUAL DCF ===============")
-    GMM_Simulations(training_data, training_labels, g, alpha=0.1, psi=0.01, actualDCF=True)
+    # GMM_Simulations(training_data, training_labels, g, alpha=0.1, psi=0.01, actualDCF=True)
 
     # =============== SCORE CALIBRATION ===============
     # print("============== MVG - SCORE CALIBRATION =============== ")
@@ -123,45 +117,6 @@ def main():
     # os.system("shutdown /s /t 1")
     # MAC
     # os.system("shutdown -h now")
-
-    # (dtr, ltr), (dte, lte) = splitData_SingleFold(training_data, training_labels, seed=0)
-    # gmm_classifier = GMM(dtr, ltr, type='diag')
-    # g = 1
-    # while g <= 16:
-    #     gmm_classifier.train_model(alpha=0.1, psi=0.01, G=4)
-    #     num_classes = len(set(training_labels))
-    #     priors = np.array([1 / num_classes] * num_classes)
-    #     predictions = gmm_classifier.classify(dte, priors)
-    #
-    #     acc, err = compute_accuracy(predictions, lte)
-    #     print(f"Error rate for type {'diag'} and G={1}: {round(err * 100, 2)}%")
-    #     g += 2
-
-
-def logpdf_GAU_ND(x, mu, C):
-    M = x.shape[0]
-    _, detC = np.linalg.slogdet(C)
-    invC = np.linalg.inv(C)
-    return np.diag(
-        -(M / 2) * np.log(2 * np.pi) - (1 / 2) * (detC) - (1 / 2) * np.dot(np.dot((x - mu).T, invC), (x - mu)))
-
-
-def find_already_done():
-    K_values = [1.0, 10.0]
-    priors = [0.5, 0.1, 0.9]
-    pi_T_values = [0.5, 0.1, 0.9]
-    ms = [False, None, 7, 5]
-    C_values = np.logspace(-2, 2, 20)
-    done = []
-    import os
-    print(os.path.abspath("."))
-    for m, pi_T,  K, p in itertools.product(ms, pi_T_values, K_values, priors):
-        try:
-            np.load(f"simulations/linearSVM/balanced/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}_pT{str(pi_T).replace('.', '-')}_PCA{m}.npy")
-            done.append((m, pi_T, K, p))
-        except FileNotFoundError:
-            pass
-    print(len(done))
 
 
 if __name__ == '__main__':
