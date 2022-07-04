@@ -241,9 +241,9 @@ def SVM_RBFSimulations(training_data, training_labels, K, C, pi_T, gamma, actual
 def GMM_Simulations(training_data, training_labels, alpha, psi, actualDCF=False, calibratedScore=False):
     variants = ['full-cov', 'diag', 'tied']
     effective_priors = [0.5, 0.1, 0.9]
-    ms = [None, 7, 5]
+    ms = [None, 7]
     raws = [True, False]
-    num_components = [2, 4]
+    g = 16
 
     table = PrettyTable()
     if actualDCF:
@@ -251,15 +251,26 @@ def GMM_Simulations(training_data, training_labels, alpha, psi, actualDCF=False,
     else:
         table.field_names = ['Hyperparameters', 'min DCF']
 
-    hyperparameters = itertools.product(ms, effective_priors, variants, raws, num_components)
-    n_iter = len(variants) * len(effective_priors) * len(ms) * len(raws) * len(num_components)
+    hyperparameters = itertools.product(ms, effective_priors, variants, raws)
+    n_iter = len(variants) * len(effective_priors) * len(ms) * len(raws)
 
     for i, (m, pi, variant, raw, g) in enumerate(hyperparameters):
         print(f"Iteration {i + 1}/{n_iter}: ", end="")
-        llrs, labels = k_fold(training_data, training_labels, GMM, nFold=5, seed=0, m=m, raw=raw, type=variant,
-                              alpha=alpha, psi=psi, G=g)
-        min_dcf = compute_min_DCF(np.array(llrs), labels, pi, 1, 1)
-        print(f"PCA m={m}, raw data: {raw}, π_tilde={pi}, variant: {variant}, G={g}", "-->", round(min_dcf, 3))
-        table.add_row([f"PCA m={m}, raw data: {raw}, π_tilde={pi}, variant: {variant}, G={g}", round(min_dcf, 3)])
+        llrs, evaluationLabels = k_fold(training_data, training_labels, GMM, nFold=5, seed=0, m=m, raw=raw,
+                                        type=variant,
+                                        alpha=alpha, psi=psi, G=g)
+        if actualDCF:
+            if calibratedScore:
+                score, labels = calibrateScores(llrs, evaluationLabels, 1e-3, pi, 0.5)
+            else:
+                score = llrs
+                labels = evaluationLabels
+            act_DCF = compute_actual_DCF(score, labels, pi, 1, 1)
+            print(f"PCA m={m}, raw data: {raw}, π_tilde={pi}, variant: {variant}, G={g}", "-->", round(act_DCF, 3))
+            table.add_row([f"PCA m={m}, raw data: {raw}, π_tilde={pi}, variant: {variant}, G={g}", round(act_DCF, 3)])
+        else:
+            min_dcf = compute_min_DCF(np.array(llrs), evaluationLabels, pi, 1, 1)
+            print(f"PCA m={m}, raw data: {raw}, π_tilde={pi}, variant: {variant}, G={g}", "-->", round(min_dcf, 3))
+            table.add_row([f"PCA m={m}, raw data: {raw}, π_tilde={pi}, variant: {variant}, G={g}", round(min_dcf, 3)])
 
     print(table)
