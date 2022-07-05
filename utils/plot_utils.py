@@ -2,10 +2,14 @@ import itertools
 import os
 
 import distinctipy
+import matplotlib
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib import ticker
+
+# from preprocessing.preprocessing import gaussianize
+import classifiers.MVG
 
 
 def plot_histogram(array, labels, titles, nbins: int = 10) -> None:
@@ -63,7 +67,7 @@ def create_heatmap(dataset, labels, cmap='Reds', title=None):
     fig.savefig(fname=f'outputs/gauss_heatmap')
 
 
-def create_scatterplots(training_data, training_labels):
+def create_scatterplots(training_data, training_labels, datatype=None):
     num_features = training_data.shape[0]
     num_classes = len(set(training_labels))
     colors = ['red', 'blue']
@@ -77,31 +81,82 @@ def create_scatterplots(training_data, training_labels):
               '7. Excess kurtosis of the DM-SNR curve',
               '8. Skewness of the DM-SNR curve']
 
-    for i, j in itertools.combinations(range(num_features), 2):
+    for n, (i, j) in enumerate(itertools.combinations(range(num_features), 2)):
         for k in range(num_classes):
             plt.scatter(training_data[i, training_labels == k], training_data[j, training_labels == k], color=colors[k],
                         label=f"Class {int(k)}")
         plt.xlabel(titles[i])
         plt.ylabel(titles[j])
         plt.legend()
-        plt.show()
+        plt.title(f"Plot {n + 1}")
+        # plt.show()
+        plt.savefig(fname=f'outputs/scatter/{datatype}Figure{n + 1}')
+        plt.cla()
+
+
+def create_scatterplots2(training_data, training_labels):
+    num_features = training_data.shape[0]
+    num_classes = len(set(training_labels))
+    colors = ['red', 'blue']
+
+    raw_data = training_data
+    gaussianized_data = 0 # gaussianize(training_data, training_data)
+
+    titles = ['1. Mean of the integrated profile',
+              '2. Standard deviation of the integrated profile',
+              '3. Excess kurtosis of the integrated profile',
+              '4. Excess kurtosis of the integrated profile',
+              '5. Mean of the DM-SNR curve',
+              '6. Standard deviation of the DM-SNR curve',
+              '7. Excess kurtosis of the DM-SNR curve',
+              '8. Skewness of the DM-SNR curve']
+
+    for n, (i, j) in enumerate(itertools.combinations(range(num_features), 2)):
+        f, axs = plt.subplots(1, 2)
+        f.set_size_inches(20, 10)
+        for k in range(num_classes):
+            axs[0].scatter(raw_data[i, training_labels == k], raw_data[j, training_labels == k], color=colors[k],
+                           label=f"Class {int(k)}")
+            axs[1].scatter(gaussianized_data[i, training_labels == k], gaussianized_data[j, training_labels == k],
+                           color=colors[k], label=f"Class {int(k)}")
+        axs[0].set_xlabel(titles[i])
+        axs[1].set_xlabel(titles[i])
+        axs[0].set_ylabel(titles[j])
+        axs[1].set_ylabel(titles[j])
+        f.legend()
+        f.suptitle(f"Plot {n + 1}")
+        # plt.show()
+        f.tight_layout()
+        f.savefig(fname=f'outputs/scatter/Figure{n + 1}')
+        plt.close(f)
 
 
 def plot_lambda():
-    lbd_values = np.logspace(-5, 5, 50)
+    lbd_values = np.logspace(-8, -5, 20)
+    lbd_values = np.array([0, *lbd_values])
+    lbd_values2 = np.logspace(-5, 5, 50)
+
+    lbd_values = np.array([*lbd_values, *lbd_values2[1:]])
     m_values = [False, None, 7, 5]
     prior = [0.5, 0.1, 0.9]
 
     i = 0
     fig, axs = plt.subplots(2, 2)
+    fig.set_size_inches(10, 8)
     # fig.suptitle('Tuning hyperparameter λ')
     plt.rcParams['text.usetex'] = True
 
     colors = ['red', 'blue', 'green']
     for m in m_values:
         for j, pi in enumerate(prior):
-            DCFs = np.load(
+            DCF1 = np.load(
+                f"../simulations/LR/LR_0_prior_{str(pi).replace('.', '-')}_PCA{str(m)}.npy")
+
+            DCF2 = np.load(
                 f"../simulations/LR/LR_prior_{str(pi).replace('.', '-')}_PCA{str(m)}.npy")
+
+            DCFs = np.array([*DCF1, *DCF2[1:]])
+
             axs[i // 2, i % 2].plot(lbd_values, DCFs, color=colors[j], label=r"$\widetilde{\pi}=$" + f"{pi}")
 
             if m == False:
@@ -114,14 +169,22 @@ def plot_lambda():
             axs[i // 2, i % 2].set_xlabel('λ')
             axs[i // 2, i % 2].set_ylabel('minDCF')
             axs[i // 2, i % 2].set_xscale('log')
+
+            xticks = [1.e-09, 1.e-08, 1.e-06, 1.e-04, 1.e-02, 1.e+00, 1.e+02, 1.e+04, 1.e+06]
+            xlabels = [r"$0$", r"$10^{-8}$", r"$10^{-6}$", r"$10^{-4}$", r"$10^{-2}$", r"$10^0$", r"$10^2$", r"$10^4$", r"$10^6$"]
+
+            axs[i // 2, i % 2].set_xticks(xticks, xlabels)
+            axs[i // 2, i % 2].get_xaxis().get_major_formatter().labelOnlyBase = False
         i += 1
     # fig.set_size_inches(10, 10)
     # fig.tight_layout()
     lines_labels = [ax.get_legend_handles_labels() for ax in fig.axes]
     lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
     fig.legend(lines[:3], labels[:3], loc=10, prop={'size': 10})
-    fig.subplots_adjust(wspace=0.3, hspace=0.6)
-    fig.subplots_adjust(top=0.88)
+    # fig.legend(lines[:3], labels[:3], loc=10, prop={'size': 10})
+    # fig.subplots_adjust(wspace=0.3, hspace=0.6)
+    # fig.subplots_adjust(top=0.88)
+    fig.tight_layout()
     fig.show()
 
 
@@ -357,26 +420,36 @@ def plot_tuningGMM2():
 
     for i, (variant, m) in enumerate(itertools.product(variants, m_values)):
         for j, (p, r) in enumerate(itertools.product(pis, raw)):
-            pp = '' if p == 0.5 else "_pi"+str(p).replace('.', '-')
+            pp = '' if p == 0.5 else "_pi" + str(p).replace('.', '-')
             DCFs = np.load(f"../simulations/GMM/GMM_rawFeature-{r}_PCA{m}_{variant}{pp}.npy")
             label = r"$\widetilde{\pi}=$" + f"{p}, {'raw' if r else 'gau'}"
-            axs[i//2, i % 2].plot(components_values, DCFs, label=label, color=colors[j])
-            axs[i//2, i % 2].set_xscale('log', base=2)
-            axs[i//2, i % 2].set_xticks(components_values)
-            axs[i//2, i % 2].set_yticks(y)
+            axs[i // 2, i % 2].plot(components_values, DCFs, label=label, color=colors[j])
+            axs[i // 2, i % 2].set_xscale('log', base=2)
+            axs[i // 2, i % 2].set_xticks(components_values)
+            axs[i // 2, i % 2].set_yticks(y)
             if i // 2 == 2:
-                axs[i//2, i % 2].set_xlabel("Number of components")
+                axs[i // 2, i % 2].set_xlabel("Number of components")
 
             v = 'tied full-cov' if variant == 'tied' else variant
 
             pca = f"PCA ($m={m}$)" if m is not None else "no PCA"
             axs[i // 2, i % 2].set_title(rf"{v}, {pca}", size=20)
 
-        axs[i//2, i % 2].legend(loc='upper right', framealpha=0.5)
+        axs[i // 2, i % 2].legend(loc='upper right', framealpha=0.5)
 
     fig.tight_layout()
     plt.show()
 
+
+def bayes_error_plots(classifier):
+    effPriorLogOdds = np.linspace(-3, 3, 21)
+    minDCF = np.load(f"results/bayesErrorPlot/{classifier.__name__}_minDCF.npy")
+    actDCF = np.load(f"results/bayesErrorPlot/{classifier.__name__}_actDCF.npy")
+
+    plt.plot(effPriorLogOdds, minDCF, label="minDCF")
+    plt.plot(effPriorLogOdds, actDCF, label="actDCF")
+    plt.legend()
+    plt.show()
 
 
 if __name__ == '__main__':
@@ -386,6 +459,6 @@ if __name__ == '__main__':
     # plot_tuningLinearSVMUnbalanced()
     # plot_tuning_LinearSVMBalanced()
 
-    print(os.path.abspath("../simulations/GMM/GMM_rawFeature-False_PCA7_diag.npy"))
-    plot_tuningGMM2()
+    # print(os.path.abspath("../simulations/GMM/GMM_rawFeature-False_PCA7_diag.npy"))
+    # plot_tuningGMM2()
     pass

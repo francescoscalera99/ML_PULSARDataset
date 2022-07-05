@@ -1,5 +1,6 @@
 import numpy as np
 
+from classifiers.LR import calibrateScores
 from utils.utils import k_fold
 
 
@@ -62,20 +63,24 @@ def compute_actual_DCF(llr, labels, prior, Cfn, Cfp):
     return actDCF
 
 
-def bayes_error_plots(training_data, training_labels, classifier, Cfn=1, Cfp=1, **kwargs):
+def bayes_error_plots_data(training_data, training_labels, classifier, Cfn=1, Cfp=1, **kwargs):
     effPriorLogOdds = np.linspace(-3, 3, 21)
     effPrior = 1 / (1 + np.exp(-effPriorLogOdds))
 
     actDCFs = []
+    actDCFs_cal = []
     minDCFs = []
+    minDCFs_cal = []
 
     score, labels = k_fold(training_data, training_labels, classifier, nFold=5, seed=0, **kwargs)
+    calibrated_score = calibrateScores(score, labels)
     for e in effPrior:
         actDCFs.append(compute_actual_DCF(score, labels, e, Cfn, Cfp))
         minDCFs.append(compute_min_DCF(score, labels, e, Cfn, Cfp))
 
-    np.save(f"../results/bayesErrorPlot/{classifier.__name__}_actDCF", np.array(actDCFs))
-    np.save(f"../results/bayesErrorPlot/{classifier.__name__}_minDCF", np.array(minDCFs))
+    print("Saving files...")
+    np.save(f"results/bayesErrorPlot/{classifier.__name__}_actDCF", np.array(actDCFs))
+    np.save(f"results/bayesErrorPlot/{classifier.__name__}_minDCF", np.array(minDCFs))
     return actDCFs, minDCFs
 
 
