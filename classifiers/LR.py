@@ -69,9 +69,9 @@ def tuning_lambda(training_data, training_labels):
 def calibrateScores(scores, evaluationLabels, lambd, prior, pi_T=0.5):
     # f(s) = as+b can be interpreted as the llr for the two class hypothesis
     # class posterior probability: as+b+log(pi/(1-pi)) = as +b'
-    logReg = LR(scores, evaluationLabels, lbd=1e-3, pi_T=pi_T)
+    logReg = LR(vrow(scores), evaluationLabels, lbd=lambd, pi_T=pi_T)
     logReg.train_model()
-    logReg.classify(scores, np.empty(0))
+    logReg.classify(vrow(scores), np.empty(0))
     calibratedScore = logReg.get_llrs()
     calibratedScore = calibratedScore - np.log(prior / (1 - prior))
     return calibratedScore

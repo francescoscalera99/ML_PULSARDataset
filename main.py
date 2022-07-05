@@ -105,8 +105,8 @@ def main():
     # SVM_PolySimulations(training_data, training_labels, K_Poly, CPoly, pi_TPolyRBF, c, d, actualDCF=True, calibratedScore=True)
     # print("============== SVM RBF BALANCED - SCORE CALIBRATION ===============")
     # SVM_RBFSimulations(training_data, training_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF, actualDCF=True, calibratedScore=True)
-    # print("============== LR - SCORE CALIBRATION ===============")
-    # LR_simulations(training_data, training_labels, lbd, actualDCF=True, calibratedScore=True)
+    print("============== LR - SCORE CALIBRATION ===============")
+    LR_simulations(training_data, training_labels, lbd, actualDCF=True, calibratedScore=True)
     # print("============== GMM - SCORE CALIBRATION ===============")
     # GMM_Simulations(training_data, training_labels, g, alpha=0.1, psi=0.01, actualDCF=True, calibratedScore=True)
 
