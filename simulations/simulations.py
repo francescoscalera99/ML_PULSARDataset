@@ -97,8 +97,8 @@ def LR_simulations(training_data, training_labels, lbd, calibratedScore=False, a
             table.add_row([f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T}", round(min_dcf, 3)])
 
     print(table)
-    with open(f"results/LR_ACT-{actualDCF}_calibrated-{calibratedScore}.txt", 'w') as f:
-        f.write(str(table))
+    # with open(f"results/LR_ACT-{actualDCF}_calibrated-{calibratedScore}.txt", 'w') as f:
+    #     f.write(str(table))
 
 
 def SVM_LinearUnbalancedSimulations(training_data, training_labels, K, C, calibratedScore=False, actualDCF=False):
