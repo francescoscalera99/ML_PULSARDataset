@@ -49,29 +49,29 @@ class LR(ClassifierClass):
 
 def tuning_lambda(training_data, training_labels):
     m_values = [False, None, 7, 5]
-    lbd_values = np.logspace(-5, 5, 50)
+    lbd_values = np.logspace(-8, -5, 20)
+    lbd_values = np.array([0, *lbd_values])
     priors = [0.5, 0.1, 0.9]
 
     for m in m_values:
         for pi in priors:
             DCFs = []
-            for (i,lbd) in enumerate(lbd_values):
+            for (i, lbd) in enumerate(lbd_values):
                 if m == False:
                     llrs, evaluationLabels = k_fold(training_data, training_labels, LR, 5, m=None, raw=True, seed=0, lbd=lbd, pi_T=0.5)
                 else:
                     llrs, evaluationLabels = k_fold(training_data, training_labels, LR, 5, m=m, raw=False, seed=0, lbd=lbd, pi_T=0.5)
                 min_dcf = compute_min_DCF(np.array(llrs), evaluationLabels, pi, 1, 1)
-                print(f"{i} data:PCA{m}, lbd={lbd}, pi={pi} -> min DCF", min_dcf)
+                print(f"Done iteration {i+1} data:PCA{m}, lbd={lbd}, pi={pi} -> min DCF", min_dcf)
                 DCFs.append(min_dcf)
-            np.save(f"LR_prior_{str(pi).replace('.', '-')}_PCA{m}", np.array(DCFs))
+            np.save(f"LR_0_prior_{str(pi).replace('.', '-')}_PCA{m}", np.array(DCFs))
 
 
-def calibrateScores(scores, evaluationLabels, lambd, prior, pi_T=0.5):
+def calibrateScores(scores, evaluationLabels, prior=0.5, lambd=1e-3, pi_T=0.5):
     # f(s) = as+b can be interpreted as the llr for the two class hypothesis
     # class posterior probability: as+b+log(pi/(1-pi)) = as +b'
     logReg = LR(vrow(scores), evaluationLabels, lbd=lambd, pi_T=pi_T)
     logReg.train_model()
-    logReg.classify(vrow(scores), np.empty(0))
-    calibratedScore = logReg.get_llrs()
-    calibratedScore = calibratedScore - np.log(prior / (1 - prior))
+    logReg.classify(vrow(scores), None)
+    calibratedScore = logReg.get_llrs() - np.log(prior/(1-prior))
     return calibratedScore
