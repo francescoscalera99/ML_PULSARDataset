@@ -44,7 +44,7 @@ def main():
 
     # =============== LOGISTIC REGRESSION ===============
     # tuning_lambda(training_data, training_labels)
-    lbd = 0
+    lbd = 1e-6
     # LR_simulations(training_data, training_labels, lbd)
 
     # =============== SUPPORT VECTOR MACHINE ===============
@@ -95,20 +95,20 @@ def main():
     # GMM_Simulations(training_data, training_labels, g, alpha=0.1, psi=0.01, actualDCF=True)
 
     # =============== SCORE CALIBRATION ===============
-    print("============== MVG - SCORE CALIBRATION =============== ")
-    MVG_simulations(training_data, training_labels, actualDCF=True, calibratedScore=True)
-    print("============== SVM LINEAR UNBALANCED - SCORE CALIBRATION ===============")
-    SVM_LinearUnbalancedSimulations(training_data, training_labels, K_LinearUnb, C_LinearUnb, actualDCF=True, calibratedScore=True )
-    print("============== SVM LINEAR BALANCED - SCORE CALIBRATION ===============")
-    SVM_LinearBalancedSimulations(training_data, training_labels, K_LinearB, C_LinearB, actualDCF=True, calibratedScore=True)
-    print("============== SVM POLY - SCORE CALIBRATION ===============")
-    SVM_PolySimulations(training_data, training_labels, K_Poly, CPoly, pi_TPolyRBF, c, d, actualDCF=True, calibratedScore=True)
-    print("============== SVM RBF BALANCED - SCORE CALIBRATION ===============")
-    SVM_RBFSimulations(training_data, training_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF, actualDCF=True, calibratedScore=True)
+    # print("============== MVG - SCORE CALIBRATION =============== ")
+    # MVG_simulations(training_data, training_labels, actualDCF=True, calibratedScore=True)
+    # print("============== SVM LINEAR UNBALANCED - SCORE CALIBRATION ===============")
+    # SVM_LinearUnbalancedSimulations(training_data, training_labels, K_LinearUnb, C_LinearUnb, actualDCF=True, calibratedScore=True )
+    # print("============== SVM LINEAR BALANCED - SCORE CALIBRATION ===============")
+    # SVM_LinearBalancedSimulations(training_data, training_labels, K_LinearB, C_LinearB, actualDCF=True, calibratedScore=True)
+    # print("============== SVM POLY - SCORE CALIBRATION ===============")
+    # SVM_PolySimulations(training_data, training_labels, K_Poly, CPoly, pi_TPolyRBF, c, d, actualDCF=True, calibratedScore=True)
+    # print("============== SVM RBF BALANCED - SCORE CALIBRATION ===============")
+    # SVM_RBFSimulations(training_data, training_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF, actualDCF=True, calibratedScore=True)
     print("============== LR - SCORE CALIBRATION ===============")
     LR_simulations(training_data, training_labels, lbd, actualDCF=True, calibratedScore=True)
-    print("============== GMM - SCORE CALIBRATION ===============")
-    GMM_Simulations(training_data, training_labels, g, alpha=0.1, psi=0.01, actualDCF=True, calibratedScore=True)
+    # print("============== GMM - SCORE CALIBRATION ===============")
+    # GMM_Simulations(training_data, training_labels, g, alpha=0.1, psi=0.01, actualDCF=True, calibratedScore=True)
 
     # =============== EXPERIMENTAL RESULT ===============
 

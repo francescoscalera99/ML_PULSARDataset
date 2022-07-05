@@ -1,15 +1,15 @@
 +---------------------------------------------+---------+
 |               Hyperparameters               | act DCF |
 +---------------------------------------------+---------+
-| PCA m=False, piT_=0.5 π_tilde=0.5,  C =0.02 |   0.33  |
-| PCA m=False, piT_=0.1 π_tilde=0.5,  C =0.02 |  0.482  |
-| PCA m=False, piT_=0.9 π_tilde=0.5,  C =0.02 |  0.539  |
-| PCA m=False, piT_=0.5 π_tilde=0.1,  C =0.02 |  2.094  |
-| PCA m=False, piT_=0.1 π_tilde=0.1,  C =0.02 |  2.101  |
-| PCA m=False, piT_=0.9 π_tilde=0.1,  C =0.02 |   4.01  |
-| PCA m=False, piT_=0.5 π_tilde=0.9,  C =0.02 |  1.207  |
-| PCA m=False, piT_=0.1 π_tilde=0.9,  C =0.02 |  2.724  |
-| PCA m=False, piT_=0.9 π_tilde=0.9,  C =0.02 |  1.377  |
+| PCA m=False, piT_=0.5 π_tilde=0.5,  C =0.02 |  0.331  |
+| PCA m=False, piT_=0.1 π_tilde=0.5,  C =0.02 |  0.479  |
+| PCA m=False, piT_=0.9 π_tilde=0.5,  C =0.02 |  0.541  |
+| PCA m=False, piT_=0.5 π_tilde=0.1,  C =0.02 |  2.111  |
+| PCA m=False, piT_=0.1 π_tilde=0.1,  C =0.02 |   2.11  |
+| PCA m=False, piT_=0.9 π_tilde=0.1,  C =0.02 |  3.951  |
+| PCA m=False, piT_=0.5 π_tilde=0.9,  C =0.02 |  1.198  |
+| PCA m=False, piT_=0.1 π_tilde=0.9,  C =0.02 |  2.681  |
+| PCA m=False, piT_=0.9 π_tilde=0.9,  C =0.02 |  1.457  |
 |  PCA m=None, piT_=0.5 π_tilde=0.5,  C =0.02 |  0.126  |
 |  PCA m=None, piT_=0.1 π_tilde=0.5,  C =0.02 |  0.173  |
 |  PCA m=None, piT_=0.9 π_tilde=0.5,  C =0.02 |  0.352  |

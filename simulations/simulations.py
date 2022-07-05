@@ -12,42 +12,61 @@ from utils.utils import k_fold
 
 def MVG_simulations(training_data, training_labels, calibratedScore=False, actualDCF=False):
     variants = ['full-cov', 'diag', 'tied']
-    ms = [7, 5, 4]
-    pis = [0.1, 0.5, 0.9]
+    ms = [False, None, 7, 5, 4]
+    effective_priors = [0.1, 0.5, 0.9]
 
-    hyperparameters = itertools.product(variants, ms, pis)
+    hyperparameters = itertools.product(variants, ms, effective_priors)
     table = PrettyTable()
     if actualDCF:
-        table.field_names = ['Hyperparameters', 'act DCF']
+        if calibratedScore:
+            table.field_names = ['Hyperparameters', 'act DCF (0.5)', 'actDCF (0.1)', 'act DCF (0.9)']
+        else:
+            table.field_names = ['Hyperparameters', 'act DCF']
     else:
         table.field_names = ['Hyperparameters', 'min DCF']
 
     for i, (variant, m, pi) in enumerate(hyperparameters):
         print(f"Iteration {i + 1}/{len(variants) * len(ms) * len(pis)}")
-        llrs, evaluationLabels = k_fold(training_data, training_labels, MVG, 5, seed=0, m=m, raw=True, variant=variant)
+        if m == False:
+            llrs, evaluationLabels = k_fold(training_data, training_labels, MVG, 5, seed=0, m=None, raw=True, variant=variant)
+        else:
+            llrs, evaluationLabels = k_fold(training_data, training_labels, MVG, 5, seed=0, m=m, raw=False,
+                                            variant=variant)
         if actualDCF:
             if calibratedScore:
-                score = calibrateScores(llrs, evaluationLabels, 1e-4, pi, 0.5)
+                actDCF_cal = []
+                priors_logReg = [0.5, 0.1, 0.9]
+                for prior in priors_logReg:
+                    score = calibrateScores(llrs, evaluationLabels, 1e-4, prior)
+                    act_DCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
+                    actDCF_cal.append(round(act_DCF, 3))
+                print(f"Gaussianized features, PCA m={m}, variant={variant}, π_tilde={pi}", "-->", *actDCF_cal)
+                table.add_row([f"Gaussianized features, PCA m={m}, variant={variant}, π_tilde={pi}", *actDCF_cal])
             else:
                 score = llrs
-            act_dcf = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
-            table.add_row([f"Raw features, PCA m={m}, variant={variant}, π_tilde={pi}", round(act_dcf, 3)])
+                actDCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
+                table.add_row([f"Gaussianized features, PCA m={m}, variant={variant}, π_tilde={pi}", round(actDCF, 3)])
         else:
             min_dcf = compute_min_DCF(np.array(llrs), evaluationLabels, pi, 1, 1)
-            table.add_row([f"Raw features, PCA m={m}, variant={variant}, π_tilde={pi}", round(min_dcf, 3)])
+            table.add_row([f"Gaussianzed features, PCA m={m}, variant={variant}, π_tilde={pi}", round(min_dcf, 3)])
     print(table)
+    with open(f"results/MVG_ACT-{actualDCF}_calibrated-{calibratedScore}.txt", 'w') as f:
+        f.write(str(table))
 
 
 def LR_simulations(training_data, training_labels, lbd, calibratedScore=False, actualDCF=False):
     m_values = [False, None, 7, 5]
     pis_T = [0.5, 0.1, 0.9]
-    pis = [0.5, 0.1, 0.9]
+    effective_priors = [0.5, 0.1, 0.9]
 
-    hyperparameters = itertools.product(m_values, pis, pis_T)
+    hyperparameters = itertools.product(m_values, effective_priors, pis_T)
 
     table = PrettyTable()
     if actualDCF:
-        table.field_names = ['Hyperparameters', 'act DCF']
+        if calibratedScore:
+            table.field_names = ['Hyperparameters', 'act DCF (0.5)', 'actDCF (0.1)', 'act DCF (0.9)']
+        else:
+            table.field_names = ['Hyperparameters', 'act DCF']
     else:
         table.field_names = ['Hyperparameters', 'min DCF']
 
@@ -61,11 +80,18 @@ def LR_simulations(training_data, training_labels, lbd, calibratedScore=False, a
                                             pi_T=pi_T)
         if actualDCF:
             if calibratedScore:
-                score = calibrateScores(llrs, evaluationLabels, 1e-4, pi, 0.5)
+                actDCF_cal = []
+                priors_logReg = [0.5, 0.1, 0.9]
+                for prior in priors_logReg:
+                    score = calibrateScores(llrs, evaluationLabels, 1e-4, prior)
+                    act_DCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
+                    actDCF_cal.append(round(act_DCF, 3))
+                print(f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T}", "-->", *actDCF_cal)
+                table.add_row([f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T}", *actDCF_cal])
             else:
                 score = llrs
-            actDCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
-            table.add_row([f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T}", round(actDCF, 3)])
+                actDCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
+                table.add_row([f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T}", round(actDCF, 3)])
         else:
             min_dcf = compute_min_DCF(np.array(llrs), evaluationLabels, pi, 1, 1)
             table.add_row([f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T}", round(min_dcf, 3)])
@@ -77,13 +103,16 @@ def LR_simulations(training_data, training_labels, lbd, calibratedScore=False, a
 
 def SVM_LinearUnbalancedSimulations(training_data, training_labels, K, C, calibratedScore=False, actualDCF=False):
     ms = [False, None, 7, 5]
-    priors = [0.5, 0.1, 0.9]
+    effective_priors = [0.5, 0.1, 0.9]
 
-    hyperparameters = itertools.product(ms, priors)
+    hyperparameters = itertools.product(ms, effective_priors)
 
     table = PrettyTable()
     if actualDCF:
-        table.field_names = ['Hyperparameters', 'act DCF']
+        if calibratedScore:
+            table.field_names = ['Hyperparameters', 'act DCF (0.5)', 'actDCF (0.1)', 'act DCF (0.9)']
+        else:
+            table.field_names = ['Hyperparameters', 'act DCF']
     else:
         table.field_names = ['Hyperparameters', 'min DCF']
 
@@ -101,11 +130,19 @@ def SVM_LinearUnbalancedSimulations(training_data, training_labels, K, C, calibr
                                             kernel_params=(1, 0), kernel_type='poly')
         if actualDCF:
             if calibratedScore:
-                score = calibrateScores(llrs, evaluationLabels, 1e-4, pi, 0.5)
+                actDCF_cal = []
+                priors_logReg = [0.5, 0.1, 0.9]
+                for prior in priors_logReg:
+                    score = calibrateScores(llrs, evaluationLabels, 1e-4, prior)
+                    act_DCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
+                    actDCF_cal.append(round(act_DCF, 3))
+                table.add_row([f"PCA m={m} π_tilde={pi}, C ={C}, K{K} --> ", *actDCF_cal])
             else:
                 score = llrs
-            actDCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
-            table.add_row([f"PCA m={m}, π_tilde={pi},  C ={C}", round(actDCF, 3)])
+                act_DCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
+                print(f"PCA m={m} π_tilde={pi}, C ={C}, K{K} --> ", round(act_DCF, 3))
+                table.add_row(
+                    [f"PCA m={m} π_tilde={pi}, C ={C}, K{K} --> ", round(act_DCF, 3)])
         else:
             min_dcf = compute_min_DCF(np.array(llrs), evaluationLabels, pi, 1, 1)
             print(f"PCA m={m} π_tilde={pi}, C ={C}, K{K} --> ", round(min_dcf, 3))
@@ -119,13 +156,16 @@ def SVM_LinearUnbalancedSimulations(training_data, training_labels, K, C, calibr
 def SVM_LinearBalancedSimulations(training_data, training_labels, K, C, calibratedScore=False, actualDCF=False):
     m = [False, None, 7, 5]
     pi_T_values = [0.5, 0.1, 0.9]
-    priors = [0.5, 0.1, 0.9]
+    effective_priors = [0.5, 0.1, 0.9]
 
-    hyperparameters = itertools.product(m, priors, pi_T_values)
+    hyperparameters = itertools.product(m, effective_priors, pi_T_values)
 
     table = PrettyTable()
     if actualDCF:
-        table.field_names = ['Hyperparameters', 'act DCF']
+        if calibratedScore:
+            table.field_names = ['Hyperparameters', 'act DCF (0.5)', 'actDCF (0.1)', 'act DCF (0.9)']
+        else:
+            table.field_names = ['Hyperparameters', 'act DCF']
     else:
         table.field_names = ['Hyperparameters', 'min DCF']
 
@@ -142,11 +182,19 @@ def SVM_LinearBalancedSimulations(training_data, training_labels, K, C, calibrat
                                             kernel_params=(1, 0), kernel_type='poly')
         if actualDCF:
             if calibratedScore:
-                score = calibrateScores(llrs, evaluationLabels, 1e-4, pi, 0.5)
+                actDCF_cal = []
+                priors_logReg = [0.5, 0.1, 0.9]
+                for prior in priors_logReg:
+                    score = calibrateScores(llrs, evaluationLabels, 1e-4, prior)
+                    act_DCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
+                    actDCF_cal.append(round(act_DCF, 3))
+                table.add_row([f"PCA m={m}, pi_T={pi_T}, π_tilde={pi}, C ={C}", *actDCF_cal])
             else:
                 score = llrs
-            actDCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
-            table.add_row([f"PCA m={m}, piT_={pi_T} π_tilde={pi},  C ={C}", round(actDCF, 3)])
+                act_DCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
+                print(f"PCA m={m}, pi_T={pi_T}, π_tilde={pi}, C ={C}", "-->", round(act_DCF, 3))
+                table.add_row(
+                    [f"PCA m={m}, pi_T={pi_T}, π_tilde={pi}, C ={C}", round(act_DCF, 3)])
         else:
             min_dcf = compute_min_DCF(np.array(llrs), evaluationLabels, pi, 1, 1)
             print(f"PCA m={m} pi_T={pi_T} π_tilde={pi}, C ={C}, K{K} --> ", round(min_dcf, 3))
@@ -159,13 +207,16 @@ def SVM_LinearBalancedSimulations(training_data, training_labels, K, C, calibrat
 
 def SVM_PolySimulations(training_data, training_labels, K, C, pi_T, c, d, actualDCF=False, calibratedScore=False):
     m = [False, None, 7, 5]
-    priors = [0.5, 0.1, 0.9]
+    effective_priors = [0.5, 0.1, 0.9]
 
-    hyperparameters = itertools.product(m, priors)
+    hyperparameters = itertools.product(m, effective_priors)
 
     table = PrettyTable()
     if actualDCF:
-        table.field_names = ['Hyperparameters', 'act DCF']
+        if calibratedScore:
+            table.field_names = ['Hyperparameters', 'act DCF (0.5)', 'actDCF (0.1)', 'act DCF (0.9)']
+        else:
+            table.field_names = ['Hyperparameters', 'act DCF']
     else:
         table.field_names = ['Hyperparameters', 'min DCF']
 
@@ -180,12 +231,19 @@ def SVM_PolySimulations(training_data, training_labels, K, C, pi_T, c, d, actual
                                             kernel_params=(d, c), kernel_type='poly')
         if actualDCF:
             if calibratedScore:
-                score = calibrateScores(llrs, evaluationLabels, 1e-4, pi, 0.5)
+                actDCF_cal = []
+                priors_logReg = [0.5, 0.1, 0.9]
+                for prior in priors_logReg:
+                    score = calibrateScores(llrs, evaluationLabels, 1e-4, prior)
+                    act_DCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
+                    actDCF_cal.append(round(act_DCF, 3))
+                table.add_row([f"PCA m={m}, π_tilde={pi}, pi_T = 0.5, C ={C} K={K}, c={c}, d={d}", *actDCF_cal])
             else:
                 score = llrs
-            act_DCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
-            table.add_row(
-                [f"PCA m={m}, π_tilde={pi}, pi_T = 0.5, C ={C} K={K}, c={c}, d={d}", round(act_DCF, 3)])
+                act_DCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
+                print(f"PCA m={m}, π_tilde={pi}, pi_T = 0.5, C ={C} K={K}, c={c}, d={d}", "-->", round(act_DCF, 3))
+                table.add_row(
+                    [f"PCA m={m}, π_tilde={pi}, pi_T = 0.5, C ={C} K={K}, c={c}, d={d}", round(act_DCF, 3)])
         else:
             min_dcf = compute_min_DCF(llrs, evaluationLabels, pi, 1, 1)
             print(f"PCA m={m}, π_tilde={pi}, pi_T = 0.5, C ={C} K={K}, c={c}, d={d}", "-->",
@@ -194,6 +252,8 @@ def SVM_PolySimulations(training_data, training_labels, K, C, pi_T, c, d, actual
                 [f"PCA m={m}, π_tilde={pi}, pi_T = 0.5, C ={C} K={K}, c={c}, d={d}", round(min_dcf, 3)])
 
     print(table)
+    with open(f"results/SVM_Poly_ACT-{actualDCF}_calibrated{calibratedScore}.txt", 'w') as f:
+        f.write(str(table))
 
 
 def SVM_RBFSimulations(training_data, training_labels, K, C, pi_T, gamma, actualDCF=False, calibratedScore=False):
@@ -203,7 +263,10 @@ def SVM_RBFSimulations(training_data, training_labels, K, C, pi_T, gamma, actual
 
     table = PrettyTable()
     if actualDCF:
-        table.field_names = ['Hyperparameters', 'act DCF']
+        if calibratedScore:
+            table.field_names = ['Hyperparameters', 'act DCF (0.5)', 'actDCF (0.1)', 'act DCF (0.9)']
+        else:
+            table.field_names = ['Hyperparameters', 'act DCF']
     else:
         table.field_names = ['Hyperparameters', 'min DCF']
 
@@ -220,16 +283,26 @@ def SVM_RBFSimulations(training_data, training_labels, K, C, pi_T, gamma, actual
                                             k=K, c=C, kernel_params=gamma, kernel_type='RBF')
         if actualDCF:
             if calibratedScore:
-                score = calibrateScores(llrs, evaluationLabels, 1e-4, pi, 0.5)
+                actDCF_cal = []
+                priors_logReg = [0.5, 0.1, 0.9]
+                for prior in priors_logReg:
+                    score = calibrateScores(llrs, evaluationLabels, 1e-4, prior)
+                    act_DCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
+                    actDCF_cal.append(round(act_DCF, 3))
+                table.add_row([f"PCA m={m}, π_tilde={pi}, π_T={pi_T}  C ={C}", *actDCF_cal])
             else:
                 score = llrs
-            act_DCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
-            table.add_row([f"PCA m={m}, π_tilde={pi}, π_T={pi_T}  C ={C}", round(act_DCF, 3)])
+                act_DCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
+                print(f"PCA m={m}, π_tilde={pi}, π_T={pi_T}  C ={C}", "-->", round(act_DCF, 3))
+                table.add_row(
+                    [f"PCA m={m}, π_tilde={pi}, π_T={pi_T}  C ={C}", round(act_DCF, 3)])
         else:
             min_dcf = compute_min_DCF(np.array(llrs), evaluationLabels, pi, 1, 1)
             table.add_row([f"PCA m={m}, π_tilde={pi}, π_T={pi_T}  C ={C}", round(min_dcf, 3)])
 
     print(table)
+    with open(f"results/SVM_RBF_ACT-{actualDCF}_calibrated{calibratedScore}.txt", 'w') as f:
+        f.write(str(table))
 
 
 def GMM_Simulations(training_data, training_labels, g, alpha, psi, actualDCF=False, calibratedScore=False):
@@ -240,7 +313,10 @@ def GMM_Simulations(training_data, training_labels, g, alpha, psi, actualDCF=Fal
 
     table = PrettyTable()
     if actualDCF:
-        table.field_names = ['Hyperparameters', 'act DCF']
+        if calibratedScore:
+            table.field_names = ['Hyperparameters', 'act DCF (0.5)', 'actDCF (0.1)', 'act DCF (0.9)']
+        else:
+            table.field_names = ['Hyperparameters', 'act DCF']
     else:
         table.field_names = ['Hyperparameters', 'min DCF']
 
@@ -254,15 +330,24 @@ def GMM_Simulations(training_data, training_labels, g, alpha, psi, actualDCF=Fal
                                         alpha=alpha, psi=psi, G=g)
         if actualDCF:
             if calibratedScore:
-                score = calibrateScores(llrs, evaluationLabels, 1e-4, pi, 0.5)
+                actDCF_cal = []
+                priors_logReg = [0.5, 0.1, 0.9]
+                for prior in priors_logReg:
+                    score = calibrateScores(llrs, evaluationLabels, 1e-4, prior)
+                    act_DCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
+                    actDCF_cal.append(round(act_DCF,3))
+                print(f"PCA m={m}, raw data: {raw}, π_tilde={pi}, variant: {variant}, G={g}", "-->", *actDCF_cal)
+                table.add_row([f"PCA m={m}, raw data: {raw}, π_tilde={pi}, variant: {variant}, G={g}", *actDCF_cal])
             else:
                 score = llrs
-            act_DCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
-            print(f"PCA m={m}, raw data: {raw}, π_tilde={pi}, variant: {variant}, G={g}", "-->", round(act_DCF, 3))
-            table.add_row([f"PCA m={m}, raw data: {raw}, π_tilde={pi}, variant: {variant}, G={g}", round(act_DCF, 3)])
+                act_DCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
+                print(f"PCA m={m}, raw data: {raw}, π_tilde={pi}, variant: {variant}, G={g}", "-->", round(act_DCF, 3))
+                table.add_row([f"PCA m={m}, raw data: {raw}, π_tilde={pi}, variant: {variant}, G={g}", round(act_DCF, 3)])
         else:
             min_dcf = compute_min_DCF(np.array(llrs), evaluationLabels, pi, 1, 1)
             print(f"PCA m={m}, raw data: {raw}, π_tilde={pi}, variant: {variant}, G={g}", "-->", round(min_dcf, 3))
             table.add_row([f"PCA m={m}, raw data: {raw}, π_tilde={pi}, variant: {variant}, G={g}", round(min_dcf, 3)])
 
     print(table)
+    with open(f"results/GMM_ACT-{actualDCF}_calibrated{calibratedScore}.txt", 'w') as f:
+        f.write(str(table))

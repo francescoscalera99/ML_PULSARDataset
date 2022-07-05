@@ -1,0 +1,40 @@
++-------------------------------------------------------+---------+
+|                    Hyperparameters                    | act DCF |
++-------------------------------------------------------+---------+
+| PCA m=False, data: gaussianized, π_tilde=0.5, π_T=0.5 |  0.155  |
+| PCA m=False, data: gaussianized, π_tilde=0.5, π_T=0.1 |  0.259  |
+| PCA m=False, data: gaussianized, π_tilde=0.5, π_T=0.9 |  0.401  |
+| PCA m=False, data: gaussianized, π_tilde=0.1, π_T=0.5 |  0.276  |
+| PCA m=False, data: gaussianized, π_tilde=0.1, π_T=0.1 |  0.423  |
+| PCA m=False, data: gaussianized, π_tilde=0.1, π_T=0.9 |  0.536  |
+| PCA m=False, data: gaussianized, π_tilde=0.9, π_T=0.5 |   0.6   |
+| PCA m=False, data: gaussianized, π_tilde=0.9, π_T=0.1 |  1.047  |
+| PCA m=False, data: gaussianized, π_tilde=0.9, π_T=0.9 |  0.894  |
+|  PCA m=None, data: gaussianized, π_tilde=0.5, π_T=0.5 |  0.184  |
+|  PCA m=None, data: gaussianized, π_tilde=0.5, π_T=0.1 |  0.287  |
+|  PCA m=None, data: gaussianized, π_tilde=0.5, π_T=0.9 |  0.477  |
+|  PCA m=None, data: gaussianized, π_tilde=0.1, π_T=0.5 |  0.382  |
+|  PCA m=None, data: gaussianized, π_tilde=0.1, π_T=0.1 |  0.988  |
+|  PCA m=None, data: gaussianized, π_tilde=0.1, π_T=0.9 |  0.542  |
+|  PCA m=None, data: gaussianized, π_tilde=0.9, π_T=0.5 |  0.698  |
+|  PCA m=None, data: gaussianized, π_tilde=0.9, π_T=0.1 |  0.708  |
+|  PCA m=None, data: gaussianized, π_tilde=0.9, π_T=0.9 |  0.938  |
+|   PCA m=7, data: gaussianized, π_tilde=0.5, π_T=0.5   |  0.184  |
+|   PCA m=7, data: gaussianized, π_tilde=0.5, π_T=0.1   |  0.287  |
+|   PCA m=7, data: gaussianized, π_tilde=0.5, π_T=0.9   |  0.477  |
+|   PCA m=7, data: gaussianized, π_tilde=0.1, π_T=0.5   |  0.382  |
+|   PCA m=7, data: gaussianized, π_tilde=0.1, π_T=0.1   |  0.988  |
+|   PCA m=7, data: gaussianized, π_tilde=0.1, π_T=0.9   |  0.542  |
+|   PCA m=7, data: gaussianized, π_tilde=0.9, π_T=0.5   |  0.699  |
+|   PCA m=7, data: gaussianized, π_tilde=0.9, π_T=0.1   |  0.708  |
+|   PCA m=7, data: gaussianized, π_tilde=0.9, π_T=0.9   |  0.938  |
+|   PCA m=5, data: gaussianized, π_tilde=0.5, π_T=0.5   |  0.186  |
+|   PCA m=5, data: gaussianized, π_tilde=0.5, π_T=0.1   |  0.287  |
+|   PCA m=5, data: gaussianized, π_tilde=0.5, π_T=0.9   |  0.477  |
+|   PCA m=5, data: gaussianized, π_tilde=0.1, π_T=0.5   |   0.38  |
+|   PCA m=5, data: gaussianized, π_tilde=0.1, π_T=0.1   |  0.988  |
+|   PCA m=5, data: gaussianized, π_tilde=0.1, π_T=0.9   |  0.544  |
+|   PCA m=5, data: gaussianized, π_tilde=0.9, π_T=0.5   |  0.699  |
+|   PCA m=5, data: gaussianized, π_tilde=0.9, π_T=0.1   |  0.708  |
+|   PCA m=5, data: gaussianized, π_tilde=0.9, π_T=0.9   |  0.938  |
++-------------------------------------------------------+---------+
