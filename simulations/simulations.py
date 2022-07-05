@@ -27,14 +27,14 @@ def MVG_simulations(training_data, training_labels, calibratedScore=False, actua
         llrs, evaluationLabels = k_fold(training_data, training_labels, MVG, 5, seed=0, m=m, raw=True, variant=variant)
         if actualDCF:
             if calibratedScore:
-                score = calibrateScores(llrs, evaluationLabels, 1e-3, pi, 0.5)
+                score = calibrateScores(llrs, evaluationLabels, 1e-4, pi, 0.5)
             else:
                 score = llrs
             act_dcf = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
-            table.add_row([f"Raw features, PCA m={m}, variant={variant}, π_tilde={pi} -> min dcf", round(act_dcf, 3)])
+            table.add_row([f"Raw features, PCA m={m}, variant={variant}, π_tilde={pi}", round(act_dcf, 3)])
         else:
             min_dcf = compute_min_DCF(np.array(llrs), evaluationLabels, pi, 1, 1)
-            table.add_row([f"Raw features, PCA m={m}, variant={variant}, π_tilde={pi} -> min dcf", round(min_dcf, 3)])
+            table.add_row([f"Raw features, PCA m={m}, variant={variant}, π_tilde={pi}", round(min_dcf, 3)])
     print(table)
 
 
@@ -61,7 +61,7 @@ def LR_simulations(training_data, training_labels, lbd, calibratedScore=False, a
                                             pi_T=pi_T)
         if actualDCF:
             if calibratedScore:
-                score = calibrateScores(llrs, evaluationLabels, 1e-3, pi, 0.5)
+                score = calibrateScores(llrs, evaluationLabels, 1e-4, pi, 0.5)
             else:
                 score = llrs
             actDCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
@@ -101,7 +101,7 @@ def SVM_LinearUnbalancedSimulations(training_data, training_labels, K, C, calibr
                                             kernel_params=(1, 0), kernel_type='poly')
         if actualDCF:
             if calibratedScore:
-                score = calibrateScores(llrs, evaluationLabels, 1e-3, pi, 0.5)
+                score = calibrateScores(llrs, evaluationLabels, 1e-4, pi, 0.5)
             else:
                 score = llrs
             actDCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
@@ -142,7 +142,7 @@ def SVM_LinearBalancedSimulations(training_data, training_labels, K, C, calibrat
                                             kernel_params=(1, 0), kernel_type='poly')
         if actualDCF:
             if calibratedScore:
-                score = calibrateScores(llrs, evaluationLabels, 1e-3, pi, 0.5)
+                score = calibrateScores(llrs, evaluationLabels, 1e-4, pi, 0.5)
             else:
                 score = llrs
             actDCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
@@ -180,7 +180,7 @@ def SVM_PolySimulations(training_data, training_labels, K, C, pi_T, c, d, actual
                                             kernel_params=(d, c), kernel_type='poly')
         if actualDCF:
             if calibratedScore:
-                score = calibrateScores(llrs, evaluationLabels, 1e-3, pi, 0.5)
+                score = calibrateScores(llrs, evaluationLabels, 1e-4, pi, 0.5)
             else:
                 score = llrs
             act_DCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
@@ -220,7 +220,7 @@ def SVM_RBFSimulations(training_data, training_labels, K, C, pi_T, gamma, actual
                                             k=K, c=C, kernel_params=gamma, kernel_type='RBF')
         if actualDCF:
             if calibratedScore:
-                score = calibrateScores(llrs, evaluationLabels, 1e-3, pi, 0.5)
+                score = calibrateScores(llrs, evaluationLabels, 1e-4, pi, 0.5)
             else:
                 score = llrs
             act_DCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
@@ -254,7 +254,7 @@ def GMM_Simulations(training_data, training_labels, g, alpha, psi, actualDCF=Fal
                                         alpha=alpha, psi=psi, G=g)
         if actualDCF:
             if calibratedScore:
-                score = calibrateScores(llrs, evaluationLabels, 1e-3, pi, 0.5)
+                score = calibrateScores(llrs, evaluationLabels, 1e-4, pi, 0.5)
             else:
                 score = llrs
             act_DCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
