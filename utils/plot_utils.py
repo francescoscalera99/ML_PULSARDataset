@@ -9,7 +9,6 @@ import seaborn as sns
 from matplotlib import ticker
 
 # from preprocessing.preprocessing import gaussianize
-import classifiers.MVG
 
 
 def plot_histogram(array, labels, titles, nbins: int = 10) -> None:
@@ -445,9 +444,12 @@ def bayes_error_plots(classifier):
     effPriorLogOdds = np.linspace(-3, 3, 21)
     minDCF = np.load(f"results/bayesErrorPlot/{classifier.__name__}_minDCF.npy")
     actDCF = np.load(f"results/bayesErrorPlot/{classifier.__name__}_actDCF.npy")
-
+    minDCF_cal = np.load(f"results/bayesErrorPlot/{classifier.__name__}_minDCF_Calibrated.npy")
+    actDCF_cal = np.load(f"results/bayesErrorPlot/{classifier.__name__}_actDCF_Calibrated.npy")
     plt.plot(effPriorLogOdds, minDCF, label="minDCF")
     plt.plot(effPriorLogOdds, actDCF, label="actDCF")
+    plt.plot(effPriorLogOdds, minDCF_cal, label="minDCF (cal.)")
+    plt.plot(effPriorLogOdds, actDCF_cal, label="actDCF (cal.)")
     plt.legend()
     plt.show()
 

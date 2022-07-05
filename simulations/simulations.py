@@ -34,14 +34,16 @@ def MVG_simulations(training_data, training_labels, calibratedScore=False, actua
                                             variant=variant)
         if actualDCF:
             if calibratedScore:
+
+                priors_T_logReg = [0.5, 0.1, 0.9]
+
                 actDCF_cal = []
-                priors_logReg = [0.5, 0.1, 0.9]
-                for prior in priors_logReg:
-                    score = calibrateScores(llrs, evaluationLabels, 1e-4, prior)
+                for prior in priors_T_logReg:
+                    score = calibrateScores(llrs, evaluationLabels, 1e-4, pi_T=prior)
                     act_DCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
                     actDCF_cal.append(round(act_DCF, 3))
-                print(f"Gaussianized features, PCA m={m}, variant={variant}, π_tilde={pi}", "-->", *actDCF_cal)
-                table.add_row([f"Gaussianized features, PCA m={m}, variant={variant}, π_tilde={pi}", *actDCF_cal])
+                table.add_row([f"PCA m={m}, variant={variant}, π_tilde={pi}", *actDCF_cal])
+                print(f"PCA m={m}, variant={variant}, π_tilde={pi}", "-->", *actDCF_cal)
             else:
                 score = llrs
                 actDCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
@@ -335,7 +337,7 @@ def GMM_Simulations(training_data, training_labels, g, alpha, psi, actualDCF=Fal
                 for prior in priors_logReg:
                     score = calibrateScores(llrs, evaluationLabels, 1e-4, prior)
                     act_DCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
-                    actDCF_cal.append(round(act_DCF,3))
+                    actDCF_cal.append(round(act_DCF, 3))
                 print(f"PCA m={m}, raw data: {raw}, π_tilde={pi}, variant: {variant}, G={g}", "-->", *actDCF_cal)
                 table.add_row([f"PCA m={m}, raw data: {raw}, π_tilde={pi}, variant: {variant}, G={g}", *actDCF_cal])
             else:

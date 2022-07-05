@@ -77,14 +77,19 @@ def bayes_error_plots_data(training_data, training_labels, classifier, Cfn=1, Cf
     for e in effPrior:
         actDCFs.append(compute_actual_DCF(score, labels, e, Cfn, Cfp))
         minDCFs.append(compute_min_DCF(score, labels, e, Cfn, Cfp))
+        actDCFs_cal.append(compute_actual_DCF(calibrated_score, labels, e, Cfn, Cfp))
+        minDCFs_cal.append(compute_min_DCF(calibrated_score, labels, e, Cfn, Cfp))
 
     print("Saving files...")
     np.save(f"results/bayesErrorPlot/{classifier.__name__}_actDCF", np.array(actDCFs))
     np.save(f"results/bayesErrorPlot/{classifier.__name__}_minDCF", np.array(minDCFs))
-    return actDCFs, minDCFs
+    np.save(f"results/bayesErrorPlot/{classifier.__name__}_actDCF_Calibrated", np.array(actDCFs_cal))
+    np.save(f"results/bayesErrorPlot/{classifier.__name__}_minDCF_Calibrated", np.array(minDCFs_cal))
+    return actDCFs, minDCFs, actDCFs_cal, minDCFs_cal
 
 
 def main():
+
     pass
 
 
