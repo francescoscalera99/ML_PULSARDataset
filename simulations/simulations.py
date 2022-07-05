@@ -26,7 +26,7 @@ def MVG_simulations(training_data, training_labels, calibratedScore=False, actua
         table.field_names = ['Hyperparameters', 'min DCF']
 
     for i, (variant, m, pi) in enumerate(hyperparameters):
-        print(f"Iteration {i + 1}/{len(variants) * len(ms) * len(pis)}")
+        print(f"Iteration {i + 1}/{len(variants) * len(ms) * len(effective_priors)}")
         if m == False:
             llrs, evaluationLabels = k_fold(training_data, training_labels, MVG, 5, seed=0, m=None, raw=True, variant=variant)
         else:
@@ -71,7 +71,7 @@ def LR_simulations(training_data, training_labels, lbd, calibratedScore=False, a
         table.field_names = ['Hyperparameters', 'min DCF']
 
     for i, (m, pi, pi_T) in enumerate(hyperparameters):
-        print(f"Iteration {i + 1}/{len(m_values) * len(pis) * len(pis_T)}")
+        print(f"Iteration {i + 1}/{len(m_values) * len(effective_priors) * len(pis_T)}")
         if m == False:  # raw features
             llrs, evaluationLabels = k_fold(training_data, training_labels, LR, 5, m=None, raw=True, seed=0, lbd=lbd,
                                             pi_T=pi_T)
@@ -117,7 +117,7 @@ def SVM_LinearUnbalancedSimulations(training_data, training_labels, K, C, calibr
         table.field_names = ['Hyperparameters', 'min DCF']
 
     for i, (m, pi) in enumerate(hyperparameters):
-        print(f"Iteration {i + 1}/{len(ms) * len(priors)}")
+        print(f"Iteration {i + 1}/{len(ms) * len(effective_priors)}")
         if m == False:
             llrs, evaluationLabels = k_fold(training_data, training_labels, SVM, 5, seed=0, balanced=False, m=None,
                                             raw=True,
