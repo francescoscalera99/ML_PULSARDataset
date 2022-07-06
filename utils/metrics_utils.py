@@ -1,6 +1,6 @@
 import numpy as np
 
-from classifiers.LR import calibrateScores, calibrateScoresKFold
+from classifiers.LR import calibrateScores
 from utils.matrix_utils import vrow
 from utils.utils import k_fold
 

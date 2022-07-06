@@ -9,6 +9,8 @@ from classifiers.GMM2 import tuning_componentsGMM
 from classifiers.MVG import MVG
 from classifiers.SVM import tuning_parameters_PolySVM, tuning_parameters_RBFSVM, tuning_parameters_LinearSVMBalanced
 from preprocessing.preprocessing import PCA
+from simulations.evaluation import MVG_evaluation, LR_evaluation, SVM_LinearUnbalanced_evaluation, \
+    SVM_LinearBalanced_evaluation, SVM_Poly_evaluation, SVM_RBF_evaluation, GMM_evaluation
 from simulations.simulations import MVG_simulations, GMM_Simulations, SVM_LinearUnbalancedSimulations, \
     SVM_PolySimulations, SVM_RBFSimulations, SVM_LinearBalancedSimulations, LR_simulations
 from utils.metrics_utils import bayes_error_plots_data
@@ -49,7 +51,7 @@ def main():
     # =============== LOGISTIC REGRESSION ===============
     # tuning_lambda(training_data, training_labels)
     lbd = 1e-7
-    LR_simulations(training_data, training_labels, lbd)
+    # LR_simulations(training_data, training_labels, lbd)
 
     # =============== SUPPORT VECTOR MACHINE ===============
     # print("LINEAR SVM - TUNING PARAMETERS")
@@ -62,38 +64,39 @@ def main():
     # tuning_parameters_LinearSVMUnBalanced(training_data, training_labels)
 
     # print(" ---------- SVM LINEAR UNBALANCED SIMULATION ----------")
-    # K_LinearUnb = 1.0  # This values comes from tuning of hyperparameters
-    # C_LinearUnb = 1
+    K_LinearUnb = 1.0  # This values comes from tuning of hyperparameters
+    C_LinearUnb = 1
     # SVM_LinearUnbalancedSimulations(training_data, training_labels, K_LinearUnb, C_LinearUnb)
 
     # print(" ---------- SVM LINEAR BALANCED SIMULATION ----------")
-    # K_LinearB = 1.0  # This values comes from tuning of hyperparameters
-    # C_LinearB = 2e-2
+    K_LinearB = 1.0  # This values comes from tuning of hyperparameters
+    C_LinearB = 2e-2
     # SVM_LinearBalancedSimulations(training_data, training_labels, K_LinearB, C_LinearB)
 
     # print(" ---------- SVM POLY SIMULATION ----------")
-    # K_Poly = 1.0
-    # pi_TPolyRBF = 0.5
-    # CPoly = 1e-2
-    # c = 15
-    # d = 2
+    K_Poly = 1.0
+    pi_TPolyRBF = 0.5
+    CPoly = 1e-2
+    c = 15
+    d = 2
     # SVM_PolySimulations(training_data, training_labels, K_Poly, CPoly, pi_TPolyRBF, c, d)
 
     # print(" ---------- SVM RBF SIMULATION ----------")
-    # K_RBF = 0
-    # gamma_RBF = 1e-3
-    # C_RBF = 1e-1
+    K_RBF = 0
+    gamma_RBF = 1e-3
+    C_RBF = 1e-1
     # SVM_RBFSimulations(training_data, training_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF)
 
     # =============== GAUSSIAN MIXTURE MODELS ===============
     # tuning_componentsGMM(training_data, training_labels, psi=0.01)
-    # g = 16
+    g = 16
     # GMM_Simulations(training_data, training_labels, g, alpha=0.1, psi=0.01)
 
     # =============== COMPUTING ACTUAL DCF ===============
     # MVG_simulations(training_data, training_labels, actualDCF=True, calibrateScore=False)
     # LR_simulations(training_data, training_labels, lbd, actualDCF=True)
-    # SVM_LinearSimulations(training_data, training_labels, K_Linear, C_piT_Linear, actualDCF=True, calibratedScore=False)
+    # SVM_LinearUnbalancedSimulations(training_data, training_labels, K_LinearUnb, C_LinearUnb, actualDCF=True, calibratedScore=False)
+    # SVM_LinearBalancedSimulations(training_data, training_labels, K_LinearB, C_LinearB, actualDCF=True, calibratedScore=False)
     # SVM_PolySimulations(training_data, training_labels, K_Poly, CPoly, pi_TPolyRBF, c, d, actualDCF=True, calibratedScore=False)
     # SVM_RBFSimulations(training_data, training_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF, actualDCF=True, calibratedScore=False)
     # GMM_Simulations(training_data, training_labels, g, alpha=0.1, psi=0.01, actualDCF=True)
@@ -120,6 +123,20 @@ def main():
     # bayes_error_plots(MVG)
 
     # =============== EXPERIMENTAL RESULT ===============
+    print("============= MVG EVALUATION =============")
+    MVG_evaluation(training_data, training_labels, testing_data, testing_labels)
+    print("============= LR EVALUATION ===============")
+    LR_evaluation(training_data, training_labels, testing_data, testing_labels, lbd)
+    print("============ SVM LINEAR UNBALANCED EVALUATION ==========")
+    SVM_LinearUnbalanced_evaluation(training_data, training_labels, testing_data, testing_labels, K_LinearUnb, C_LinearUnb)
+    print("============ SVM LINEAR BALANCED EVALUATION ==========")
+    SVM_LinearBalanced_evaluation(training_data, training_labels, testing_data, testing_labels, K_LinearB, C_LinearB)
+    print("============ SVM POLY EVALUATION ==========")
+    SVM_Poly_evaluation(training_data, training_labels, testing_data, testing_labels, K_Poly, CPoly, pi_TPolyRBF, c, d)
+    print("============ SVM RBF EVALUATION ==========")
+    SVM_RBF_evaluation(training_data, training_labels, testing_data, testing_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF)
+    print("============ GMM EVALUATION ==========")
+    GMM_evaluation(training_data, training_labels, testing_data, testing_labels, g, alpha=0.1, psi=0.01)
 
     # ****************** TURN OFF PC AT END OF SIMULATION (needs sudo) ******************
     # (windows ?)

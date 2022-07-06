@@ -11,7 +11,7 @@ from preprocessing.preprocessing import PCA, gaussianize
 from utils.metrics_utils import compute_actual_DCF, compute_min_DCF
 
 
-def MVG_evaluation(training_data, ltr, testing_data, evaluationLabels, actualDCF=False, calibratedScore=False, **kwargs):
+def MVG_evaluation(training_data, ltr, testing_data, evaluationLabels, actualDCF=False, calibratedScore=False):
     variants = ['full-cov', 'diag', 'tied']
     ms = [False, None, 7, 5, 4]
     effective_priors = [0.1, 0.5, 0.9]
@@ -40,7 +40,7 @@ def MVG_evaluation(training_data, ltr, testing_data, evaluationLabels, actualDCF
                 dte = PCA(dte_gauss, dtr_gauss, m)
             else:
                 dtr = dtr_gauss
-                dte = dtr_gauss
+                dte = dte_gauss
 
         mvg = MVG(dtr, ltr, variant=variant)
         mvg.train_model()
@@ -160,7 +160,7 @@ def SVM_LinearUnbalanced_evaluation(training_data, ltr, testing_data, evaluation
                 dte = PCA(dte_gauss, dtr_gauss, m)
             else:
                 dtr = dtr_gauss
-                dte = dtr_gauss
+                dte = dte_gauss
 
         svm = SVM(dtr, ltr, k=K, c=C, kernel_params=(1, 0), kernel_type='poly')
         svm.train_model(balanced=False, pi_T=None)
@@ -223,7 +223,7 @@ def SVM_LinearBalanced_evaluation(training_data, ltr, testing_data, evaluationLa
                 dte = PCA(dte_gauss, dtr_gauss, m)
             else:
                 dtr = dtr_gauss
-                dte = dtr_gauss
+                dte = dte_gauss
 
         svm = SVM(dtr, ltr, k=K, c=C, kernel_params=(1, 0), kernel_type='poly')
         svm.train_model(balanced=True, pi_T=pi_T)
@@ -283,7 +283,7 @@ def SVM_Poly_evaluation(training_data, ltr, testing_data, evaluationLabels, K, C
                 dte = PCA(dte_gauss, dtr_gauss, m)
             else:
                 dtr = dtr_gauss
-                dte = dtr_gauss
+                dte = dte_gauss
 
         svm = SVM(dtr, ltr, k=K, c=C, kernel_params=(d, c), kernel_type='poly')
         svm.train_model(balanced=True, pi_T=pi_T)
@@ -344,7 +344,7 @@ def SVM_RBF_evaluation(training_data, ltr, testing_data, evaluationLabels, K, C,
                 dte = PCA(dte_gauss, dtr_gauss, m)
             else:
                 dtr = dtr_gauss
-                dte = dtr_gauss
+                dte = dte_gauss
 
         svm = SVM(dtr, ltr, k=K, c=C, kernel_params=gamma, kernel_type='RBF')
         svm.train_model(balanced=True, pi_T=pi_T)
@@ -411,7 +411,7 @@ def GMM_evaluation(training_data, ltr, testing_data, evaluationLabels, g, alpha,
                 dte = PCA(dte_gauss, dtr_gauss, m)
             else:
                 dtr = dtr_gauss
-                dte = dtr_gauss
+                dte = dte_gauss
 
         gmm = GMM(dtr, ltr, type=variant)
         gmm.train_model(alpha=alpha, psi=psi, G=g)
