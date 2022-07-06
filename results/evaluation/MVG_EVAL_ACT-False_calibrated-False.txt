@@ -1,0 +1,57 @@
++--------------------------------------------+---------+
+|              Hyperparameters               | min DCF |
++--------------------------------------------+---------+
+| PCA m=False, variant=full-cov, π_tilde=0.1 |  0.283  |
+| PCA m=False, variant=full-cov, π_tilde=0.5 |   0.14  |
+| PCA m=False, variant=full-cov, π_tilde=0.9 |  0.646  |
+|   PCA m=False, variant=diag, π_tilde=0.1   |   0.33  |
+|   PCA m=False, variant=diag, π_tilde=0.5   |  0.185  |
+|   PCA m=False, variant=diag, π_tilde=0.9   |  0.621  |
+|   PCA m=False, variant=tied, π_tilde=0.1   |  0.207  |
+|   PCA m=False, variant=tied, π_tilde=0.5   |   0.11  |
+|   PCA m=False, variant=tied, π_tilde=0.9   |  0.591  |
+
+| PCA m=None, variant=full-cov, π_tilde=0.1  |  0.242  |
+| PCA m=None, variant=full-cov, π_tilde=0.5  |  0.151  |
+| PCA m=None, variant=full-cov, π_tilde=0.9  |   0.62  |
+|   PCA m=None, variant=diag, π_tilde=0.1    |  0.285  |
+|   PCA m=None, variant=diag, π_tilde=0.5    |  0.154  |
+|   PCA m=None, variant=diag, π_tilde=0.9    |  0.574  |
+
+|   PCA m=None, variant=tied, π_tilde=0.1    |  0.222  |
+|   PCA m=None, variant=tied, π_tilde=0.5    |  0.126  |
+|   PCA m=None, variant=tied, π_tilde=0.9    |   0.54  |
+
+|   PCA m=7, variant=full-cov, π_tilde=0.1   |  0.246  |
+|   PCA m=7, variant=full-cov, π_tilde=0.5   |  0.151  |
+|   PCA m=7, variant=full-cov, π_tilde=0.9   |  0.642  |
+
+|     PCA m=7, variant=diag, π_tilde=0.1     |  0.249  |
+|     PCA m=7, variant=diag, π_tilde=0.5     |  0.154  |
+|     PCA m=7, variant=diag, π_tilde=0.9     |   0.61  |
+
+|     PCA m=7, variant=tied, π_tilde=0.1     |  0.229  |
+|     PCA m=7, variant=tied, π_tilde=0.5     |  0.126  |
+|     PCA m=7, variant=tied, π_tilde=0.9     |  0.522  |
+
+|   PCA m=5, variant=full-cov, π_tilde=0.1   |  0.255  |
+|   PCA m=5, variant=full-cov, π_tilde=0.5   |  0.149  |
+|   PCA m=5, variant=full-cov, π_tilde=0.9   |  0.627  |
+|     PCA m=5, variant=diag, π_tilde=0.1     |  0.254  |
+|     PCA m=5, variant=diag, π_tilde=0.5     |  0.148  |
+|     PCA m=5, variant=diag, π_tilde=0.9     |  0.588  |
+
+|     PCA m=5, variant=tied, π_tilde=0.1     |  0.241  |
+|     PCA m=5, variant=tied, π_tilde=0.5     |  0.129  |
+|     PCA m=5, variant=tied, π_tilde=0.9     |  0.522  |
+
+|   PCA m=4, variant=full-cov, π_tilde=0.1   |  0.257  |
+|   PCA m=4, variant=full-cov, π_tilde=0.5   |   0.15  |
+|   PCA m=4, variant=full-cov, π_tilde=0.9   |  0.638  |
+|     PCA m=4, variant=diag, π_tilde=0.1     |  0.274  |
+|     PCA m=4, variant=diag, π_tilde=0.5     |   0.17  |
+|     PCA m=4, variant=diag, π_tilde=0.9     |  0.611  |
+|     PCA m=4, variant=tied, π_tilde=0.1     |   0.24  |
+|     PCA m=4, variant=tied, π_tilde=0.5     |  0.135  |
+|     PCA m=4, variant=tied, π_tilde=0.9     |  0.515  |
++--------------------------------------------+---------+

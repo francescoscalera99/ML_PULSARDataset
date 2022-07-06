@@ -1,16 +1,17 @@
 import itertools
+
 import numpy as np
 from prettytable import PrettyTable
 
 from classifiers.GMM2 import GMM
-from classifiers.LR import LR, calibrateScores
+from classifiers.LR import calibrateScores, LR
 from classifiers.MVG import MVG
 from classifiers.SVM import SVM
+from preprocessing.preprocessing import PCA, gaussianize
 from utils.metrics_utils import compute_actual_DCF, compute_min_DCF
-from utils.utils import k_fold
 
 
-def MVG_simulations(training_data, training_labels, calibratedScore=False, actualDCF=False):
+def MVG_evaluation(training_data, ltr, testing_data, evaluationLabels, actualDCF=False, calibratedScore=False):
     variants = ['full-cov', 'diag', 'tied']
     ms = [False, None, 7, 5, 4]
     effective_priors = [0.1, 0.5, 0.9]
@@ -27,17 +28,34 @@ def MVG_simulations(training_data, training_labels, calibratedScore=False, actua
 
     for i, (variant, m, pi) in enumerate(hyperparameters):
         print(f"Iteration {i + 1}/{len(variants) * len(ms) * len(effective_priors)}")
+
         if m == False:
-            llrs, evaluationLabels = k_fold(training_data, training_labels, MVG, 5, seed=0, m=None, raw=True, variant=variant)
+            dtr = training_data
+            dte = testing_data
         else:
-            llrs, evaluationLabels = k_fold(training_data, training_labels, MVG, 5, seed=0, m=m, raw=False,
-                                            variant=variant)
+            dtr_gauss = gaussianize(training_data, training_data)
+            dte_gauss = gaussianize(training_data, testing_data)
+            if m is not None:
+                dtr = PCA(dtr_gauss, dtr_gauss, m)
+                dte = PCA(dte_gauss, dtr_gauss, m)
+            else:
+                dtr = dtr_gauss
+                dte = dte_gauss
+
+        mvg = MVG(dtr, ltr, variant=variant)
+        mvg.train_model()
+        mvg.classify(dte, None)
+
+        llrs = mvg.get_llrs()
+
         if actualDCF:
             if calibratedScore:
-                actDCF_cal = []
+
                 priors_T_logReg = [0.5, 0.1, 0.9]
+
+                actDCF_cal = []
                 for prior in priors_T_logReg:
-                    score, labels = calibrateScores(llrs, evaluationLabels, 1e-4, prior=prior)
+                    score, labels = calibrateScores(llrs, evaluationLabels, 1e-4, prior)
                     act_DCF = compute_actual_DCF(score, labels, pi, 1, 1)
                     actDCF_cal.append(round(act_DCF, 3))
                 table.add_row([f"PCA m={m}, variant={variant}, π_tilde={pi}", *actDCF_cal])
@@ -49,11 +67,11 @@ def MVG_simulations(training_data, training_labels, calibratedScore=False, actua
             min_dcf = compute_min_DCF(np.array(llrs), evaluationLabels, pi, 1, 1)
             table.add_row([f"PCA m={m}, variant={variant}, π_tilde={pi}", round(min_dcf, 3)])
     print(table)
-    with open(f"results/actDCF/MVG_ACT-{actualDCF}_calibrated-{calibratedScore}.txt", 'w') as f:
+    with open(f"results/evaluation/MVG_EVAL_ACT-{actualDCF}_calibrated-{calibratedScore}.txt", 'w') as f:
         f.write(str(table))
 
 
-def LR_simulations(training_data, training_labels, lbd, calibratedScore=False, actualDCF=False):
+def LR_evaluation(training_data, ltr, testing_data, evaluationLabels, lbd, actualDCF=False, calibratedScore=False):
     m_values = [False, None, 7, 5]
     pis_T = [0.5, 0.1, 0.9]
     effective_priors = [0.5, 0.1, 0.9]
@@ -71,12 +89,26 @@ def LR_simulations(training_data, training_labels, lbd, calibratedScore=False, a
 
     for i, (m, pi, pi_T) in enumerate(hyperparameters):
         print(f"Iteration {i + 1}/{len(m_values) * len(effective_priors) * len(pis_T)}")
-        if m == False:  # raw features
-            llrs, evaluationLabels = k_fold(training_data, training_labels, LR, 5, m=None, raw=True, seed=0, lbd=lbd,
-                                            pi_T=pi_T)
+
+        if m == False:
+            dtr = training_data
+            dte = testing_data
         else:
-            llrs, evaluationLabels = k_fold(training_data, training_labels, LR, 5, m=m, raw=False, seed=0, lbd=lbd,
-                                            pi_T=pi_T)
+            dtr_gauss = gaussianize(training_data, training_data)
+            dte_gauss = gaussianize(training_data, testing_data)
+            if m is not None:
+                dtr = PCA(dtr_gauss, dtr_gauss, m)
+                dte = PCA(dte_gauss, dtr_gauss, m)
+            else:
+                dtr = dtr_gauss
+                dte = dtr_gauss
+
+        logReg = LR(dtr, ltr, lbd=lbd, pi_T=pi_T)
+        logReg.train_model()
+        logReg.classify(dte, None)
+
+        llrs = logReg.get_llrs()
+
         if actualDCF:
             if calibratedScore:
                 actDCF_cal = []
@@ -95,11 +127,11 @@ def LR_simulations(training_data, training_labels, lbd, calibratedScore=False, a
             table.add_row([f"PCA m={m}, π_tilde={pi}, π_T={pi_T}", round(min_dcf, 3)])
 
     print(table)
-    with open(f"results/actDCF/LR_ACT-{actualDCF}_calibrated-{calibratedScore}.txt", 'w') as f:
+    with open(f"results/evaluation/LR_EVAL_ACT-{actualDCF}_calibrated-{calibratedScore}.txt", 'w') as f:
         f.write(str(table))
 
 
-def SVM_LinearUnbalancedSimulations(training_data, training_labels, K, C, calibratedScore=False, actualDCF=False):
+def SVM_LinearUnbalanced_evaluation(training_data, ltr, testing_data, evaluationLabels, K, C, calibratedScore=False, actualDCF=False):
     ms = [False, None, 7, 5]
     effective_priors = [0.5, 0.1, 0.9]
 
@@ -116,16 +148,26 @@ def SVM_LinearUnbalancedSimulations(training_data, training_labels, K, C, calibr
 
     for i, (m, pi) in enumerate(hyperparameters):
         print(f"Iteration {i + 1}/{len(ms) * len(effective_priors)}")
+
         if m == False:
-            llrs, evaluationLabels = k_fold(training_data, training_labels, SVM, 5, seed=0, balanced=False, m=None,
-                                            raw=True,
-                                            pi_T=None, k=K, c=C,
-                                            kernel_params=(1, 0), kernel_type='poly')
+            dtr = training_data
+            dte = testing_data
         else:
-            llrs, evaluationLabels = k_fold(training_data, training_labels, SVM, 5, seed=0, balanced=False, m=m,
-                                            raw=False,
-                                            pi_T=None, k=K, c=C,
-                                            kernel_params=(1, 0), kernel_type='poly')
+            dtr_gauss = gaussianize(training_data, training_data)
+            dte_gauss = gaussianize(training_data, testing_data)
+            if m is not None:
+                dtr = PCA(dtr_gauss, dtr_gauss, m)
+                dte = PCA(dte_gauss, dtr_gauss, m)
+            else:
+                dtr = dtr_gauss
+                dte = dte_gauss
+
+        svm = SVM(dtr, ltr, k=K, c=C, kernel_params=(1, 0), kernel_type='poly')
+        svm.train_model(balanced=False, pi_T=None)
+        svm.classify(dte, None)
+
+        llrs = svm.get_llrs()
+
         if actualDCF:
             if calibratedScore:
                 actDCF_cal = []
@@ -146,16 +188,17 @@ def SVM_LinearUnbalancedSimulations(training_data, training_labels, K, C, calibr
             table.add_row([f"PCA m={m}, π_tilde={pi}, C ={C}", round(min_dcf, 3)])
 
     print(table)
-    with open(f"results/actDCF/SVM_linear_unbalanced_ACT-{actualDCF}_calibrated-{calibratedScore}.txt", 'w') as f:
+    with open(f"results/evaluation/SVM_linear_unbalanced_EVAL_ACT-{actualDCF}_calibrated-{calibratedScore}.txt", 'w') as f:
         f.write(str(table))
 
 
-def SVM_LinearBalancedSimulations(training_data, training_labels, K, C, calibratedScore=False, actualDCF=False):
-    m = [False, None, 7, 5]
+def SVM_LinearBalanced_evaluation(training_data, ltr, testing_data, evaluationLabels, K, C, calibratedScore=False,
+                                    actualDCF=False):
+    ms = [False, None, 7, 5]
     pi_T_values = [0.5, 0.1, 0.9]
     effective_priors = [0.5, 0.1, 0.9]
 
-    hyperparameters = itertools.product(m, effective_priors, pi_T_values)
+    hyperparameters = itertools.product(ms, effective_priors, pi_T_values)
 
     table = PrettyTable()
     if actualDCF:
@@ -166,17 +209,28 @@ def SVM_LinearBalancedSimulations(training_data, training_labels, K, C, calibrat
     else:
         table.field_names = ['Hyperparameters', 'min DCF']
 
-    for m, pi, pi_T in hyperparameters:
+    for i, (m, pi, pi_T) in enumerate(hyperparameters):
+        print(f"Iteration {i + 1}/{len(ms) * len(effective_priors)}")
+
         if m == False:
-            llrs, evaluationLabels = k_fold(training_data, training_labels, SVM, 5, seed=0, balanced=True, m=None,
-                                            raw=True,
-                                            pi_T=pi_T, k=K, c=C,
-                                            kernel_params=(1, 0), kernel_type='poly')
+            dtr = training_data
+            dte = testing_data
         else:
-            llrs, evaluationLabels = k_fold(training_data, training_labels, SVM, 5, seed=0, balanced=True, m=m,
-                                            raw=False,
-                                            pi_T=pi_T, k=K, c=C,
-                                            kernel_params=(1, 0), kernel_type='poly')
+            dtr_gauss = gaussianize(training_data, training_data)
+            dte_gauss = gaussianize(training_data, testing_data)
+            if m is not None:
+                dtr = PCA(dtr_gauss, dtr_gauss, m)
+                dte = PCA(dte_gauss, dtr_gauss, m)
+            else:
+                dtr = dtr_gauss
+                dte = dte_gauss
+
+        svm = SVM(dtr, ltr, k=K, c=C, kernel_params=(1, 0), kernel_type='poly')
+        svm.train_model(balanced=True, pi_T=pi_T)
+        svm.classify(dte, None)
+
+        llrs = svm.get_llrs()
+
         if actualDCF:
             if calibratedScore:
                 actDCF_cal = []
@@ -197,11 +251,11 @@ def SVM_LinearBalancedSimulations(training_data, training_labels, K, C, calibrat
             table.add_row([f"PCA m={m}, pi_T={pi_T}, π_tilde={pi}, C ={C}", round(min_dcf, 3)])
 
     print(table)
-    with open(f"results/actDCF/SVM_linear_balanced_ACT-{actualDCF}_calibrated{calibratedScore}.txt", 'w') as f:
+    with open(f"results/evaluation/SVM_linear_unbalanced_EVAL_ACT-{actualDCF}_calibrated-{calibratedScore}.txt", 'w') as f:
         f.write(str(table))
 
 
-def SVM_PolySimulations(training_data, training_labels, K, C, pi_T, c, d, actualDCF=False, calibratedScore=False):
+def SVM_Poly_evaluation(training_data, ltr, testing_data, evaluationLabels, K, C, pi_T, c, d, actualDCF=False, calibratedScore=False):
     m = [False, None, 7, 5]
     effective_priors = [0.5, 0.1, 0.9]
 
@@ -217,14 +271,26 @@ def SVM_PolySimulations(training_data, training_labels, K, C, pi_T, c, d, actual
         table.field_names = ['Hyperparameters', 'min DCF']
 
     for m, pi in hyperparameters:
+
         if m == False:
-            llrs, evaluationLabels = k_fold(training_data, training_labels, SVM, 5, seed=0, m=None, raw=True, k=K, c=C,
-                                            balanced=True, pi_T=pi_T,
-                                            kernel_params=(d, c), kernel_type='poly')
+            dtr = training_data
+            dte = testing_data
         else:
-            llrs, evaluationLabels = k_fold(training_data, training_labels, SVM, 5, seed=0, m=m, raw=False, k=K, c=C,
-                                            balanced=True, pi_T=pi_T,
-                                            kernel_params=(d, c), kernel_type='poly')
+            dtr_gauss = gaussianize(training_data, training_data)
+            dte_gauss = gaussianize(training_data, testing_data)
+            if m is not None:
+                dtr = PCA(dtr_gauss, dtr_gauss, m)
+                dte = PCA(dte_gauss, dtr_gauss, m)
+            else:
+                dtr = dtr_gauss
+                dte = dte_gauss
+
+        svm = SVM(dtr, ltr, k=K, c=C, kernel_params=(d, c), kernel_type='poly')
+        svm.train_model(balanced=True, pi_T=pi_T)
+        svm.classify(dte, None)
+
+        llrs = svm.get_llrs()
+
         if actualDCF:
             if calibratedScore:
                 actDCF_cal = []
@@ -247,11 +313,11 @@ def SVM_PolySimulations(training_data, training_labels, K, C, pi_T, c, d, actual
                 [f"PCA m={m}, π_tilde={pi}, pi_T = 0.5, C ={C} K={K}, c={c}, d={d}", round(min_dcf, 3)])
 
     print(table)
-    with open(f"results/actDCF/SVM_Poly_ACT-{actualDCF}_calibrated{calibratedScore}.txt", 'w') as f:
+    with open(f"results/evaluation/SVM_Poly_ACT-{actualDCF}_calibrated{calibratedScore}.txt", 'w') as f:
         f.write(str(table))
 
 
-def SVM_RBFSimulations(training_data, training_labels, K, C, pi_T, gamma, actualDCF=False, calibratedScore=False):
+def SVM_RBF_evaluation(training_data, ltr, testing_data, evaluationLabels, K, C, pi_T, gamma, actualDCF=False, calibratedScore=False):
     ms = [None, 7, 5]
     effective_priors = [0.5, 0.1, 0.9]
     hyperparameters = itertools.product(ms, effective_priors)
@@ -266,16 +332,26 @@ def SVM_RBFSimulations(training_data, training_labels, K, C, pi_T, gamma, actual
         table.field_names = ['Hyperparameters', 'min DCF']
 
     for m, pi in hyperparameters:
+
         if m == False:
-            llrs, evaluationLabels = k_fold(training_data, training_labels, SVM, 5, seed=0, m=None, raw=True,
-                                            balanced=True,
-                                            pi_T=pi_T,
-                                            k=K, c=C, kernel_params=gamma, kernel_type='RBF')
+            dtr = training_data
+            dte = testing_data
         else:
-            llrs, evaluationLabels = k_fold(training_data, training_labels, SVM, 5, seed=0, m=m, raw=False,
-                                            balanced=True,
-                                            pi_T=pi_T,
-                                            k=K, c=C, kernel_params=gamma, kernel_type='RBF')
+            dtr_gauss = gaussianize(training_data, training_data)
+            dte_gauss = gaussianize(training_data, testing_data)
+            if m is not None:
+                dtr = PCA(dtr_gauss, dtr_gauss, m)
+                dte = PCA(dte_gauss, dtr_gauss, m)
+            else:
+                dtr = dtr_gauss
+                dte = dte_gauss
+
+        svm = SVM(dtr, ltr, k=K, c=C, kernel_params=gamma, kernel_type='RBF')
+        svm.train_model(balanced=True, pi_T=pi_T)
+        svm.classify(dte, None)
+
+        llrs = svm.get_llrs()
+
         if actualDCF:
             if calibratedScore:
                 actDCF_cal = []
@@ -295,11 +371,11 @@ def SVM_RBFSimulations(training_data, training_labels, K, C, pi_T, gamma, actual
             table.add_row([f"PCA m={m}, π_tilde={pi}, π_T={pi_T}  C ={C}", round(min_dcf, 3)])
 
     print(table)
-    with open(f"results/actDCF/SVM_RBF_ACT-{actualDCF}_calibrated{calibratedScore}.txt", 'w') as f:
+    with open(f"results/evaluation/SVM_RBF_EVAL_ACT-{actualDCF}_calibrated{calibratedScore}.txt", 'w') as f:
         f.write(str(table))
 
 
-def GMM_Simulations(training_data, training_labels, g, alpha, psi, actualDCF=False, calibratedScore=False):
+def GMM_evaluation(training_data, ltr, testing_data, evaluationLabels, g, alpha, psi, actualDCF=False, calibratedScore=False):
     variants = ['full-cov', 'diag', 'tied']
     effective_priors = [0.5, 0.1, 0.9]
     ms = [None, 7]
@@ -319,9 +395,30 @@ def GMM_Simulations(training_data, training_labels, g, alpha, psi, actualDCF=Fal
 
     for i, (m, pi, variant, raw) in enumerate(hyperparameters):
         print(f"Iteration {i + 1}/{n_iter}: ", end="")
-        llrs, evaluationLabels = k_fold(training_data, training_labels, GMM, nFold=5, seed=0, m=m, raw=raw,
-                                        type=variant,
-                                        alpha=alpha, psi=psi, G=g)
+
+        if raw:
+            if m is not None:
+                dtr = PCA(training_data, training_data, m)
+                dte = PCA(testing_data, training_data, m)
+            else:
+                dtr = training_data
+                dte = testing_data
+        else:
+            dtr_gauss = gaussianize(training_data, training_data)
+            dte_gauss = gaussianize(training_data, testing_data)
+            if m is not None:
+                dtr = PCA(dtr_gauss, dtr_gauss, m)
+                dte = PCA(dte_gauss, dtr_gauss, m)
+            else:
+                dtr = dtr_gauss
+                dte = dte_gauss
+
+        gmm = GMM(dtr, ltr, type=variant)
+        gmm.train_model(alpha=alpha, psi=psi, G=g)
+        gmm.classify(dte, None)
+
+        llrs = gmm.get_llrs()
+
         if actualDCF:
             if calibratedScore:
                 actDCF_cal = []
@@ -342,5 +439,5 @@ def GMM_Simulations(training_data, training_labels, g, alpha, psi, actualDCF=Fal
             table.add_row([f"PCA m={m}, raw data: {raw}, π_tilde={pi}, variant: {variant}, G={g}", round(min_dcf, 3)])
 
     print(table)
-    with open(f"results/actDCF/GMM_ACT-{actualDCF}_calibrated{calibratedScore}.txt", 'w') as f:
+    with open(f"results/evaluation/GMM_EVAL_ACT-{actualDCF}_calibrated{calibratedScore}.txt", 'w') as f:
         f.write(str(table))
