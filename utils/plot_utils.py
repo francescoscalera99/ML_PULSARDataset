@@ -498,10 +498,10 @@ def plot_tuningGMM2():
 
 def bayes_error_plots(classifier):
     effPriorLogOdds = np.linspace(-3, 3, 21)
-    minDCF = np.load(f"results/bayesErrorPlot/{classifier.__name__}_minDCF.npy")
-    actDCF = np.load(f"results/bayesErrorPlot/{classifier.__name__}_actDCF.npy")
-    minDCF_cal = np.load(f"results/bayesErrorPlot/{classifier.__name__}_minDCF_Calibrated.npy")
-    actDCF_cal = np.load(f"results/bayesErrorPlot/{classifier.__name__}_actDCF_Calibrated.npy")
+    minDCF = np.load(f"simulations/bayesErrorPlot/{classifier.__name__}_minDCF.npy")
+    actDCF = np.load(f"simulations/bayesErrorPlot/{classifier.__name__}_actDCF.npy")
+    minDCF_cal = np.load(f"simulations/bayesErrorPlot/{classifier.__name__}_minDCF_Calibrated.npy")
+    actDCF_cal = np.load(f"simulations/bayesErrorPlot/{classifier.__name__}_actDCF_Calibrated.npy")
     plt.plot(effPriorLogOdds, minDCF, label="minDCF")
     plt.plot(effPriorLogOdds, actDCF, label="actDCF")
     plt.plot(effPriorLogOdds, minDCF_cal, label="minDCF (cal.)")

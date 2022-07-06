@@ -83,10 +83,10 @@ def bayes_error_plots_data(training_data, training_labels, classifier, Cfn=1, Cf
         minDCFs_cal.append(compute_min_DCF(calibrated_score, ordered_labels, e, Cfn, Cfp))
 
     print("Saving files...")
-    np.save(f"results/bayesErrorPlot/{classifier.__name__}_actDCF", np.array(actDCFs))
-    np.save(f"results/bayesErrorPlot/{classifier.__name__}_minDCF", np.array(minDCFs))
-    np.save(f"results/bayesErrorPlot/{classifier.__name__}_actDCF_Calibrated", np.array(actDCFs_cal))
-    np.save(f"results/bayesErrorPlot/{classifier.__name__}_minDCF_Calibrated", np.array(minDCFs_cal))
+    np.save(f"simulations/bayesErrorPlot/{classifier.__name__}_actDCF", np.array(actDCFs))
+    np.save(f"simulations/bayesErrorPlot/{classifier.__name__}_minDCF", np.array(minDCFs))
+    np.save(f"simulations/bayesErrorPlot/{classifier.__name__}_actDCF_Calibrated", np.array(actDCFs_cal))
+    np.save(f"simulations/bayesErrorPlot/{classifier.__name__}_minDCF_Calibrated", np.array(minDCFs_cal))
     return actDCFs, minDCFs, actDCFs_cal, minDCFs_cal
 
 
