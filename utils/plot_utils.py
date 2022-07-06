@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib import ticker
 
+
 # from preprocessing.preprocessing import gaussianize
 
 
@@ -99,7 +100,7 @@ def create_scatterplots2(training_data, training_labels):
     colors = ['red', 'blue']
 
     raw_data = training_data
-    gaussianized_data = 0 # gaussianize(training_data, training_data)
+    gaussianized_data = 0  # gaussianize(training_data, training_data)
 
     titles = ['1. Mean of the integrated profile',
               '2. Standard deviation of the integrated profile',
@@ -170,7 +171,8 @@ def plot_lambda():
             axs[i // 2, i % 2].set_xscale('log')
 
             xticks = [1.e-09, 1.e-08, 1.e-06, 1.e-04, 1.e-02, 1.e+00, 1.e+02, 1.e+04, 1.e+06]
-            xlabels = [r"$0$", r"$10^{-8}$", r"$10^{-6}$", r"$10^{-4}$", r"$10^{-2}$", r"$10^0$", r"$10^2$", r"$10^4$", r"$10^6$"]
+            xlabels = [r"$0$", r"$10^{-8}$", r"$10^{-6}$", r"$10^{-4}$", r"$10^{-2}$", r"$10^0$", r"$10^2$", r"$10^4$",
+                       r"$10^6$"]
 
             axs[i // 2, i % 2].set_xticks(xticks, xlabels)
             axs[i // 2, i % 2].get_xaxis().get_major_formatter().labelOnlyBase = False
@@ -309,15 +311,15 @@ def plot_tuning_LinearSVMBalanced():
         "text.usetex": True,
         "font.family": "sans-serif",
         "font.sans-serif": ["Computer Modern Serif"],
-        "axes.titlesize": 22,
-        "axes.labelsize": 18,
-        "legend.fontsize": 15
+        "axes.titlesize": 30,
+        "axes.labelsize": 30,
+        "legend.fontsize": 20,
+        "xtick.labelsize": 30,
+        "ytick.labelsize": 30,
     })
 
     i = 0
     fig, axs = plt.subplots(4, 3, sharey='all')
-    axs.tick_params(axis='both', which='major', fontsize=40)
-    colors = distinctipy.get_colors(6, pastel_factor=0.7)
 
     for m in m_values:
         j = 0
@@ -326,15 +328,14 @@ def plot_tuning_LinearSVMBalanced():
             for idx, (K, pi) in enumerate(hyperparameters):
                 DCFs = np.load(
                     f"../simulations/linearSVM/balanced/K{str(K).replace('.', '-')}_p{str(pi).replace('.', '-')}_pT{str(pi_T).replace('.', '-')}_PCA{str(m)}.npy")
-                axs[i, j].plot(C_values, DCFs, color=colors[idx],
-                               label=rf"$K={K}$,\;" + r"$\widetilde{\pi}=$" + f"{pi}")
+                axs[i, j].plot(C_values, DCFs, color=colors[idx], label=rf"$K={K}$,\;" + r"$\widetilde{\pi}=$" + f"{pi}")
                 if m is None:
-                    axs[i, j].set_title('Gaussianized features, no PCA' + rf', $\pi_T={pi_T}$')
+                    axs[i, j].set_title('Gau, no PCA' + rf', $\pi_T={pi_T}$')
                 elif m == False:
-                    axs[i, j].set_title('Raw features, no PCA, ' + rf'$\pi_T={pi_T}$')
+                    axs[i, j].set_title('Raw, no PCA, ' + rf'$\pi_T={pi_T}$')
                 else:
-                    axs[i, j].set_title('Gaussianized features, PCA ' + rf'($m = {m}$), $\pi_T={pi_T}$')
-                axs[i, j].legend()
+                    axs[i, j].set_title('Gau, PCA ' + rf'($m = {m}$), $\pi_T={pi_T}$')
+                # axs[i, j].legend()
                 axs[i, j].set_xlabel(r'$C$')
                 axs[i, j].set_ylabel(r'$minDCF$')
                 axs[i, j].set_xscale('log')
@@ -344,6 +345,14 @@ def plot_tuning_LinearSVMBalanced():
 
     fig.set_size_inches(20, 20)
     fig.tight_layout()
+
+    label_params = axs[0, 0].get_legend_handles_labels()
+
+    figl, axl = plt.subplots(figsize=(6.5, 5))
+    axl.axis(False)
+    axl.legend(*label_params, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
+    figl.show()
+
     fig.show()
 
 
@@ -455,11 +464,14 @@ def bayes_error_plots(classifier):
 
 
 if __name__ == '__main__':
+    # colors = distinctipy.get_colors(6, pastel_factor=0.7, colorblind_type='Deuteranomaly')
+    # print(colors)
+    colors = [(0.48702807223549177, 0.4242891647177821, 0.9480975665882982), (0.9146761531779931, 0.4970424422244128, 0.41460357267068376), (0.843602824944377, 0.6031154951690304, 0.9802318468625552), (0.5887251240359368, 0.9624135405893406, 0.4585532945832182), (0.422567523593921, 0.44218101996887993, 0.5516040738892886), (0.43399916426535, 0.7098723267606655, 0.6255076508970907)]
     # plot_lambda()
     # plot_tuningPolySVM()
     # plot_tuningRBFSVM()
     # plot_tuningLinearSVMUnbalanced()
-    # plot_tuning_LinearSVMBalanced()
+    plot_tuning_LinearSVMBalanced()
 
     # print(os.path.abspath("../simulations/GMM/GMM_rawFeature-False_PCA7_diag.npy"))
     # plot_tuningGMM2()

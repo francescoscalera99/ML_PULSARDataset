@@ -48,8 +48,8 @@ def main():
 
     # =============== LOGISTIC REGRESSION ===============
     # tuning_lambda(training_data, training_labels)
-    lbd = 1e-6
-    # LR_simulations(training_data, training_labels, lbd)
+    lbd = 1e-7
+    LR_simulations(training_data, training_labels, lbd)
 
     # =============== SUPPORT VECTOR MACHINE ===============
     # print("LINEAR SVM - TUNING PARAMETERS")
@@ -115,10 +115,9 @@ def main():
     # GMM_Simulations(training_data, training_labels, g, alpha=0.1, psi=0.01, actualDCF=True, calibratedScore=True)
 
     # =============== BAYES ERROR PLOT ==================
-    print("=============== BAYES ERROR PLOT ==================")
-    # MVG
-    bayes_error_plots_data(training_data, training_labels, MVG, m=None, raw=False, variant="tied")
-    bayes_error_plots(MVG)
+    # print("=============== BAYES ERROR PLOT ==================")
+    # bayes_error_plots_data(training_data, training_labels, MVG, m=None, raw=False, variant="tied")
+    # bayes_error_plots(MVG)
 
     # =============== EXPERIMENTAL RESULT ===============
 
