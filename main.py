@@ -1,7 +1,16 @@
+#!/Users/riccardo/VENV/python3_9/bin/python3.9
+
 import itertools
 
 import numpy as np
+
+from classifiers.GMM2 import tuning_componentsGMM
+# from classifiers.LR import tuning_lambda
 from classifiers.MVG import MVG
+from classifiers.SVM import tuning_parameters_PolySVM, tuning_parameters_RBFSVM, tuning_parameters_LinearSVMBalanced
+from preprocessing.preprocessing import PCA
+from simulations.simulations import MVG_simulations, GMM_Simulations, SVM_LinearUnbalancedSimulations, \
+    SVM_PolySimulations, SVM_RBFSimulations, SVM_LinearBalancedSimulations, LR_simulations
 from utils.metrics_utils import bayes_error_plots_data
 from utils.plot_utils import create_scatterplots, bayes_error_plots
 from utils.utils import load_dataset
@@ -53,32 +62,32 @@ def main():
     # tuning_parameters_LinearSVMUnBalanced(training_data, training_labels)
 
     # print(" ---------- SVM LINEAR UNBALANCED SIMULATION ----------")
-    K_LinearUnb = 1.0  # This values comes from tuning of hyperparameters
-    C_LinearUnb = 1
+    # K_LinearUnb = 1.0  # This values comes from tuning of hyperparameters
+    # C_LinearUnb = 1
     # SVM_LinearUnbalancedSimulations(training_data, training_labels, K_LinearUnb, C_LinearUnb)
 
     # print(" ---------- SVM LINEAR BALANCED SIMULATION ----------")
-    K_LinearB = 1.0  # This values comes from tuning of hyperparameters
-    C_LinearB = 2e-2
+    # K_LinearB = 1.0  # This values comes from tuning of hyperparameters
+    # C_LinearB = 2e-2
     # SVM_LinearBalancedSimulations(training_data, training_labels, K_LinearB, C_LinearB)
 
     # print(" ---------- SVM POLY SIMULATION ----------")
-    K_Poly = 1.0
-    pi_TPolyRBF = 0.5
-    CPoly = 1e-2
-    c = 15
-    d = 2
+    # K_Poly = 1.0
+    # pi_TPolyRBF = 0.5
+    # CPoly = 1e-2
+    # c = 15
+    # d = 2
     # SVM_PolySimulations(training_data, training_labels, K_Poly, CPoly, pi_TPolyRBF, c, d)
 
     # print(" ---------- SVM RBF SIMULATION ----------")
-    K_RBF = 0
-    gamma_RBF = 1e-3
-    C_RBF = 1e-1
+    # K_RBF = 0
+    # gamma_RBF = 1e-3
+    # C_RBF = 1e-1
     # SVM_RBFSimulations(training_data, training_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF)
 
     # =============== GAUSSIAN MIXTURE MODELS ===============
     # tuning_componentsGMM(training_data, training_labels, psi=0.01)
-    g = 16
+    # g = 16
     # GMM_Simulations(training_data, training_labels, g, alpha=0.1, psi=0.01)
 
     # =============== COMPUTING ACTUAL DCF ===============
@@ -104,8 +113,13 @@ def main():
     # LR_simulations(training_data, training_labels, lbd, actualDCF=True, calibratedScore=True)
     # print("============== GMM - SCORE CALIBRATION ===============")
     # GMM_Simulations(training_data, training_labels, g, alpha=0.1, psi=0.01, actualDCF=True, calibratedScore=True)
-    bayes_error_plots_data(training_data, training_labels, MVG, m=None, raw=False, variant='tied')
+
+    # =============== BAYES ERROR PLOT ==================
+    print("=============== BAYES ERROR PLOT ==================")
+    # MVG
+    bayes_error_plots_data(training_data, training_labels, MVG, m=None, raw=False, variant="tied")
     bayes_error_plots(MVG)
+
     # =============== EXPERIMENTAL RESULT ===============
 
     # ****************** TURN OFF PC AT END OF SIMULATION (needs sudo) ******************
