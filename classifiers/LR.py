@@ -68,19 +68,20 @@ class LR(ClassifierClass):
 #             np.save(f"LR_0_prior_{str(pi).replace('.', '-')}_PCA{m}", np.array(DCFs))
 
 
-def calibrateScores(scores, evaluationLabels, prior=0.5, lambd=1e-3, pi_T=0.5):
+# def calibrateScores(scores, evaluationLabels, prior=0.5, lambd=1e-3, pi_T=0.5):
+#     # f(s) = as+b can be interpreted as the llr for the two class hypothesis
+#     # class posterior probability: as+b+log(pi/(1-pi)) = as +b'
+#     logReg = LR(vrow(scores), evaluationLabels, lbd=lambd, pi_T=pi_T)
+#     logReg.train_model()
+#     logReg.classify(vrow(scores), None)
+#     calibratedScore = logReg.get_llrs() - np.log(prior/(1-prior))
+#     return calibratedScore
+#
+
+def calibrateScores(scores, evaluationLabels, lambd, prior):
     # f(s) = as+b can be interpreted as the llr for the two class hypothesis
     # class posterior probability: as+b+log(pi/(1-pi)) = as +b'
-    logReg = LR(vrow(scores), evaluationLabels, lbd=lambd, pi_T=pi_T)
-    logReg.train_model()
-    logReg.classify(vrow(scores), None)
-    calibratedScore = logReg.get_llrs() - np.log(prior/(1-prior))
-    return calibratedScore
-
-
-def calibrateScoresKFold(scores, evaluationLabels, lambd, prior, pi_T=0.5):
-    # f(s) = as+b can be interpreted as the llr for the two class hypothesis
-    # class posterior probability: as+b+log(pi/(1-pi)) = as +b'
-    calibratedScore, calibratedEvaluationLabels = k_fold(vrow(scores), evaluationLabels, LR, 5, m=None, raw=True, seed=0, lbd=lambd, pi_T=pi_T)
+    calibratedScore, calibratedEvaluationLabels = k_fold(vrow(scores), evaluationLabels, LR, 5, m=None, raw=True,
+                                                         seed=0, lbd=lambd, pi_T=prior)
     calibratedScore = calibratedScore - np.log(prior / (1 - prior))
     return calibratedScore, calibratedEvaluationLabels
