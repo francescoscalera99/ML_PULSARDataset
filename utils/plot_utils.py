@@ -2,11 +2,11 @@ import itertools
 import os
 
 import distinctipy
-import matplotlib
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from matplotlib import ticker
+import matplotlib.font_manager
+
 
 # from preprocessing.preprocessing import gaussianize
 
@@ -99,7 +99,7 @@ def create_scatterplots2(training_data, training_labels):
     colors = ['red', 'blue']
 
     raw_data = training_data
-    gaussianized_data = 0 # gaussianize(training_data, training_data)
+    gaussianized_data = 0  # gaussianize(training_data, training_data)
 
     titles = ['1. Mean of the integrated profile',
               '2. Standard deviation of the integrated profile',
@@ -170,7 +170,8 @@ def plot_lambda():
             axs[i // 2, i % 2].set_xscale('log')
 
             xticks = [1.e-09, 1.e-08, 1.e-06, 1.e-04, 1.e-02, 1.e+00, 1.e+02, 1.e+04, 1.e+06]
-            xlabels = [r"$0$", r"$10^{-8}$", r"$10^{-6}$", r"$10^{-4}$", r"$10^{-2}$", r"$10^0$", r"$10^2$", r"$10^4$", r"$10^6$"]
+            xlabels = [r"$0$", r"$10^{-8}$", r"$10^{-6}$", r"$10^{-4}$", r"$10^{-2}$", r"$10^0$", r"$10^2$", r"$10^4$",
+                       r"$10^6$"]
 
             axs[i // 2, i % 2].set_xticks(xticks, xlabels)
             axs[i // 2, i % 2].get_xaxis().get_major_formatter().labelOnlyBase = False
@@ -194,66 +195,105 @@ def plot_tuningPolySVM():
     c_values = [0, 1, 10, 15]
 
     num_colors = len(K_values) * len(c_values)
-    colors = distinctipy.get_colors(num_colors, pastel_factor=0.7)
+    # colors = distinctipy.get_colors(num_colors, pastel_factor=0.7)
+
+    plt.rcParams.update({
+        "text.usetex": True,
+        "font.family": "sans-serif",
+        "font.sans-serif": ["Computer Modern Serif"],
+        "axes.titlesize": 28,
+        "axes.labelsize": 30,
+        "legend.fontsize": 13,
+        "xtick.labelsize": 30,
+        "ytick.labelsize": 30,
+    })
 
     i = 0
-    fig, axs = plt.subplots(1, 4)
-    # fig.suptitle('Poly SVM')
-    plt.rcParams['text.usetex'] = True
+    fig, axs = plt.subplots(1, 4, sharey="row")
     for m in m_values:
         hyperparameters = itertools.product(K_values, c_values)
         for j, (K, c) in enumerate(hyperparameters):
             DCFs = np.load(
                 f"../simulations/polySVM/K{str(K).replace('.', '-')}_c{str(c).replace('.', '-')}_PCA{str(m)}.npy")
-            axs[i].plot(C_values, DCFs, color=colors[j], label=rf"$K={K}$, $c={c}$")
+            axs[i].plot(C_values, DCFs, color=colors8[j], label=rf"$K={K}$, $c={c}$", linewidth=2.5)
             if (m == False):
                 axs[i].set_title(f'5-fold, Raw features')
             else:
                 axs[i].set_title(f'5-fold, PCA (m = {m})')
-            axs[i].legend()
-            axs[i].set_xlabel(r'$C$')
-            axs[i].set_ylabel(r'$minDCF$')
+            if i == 0:
+                axs[i].legend(ncol=2)
+            axs[i].set_xlabel(r"$C$")
+            axs[i].set_ylabel(r"$minDCF$")
             axs[i].set_xscale('log')
+            axs[i].set_xticks([10 ** i for i in range(-2, 3, 2)])
         i += 1
     fig.set_size_inches(20, 5)
     fig.tight_layout()
     fig.subplots_adjust(top=0.88)
     fig.show()
 
+    label_params = axs[0].get_legend_handles_labels()
+    figl, axl = plt.subplots(figsize=(6.5, 7))
+    axl.axis(False)
+    axl.legend(*label_params, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
+    figl.show()
+
 
 def plot_tuningRBFSVM():
     C_values = np.logspace(-3, 3, 20)
     m_values = [False, None, 7]
     K_values = [0.0, 1.0]
-    gamma_values = [1e-2, 1e-3, 1e-4]
+    # gamma_values = [1e-2, 1e-3, 1e-4]
+    gamma_exp = [-2, -3, -4]
     i = 0
-    fig, axs = plt.subplots(1, 3)
+    plt.clf()
+    fig, axs = plt.subplots(1, 3, sharey="all")
     # fig.suptitle('RBF SVM')
-    plt.rcParams['text.usetex'] = True
+    plt.rcParams.update({
+        "text.usetex": True,
+        "font.family": "sans-serif",
+        "font.sans-serif": ["Computer Modern Serif"],
+        "axes.titlesize": 28,
+        "axes.labelsize": 30,
+        "legend.fontsize": 16,
+        "xtick.labelsize": 30,
+        "ytick.labelsize": 30,
+    })
 
-    num_colors = len(K_values) * len(gamma_values)
-    colors = distinctipy.get_colors(num_colors, pastel_factor=0.7)
+    # num_colors = len(K_values) * len(gamma_values)
+    # colors = distinctipy.get_colors(num_colors, pastel_factor=0.7)
 
     for m in m_values:
-        hyperparameters = itertools.product(K_values, gamma_values)
-        for j, (K, gamma) in enumerate(hyperparameters):
+        hyperparameters = itertools.product(K_values, gamma_exp)
+        for j, (K, g_exp) in enumerate(hyperparameters):
+            gamma=10**g_exp
             DCFs = np.load(
                 f"../simulations/RBF/RBF_K{str(K).replace('.', '-')}_c{str(gamma).replace('.', '-')}_PCA{str(m)}.npy")
-            axs[i].plot(C_values, DCFs, color=colors[j], label=rf"$K={K}$, $\gamma={gamma}$")
-            if (m == False):
+            lb = r"$\gamma = 10^{" + str(g_exp) + "}$"
+            axs[i].plot(C_values, DCFs, color=colors6[j], label=rf"$K={K}$, " + lb, linewidth=2.5)
+            if m == False:
                 axs[i].set_title(f'5-fold, Raw features')
             else:
-                axs[i].set_title(rf'5-fold, PCA ($m = {m}$)')
-            axs[i].legend()
-            axs[i].set_xlabel(r'$C$')
-            axs[i].set_ylabel(r'$minDCF$')
+                axs[i].set_title(rf"5-fold, PCA ($m = {m}$)")
+            if i == 0:
+                axs[i].legend(ncol=1)
+
+            axs[i].set_xlabel(r"$C$")
+            axs[i].set_ylabel(r"$minDCF$")
             axs[i].set_xscale('log')
+            axs[i].set_xticks([10 ** i for i in range(-2, 3, 2)])
         i += 1
 
     fig.set_size_inches(15, 5)
     fig.tight_layout()
     fig.subplots_adjust(top=0.88)
     fig.show()
+
+    # label_params = axs[0].get_legend_handles_labels()
+    # figl, axl = plt.subplots(figsize=(6.5, 7))
+    # axl.axis(False)
+    # axl.legend(*label_params, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
+    # figl.show()
 
 
 def plot_tuningLinearSVMUnbalanced():
@@ -268,34 +308,43 @@ def plot_tuningLinearSVMUnbalanced():
         "text.usetex": True,
         "font.family": "sans-serif",
         "font.sans-serif": ["Computer Modern Serif"],
-        "axes.titlesize": 17,
-        "axes.labelsize": 15,
-        "legend.fontsize": 12
+        "axes.titlesize": 22,
+        "axes.labelsize": 30,
+        "legend.fontsize": 20,
+        "xtick.labelsize": 30,
+        "ytick.labelsize": 30,
     })
 
     fig, axs = plt.subplots(1, 4, sharey='row')
-    colors = distinctipy.get_colors(6, pastel_factor=0.7)
+    # colors = distinctipy.get_colors(6, pastel_factor=0.7)
     for m in m_values:
         hyperparameters = itertools.product(K_values, priors)
         for j, (K, p) in enumerate(hyperparameters):
             DCFs = np.load(
                 f"../simulations/linearSVM/unbalanced/new/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}_PCA{str(m)}.npy")
-            axs[i].plot(C_values, DCFs, color=colors[j], label=r"$K=" + str(K) + r",\;\widetilde{\pi}=" + str(p) + r"$")
+            axs[i].plot(C_values, DCFs, color=colors[j], label=r"$K=" + str(K) + r",\;\widetilde{\pi}=" + str(p) + r"$", linewidth=3)
             if m is None:
-                axs[i].set_title(rf'Gaussianized features, $\pi_T=0.5$')
+                axs[i].set_title(rf"Gau, no PCA, $\pi_T=0.5$")
             elif m == False:
-                axs[i].set_title(rf'Raw features, $\pi_T=0.5$')
+                axs[i].set_title(rf"Raw, no PCA, $\pi_T=0.5$")
             else:
-                axs[i].set_title(rf'Gaussianized features, PCA ($m = {m}$), $\pi_T=0.5$')
-            axs[i].legend()
+                axs[i].set_title(rf"Gau, PCA ($m = {m}$), $\pi_T=0.5$")
+            # axs[i].legend()
             axs[i].set_xlabel('$C$')
             axs[i].set_ylabel('$minDCF$')
             axs[i].set_xscale('log')
             axs[i].yaxis.set_tick_params(labelbottom=True)
+            axs[i].set_xticks([10**i for i in range(-2, 3, 2)])
         i += 1
     fig.set_size_inches(20, 5)
     fig.tight_layout()
     fig.show()
+
+    label_params = axs[0].get_legend_handles_labels()
+    figl, axl = plt.subplots(figsize=(6.5, 5))
+    axl.axis(False)
+    axl.legend(*label_params, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
+    figl.show()
 
 
 def plot_tuning_LinearSVMBalanced():
@@ -309,15 +358,15 @@ def plot_tuning_LinearSVMBalanced():
         "text.usetex": True,
         "font.family": "sans-serif",
         "font.sans-serif": ["Computer Modern Serif"],
-        "axes.titlesize": 22,
-        "axes.labelsize": 18,
-        "legend.fontsize": 15
+        "axes.titlesize": 30,
+        "axes.labelsize": 30,
+        "legend.fontsize": 20,
+        "xtick.labelsize": 30,
+        "ytick.labelsize": 30,
     })
 
     i = 0
     fig, axs = plt.subplots(4, 3, sharey='all')
-    axs.tick_params(axis='both', which='major', fontsize=40)
-    colors = distinctipy.get_colors(6, pastel_factor=0.7)
 
     for m in m_values:
         j = 0
@@ -326,17 +375,16 @@ def plot_tuning_LinearSVMBalanced():
             for idx, (K, pi) in enumerate(hyperparameters):
                 DCFs = np.load(
                     f"../simulations/linearSVM/balanced/K{str(K).replace('.', '-')}_p{str(pi).replace('.', '-')}_pT{str(pi_T).replace('.', '-')}_PCA{str(m)}.npy")
-                axs[i, j].plot(C_values, DCFs, color=colors[idx],
-                               label=rf"$K={K}$,\;" + r"$\widetilde{\pi}=$" + f"{pi}")
+                axs[i, j].plot(C_values, DCFs, color=colors[idx], label=rf"$K={K}$,\;" + r"$\widetilde{\pi}=$" + f"{pi}", linewidth=3)
                 if m is None:
-                    axs[i, j].set_title('Gaussianized features, no PCA' + rf', $\pi_T={pi_T}$')
+                    axs[i, j].set_title('Gau, no PCA' + rf", $\pi_T={pi_T}$")
                 elif m == False:
-                    axs[i, j].set_title('Raw features, no PCA, ' + rf'$\pi_T={pi_T}$')
+                    axs[i, j].set_title('Raw, no PCA, ' + rf"$\pi_T={pi_T}$")
                 else:
-                    axs[i, j].set_title('Gaussianized features, PCA ' + rf'($m = {m}$), $\pi_T={pi_T}$')
-                axs[i, j].legend()
-                axs[i, j].set_xlabel(r'$C$')
-                axs[i, j].set_ylabel(r'$minDCF$')
+                    axs[i, j].set_title('Gau, PCA ' + rf"($m = {m}$), $\pi_T={pi_T}$")
+                # axs[i, j].legend()
+                axs[i, j].set_xlabel(r"$C$")
+                axs[i, j].set_ylabel(r"$minDCF$")
                 axs[i, j].set_xscale('log')
                 axs[i, j].yaxis.set_tick_params(labelbottom=True)
             j += 1
@@ -344,6 +392,14 @@ def plot_tuning_LinearSVMBalanced():
 
     fig.set_size_inches(20, 20)
     fig.tight_layout()
+
+    label_params = axs[0, 0].get_legend_handles_labels()
+
+    figl, axl = plt.subplots(figsize=(6.5, 5))
+    axl.axis(False)
+    axl.legend(*label_params, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
+    figl.show()
+
     fig.show()
 
 
@@ -442,10 +498,10 @@ def plot_tuningGMM2():
 
 def bayes_error_plots(classifier):
     effPriorLogOdds = np.linspace(-3, 3, 21)
-    minDCF = np.load(f"results/bayesErrorPlot/{classifier.__name__}_minDCF.npy")
-    actDCF = np.load(f"results/bayesErrorPlot/{classifier.__name__}_actDCF.npy")
-    minDCF_cal = np.load(f"results/bayesErrorPlot/{classifier.__name__}_minDCF_Calibrated.npy")
-    actDCF_cal = np.load(f"results/bayesErrorPlot/{classifier.__name__}_actDCF_Calibrated.npy")
+    minDCF = np.load(f"simulations/bayesErrorPlot/{classifier.__name__}_minDCF.npy")
+    actDCF = np.load(f"simulations/bayesErrorPlot/{classifier.__name__}_actDCF.npy")
+    minDCF_cal = np.load(f"simulations/bayesErrorPlot/{classifier.__name__}_minDCF_Calibrated.npy")
+    actDCF_cal = np.load(f"simulations/bayesErrorPlot/{classifier.__name__}_actDCF_Calibrated.npy")
     plt.plot(effPriorLogOdds, minDCF, label="minDCF")
     plt.plot(effPriorLogOdds, actDCF, label="actDCF")
     plt.plot(effPriorLogOdds, minDCF_cal, label="minDCF (cal.)")
@@ -455,9 +511,13 @@ def bayes_error_plots(classifier):
 
 
 if __name__ == '__main__':
+    # colors8 = distinctipy.get_colors(8, pastel_factor=1, colorblind_type='Deuteranomaly')
+    # print(colors8)
+    colors6 = [(0.48702807223549177, 0.4242891647177821, 0.9480975665882982), (0.9146761531779931, 0.4970424422244128, 0.41460357267068376), (0.843602824944377, 0.6031154951690304, 0.9802318468625552), (0.5887251240359368, 0.9624135405893406, 0.4585532945832182), (0.422567523593921, 0.44218101996887993, 0.5516040738892886), (0.43399916426535, 0.7098723267606655, 0.6255076508970907)]
+    # colors8 = [(0.5450484248310105, 0.5130972742328073, 0.5102488831581509), (0.6109330873928905, 0.7193582681286009, 0.9814590256707204), (0.9727770320054765, 0.7854905796839438, 0.5145282365057959), (0.9806065670005477, 0.5066792697066322, 0.7311620666921056), (0.565920914907729, 0.9141080668353584, 0.7641066636691687), (0.5114677713143507, 0.5061193495393317, 0.9951605179132765), (0.5830073483609048, 0.5244350779880778, 0.7931264147573027), (0.5692188040526873, 0.7826586898074446, 0.5098679245540738)]
     # plot_lambda()
     # plot_tuningPolySVM()
-    # plot_tuningRBFSVM()
+    plot_tuningRBFSVM()
     # plot_tuningLinearSVMUnbalanced()
     # plot_tuning_LinearSVMBalanced()
 
