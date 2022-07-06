@@ -284,7 +284,7 @@ def plot_tuningLinearSVMUnbalanced():
         for j, (K, p) in enumerate(hyperparameters):
             DCFs = np.load(
                 f"../simulations/linearSVM/unbalanced/new/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}_PCA{str(m)}.npy")
-            axs[i].plot(C_values, DCFs, color=colors[j], label=r"$K=" + str(K) + r",\;\widetilde{\pi}=" + str(p) + r"$")
+            axs[i].plot(C_values, DCFs, color=colors[j], label=r"$K=" + str(K) + r",\;\widetilde{\pi}=" + str(p) + r"$", linewidth=3)
             if m is None:
                 axs[i].set_title(rf'Gau, no PCA, $\pi_T=0.5$')
             elif m == False:
