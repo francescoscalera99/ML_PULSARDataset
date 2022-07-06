@@ -1,0 +1,49 @@
++--------------------------------------------+---------+
+|              Hyperparameters               | act DCF |
++--------------------------------------------+---------+
+| PCA m=False, variant=full-cov, π_tilde=0.1 |  0.349  |
+| PCA m=False, variant=full-cov, π_tilde=0.5 |  0.161  |
+| PCA m=False, variant=full-cov, π_tilde=0.9 |  0.954  |
+| PCA m=None, variant=full-cov, π_tilde=0.1  |   0.4   |
+| PCA m=None, variant=full-cov, π_tilde=0.5  |  0.177  |
+| PCA m=None, variant=full-cov, π_tilde=0.9  |  0.888  |
+|   PCA m=7, variant=full-cov, π_tilde=0.1   |  0.396  |
+|   PCA m=7, variant=full-cov, π_tilde=0.5   |  0.181  |
+|   PCA m=7, variant=full-cov, π_tilde=0.9   |  0.873  |
+|   PCA m=5, variant=full-cov, π_tilde=0.1   |  0.388  |
+|   PCA m=5, variant=full-cov, π_tilde=0.5   |  0.187  |
+|   PCA m=5, variant=full-cov, π_tilde=0.9   |  0.782  |
+|   PCA m=4, variant=full-cov, π_tilde=0.1   |  0.346  |
+|   PCA m=4, variant=full-cov, π_tilde=0.5   |  0.177  |
+|   PCA m=4, variant=full-cov, π_tilde=0.9   |  0.768  |
+|   PCA m=False, variant=diag, π_tilde=0.1   |  0.567  |
+|   PCA m=False, variant=diag, π_tilde=0.5   |  0.195  |
+|   PCA m=False, variant=diag, π_tilde=0.9   |  1.219  |
+|   PCA m=None, variant=diag, π_tilde=0.1    |  0.432  |
+|   PCA m=None, variant=diag, π_tilde=0.5    |  0.158  |
+|   PCA m=None, variant=diag, π_tilde=0.9    |  0.901  |
+|     PCA m=7, variant=diag, π_tilde=0.1     |   0.27  |
+|     PCA m=7, variant=diag, π_tilde=0.5     |  0.172  |
+|     PCA m=7, variant=diag, π_tilde=0.9     |  0.708  |
+|     PCA m=5, variant=diag, π_tilde=0.1     |  0.252  |
+|     PCA m=5, variant=diag, π_tilde=0.5     |  0.166  |
+|     PCA m=5, variant=diag, π_tilde=0.9     |  0.724  |
+|     PCA m=4, variant=diag, π_tilde=0.1     |  0.268  |
+|     PCA m=4, variant=diag, π_tilde=0.5     |  0.176  |
+|     PCA m=4, variant=diag, π_tilde=0.9     |  0.711  |
+|   PCA m=False, variant=tied, π_tilde=0.1   |  0.274  |
+|   PCA m=False, variant=tied, π_tilde=0.5   |  0.191  |
+|   PCA m=False, variant=tied, π_tilde=0.9   |  1.422  |
+|   PCA m=None, variant=tied, π_tilde=0.1    |  0.247  |
+|   PCA m=None, variant=tied, π_tilde=0.5    |  0.139  |
+|   PCA m=None, variant=tied, π_tilde=0.9    |  0.606  |
+|     PCA m=7, variant=tied, π_tilde=0.1     |  0.251  |
+|     PCA m=7, variant=tied, π_tilde=0.5     |  0.143  |
+|     PCA m=7, variant=tied, π_tilde=0.9     |  0.588  |
+|     PCA m=5, variant=tied, π_tilde=0.1     |  0.259  |
+|     PCA m=5, variant=tied, π_tilde=0.5     |   0.15  |
+|     PCA m=5, variant=tied, π_tilde=0.9     |  0.639  |
+|     PCA m=4, variant=tied, π_tilde=0.1     |  0.269  |
+|     PCA m=4, variant=tied, π_tilde=0.5     |  0.146  |
+|     PCA m=4, variant=tied, π_tilde=0.9     |  0.615  |
++--------------------------------------------+---------+
