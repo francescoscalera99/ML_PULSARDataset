@@ -34,12 +34,10 @@ def MVG_simulations(training_data, training_labels, calibratedScore=False, actua
                                             variant=variant)
         if actualDCF:
             if calibratedScore:
-
-                priors_T_logReg = [0.5, 0.1, 0.9]
-
                 actDCF_cal = []
+                priors_T_logReg = [0.5, 0.1, 0.9]
                 for prior in priors_T_logReg:
-                    score = calibrateScores(llrs, evaluationLabels, 1e-4, pi_T=prior)
+                    score = calibrateScores(llrs, evaluationLabels, 1e-4, prior=prior)
                     act_DCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
                     actDCF_cal.append(round(act_DCF, 3))
                 table.add_row([f"PCA m={m}, variant={variant}, π_tilde={pi}", *actDCF_cal])
@@ -52,7 +50,7 @@ def MVG_simulations(training_data, training_labels, calibratedScore=False, actua
             min_dcf = compute_min_DCF(np.array(llrs), evaluationLabels, pi, 1, 1)
             table.add_row([f"Gaussianzed features, PCA m={m}, variant={variant}, π_tilde={pi}", round(min_dcf, 3)])
     print(table)
-    with open(f"results/MVG_ACT-{actualDCF}_calibrated-{calibratedScore}.txt", 'w') as f:
+    with open(f"results/actDCF/MVG_ACT-{actualDCF}_calibrated-{calibratedScore}.txt", 'w') as f:
         f.write(str(table))
 
 
@@ -99,8 +97,8 @@ def LR_simulations(training_data, training_labels, lbd, calibratedScore=False, a
             table.add_row([f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T}", round(min_dcf, 3)])
 
     print(table)
-    # with open(f"results/LR_ACT-{actualDCF}_calibrated-{calibratedScore}.txt", 'w') as f:
-    #     f.write(str(table))
+    with open(f"results/actDCF/LR_ACT-{actualDCF}_calibrated-{calibratedScore}.txt", 'w') as f:
+        f.write(str(table))
 
 
 def SVM_LinearUnbalancedSimulations(training_data, training_labels, K, C, calibratedScore=False, actualDCF=False):
@@ -151,7 +149,7 @@ def SVM_LinearUnbalancedSimulations(training_data, training_labels, K, C, calibr
             table.add_row([f"PCA m={m}, π_tilde={pi}, C ={C}", round(min_dcf, 3)])
 
     print(table)
-    with open(f"results/SVM_linear_unbalanced_ACT-{actualDCF}_calibrated-{calibratedScore}.txt", 'w') as f:
+    with open(f"results/actDCF/SVM_linear_unbalanced_ACT-{actualDCF}_calibrated-{calibratedScore}.txt", 'w') as f:
         f.write(str(table))
 
 
@@ -203,7 +201,7 @@ def SVM_LinearBalancedSimulations(training_data, training_labels, K, C, calibrat
             table.add_row([f"PCA m={m}, pi_T={pi_T}, π_tilde={pi}, C ={C}", round(min_dcf, 3)])
 
     print(table)
-    with open(f"results/SVM_linear_balanced_ACT-{actualDCF}_calibrated{calibratedScore}.txt", 'w') as f:
+    with open(f"results/actDCF/SVM_linear_balanced_ACT-{actualDCF}_calibrated{calibratedScore}.txt", 'w') as f:
         f.write(str(table))
 
 
@@ -254,7 +252,7 @@ def SVM_PolySimulations(training_data, training_labels, K, C, pi_T, c, d, actual
                 [f"PCA m={m}, π_tilde={pi}, pi_T = 0.5, C ={C} K={K}, c={c}, d={d}", round(min_dcf, 3)])
 
     print(table)
-    with open(f"results/SVM_Poly_ACT-{actualDCF}_calibrated{calibratedScore}.txt", 'w') as f:
+    with open(f"results/actDCF/SVM_Poly_ACT-{actualDCF}_calibrated{calibratedScore}.txt", 'w') as f:
         f.write(str(table))
 
 
@@ -303,7 +301,7 @@ def SVM_RBFSimulations(training_data, training_labels, K, C, pi_T, gamma, actual
             table.add_row([f"PCA m={m}, π_tilde={pi}, π_T={pi_T}  C ={C}", round(min_dcf, 3)])
 
     print(table)
-    with open(f"results/SVM_RBF_ACT-{actualDCF}_calibrated{calibratedScore}.txt", 'w') as f:
+    with open(f"results/actDCF/SVM_RBF_ACT-{actualDCF}_calibrated{calibratedScore}.txt", 'w') as f:
         f.write(str(table))
 
 
@@ -351,5 +349,5 @@ def GMM_Simulations(training_data, training_labels, g, alpha, psi, actualDCF=Fal
             table.add_row([f"PCA m={m}, raw data: {raw}, π_tilde={pi}, variant: {variant}, G={g}", round(min_dcf, 3)])
 
     print(table)
-    with open(f"results/GMM_ACT-{actualDCF}_calibrated{calibratedScore}.txt", 'w') as f:
+    with open(f"results/actDCF/GMM_ACT-{actualDCF}_calibrated{calibratedScore}.txt", 'w') as f:
         f.write(str(table))

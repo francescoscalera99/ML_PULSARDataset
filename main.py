@@ -4,10 +4,12 @@ import itertools
 
 import numpy as np
 
-from classifiers.GMM2 import tuning_componentsGMM
+from classifiers.GMM2 import tuning_componentsGMM, GMM
 # from classifiers.LR import tuning_lambda
+from classifiers.LR import LR
 from classifiers.MVG import MVG
-from classifiers.SVM import tuning_parameters_PolySVM, tuning_parameters_RBFSVM, tuning_parameters_LinearSVMBalanced
+from classifiers.SVM import tuning_parameters_PolySVM, tuning_parameters_RBFSVM, tuning_parameters_LinearSVMBalanced, \
+    SVM
 from preprocessing.preprocessing import PCA
 from simulations.simulations import MVG_simulations, GMM_Simulations, SVM_LinearUnbalancedSimulations, \
     SVM_PolySimulations, SVM_RBFSimulations, SVM_LinearBalancedSimulations, LR_simulations
@@ -49,7 +51,7 @@ def main():
     # =============== LOGISTIC REGRESSION ===============
     # tuning_lambda(training_data, training_labels)
     lbd = 1e-7
-    LR_simulations(training_data, training_labels, lbd)
+    # LR_simulations(training_data, training_labels, lbd)
 
     # =============== SUPPORT VECTOR MACHINE ===============
     # print("LINEAR SVM - TUNING PARAMETERS")
@@ -67,8 +69,8 @@ def main():
     # SVM_LinearUnbalancedSimulations(training_data, training_labels, K_LinearUnb, C_LinearUnb)
 
     # print(" ---------- SVM LINEAR BALANCED SIMULATION ----------")
-    # K_LinearB = 1.0  # This values comes from tuning of hyperparameters
-    # C_LinearB = 2e-2
+    K_LinearB = 1.0  # This values comes from tuning of hyperparameters
+    C_LinearB = 2e-2
     # SVM_LinearBalancedSimulations(training_data, training_labels, K_LinearB, C_LinearB)
 
     # print(" ---------- SVM POLY SIMULATION ----------")
@@ -87,7 +89,7 @@ def main():
 
     # =============== GAUSSIAN MIXTURE MODELS ===============
     # tuning_componentsGMM(training_data, training_labels, psi=0.01)
-    # g = 16
+    g = 16
     # GMM_Simulations(training_data, training_labels, g, alpha=0.1, psi=0.01)
 
     # =============== COMPUTING ACTUAL DCF ===============
@@ -100,24 +102,49 @@ def main():
 
     # =============== SCORE CALIBRATION ===============
     # print("============== MVG - SCORE CALIBRATION =============== ")
-    # MVG_simulations(training_data, training_labels, actualDCF=True, calibratedScore=True)
+    MVG_simulations(training_data, training_labels, actualDCF=True, calibratedScore=True)
+    # print("============== LR - SCORE CALIBRATION ===============")
+    LR_simulations(training_data, training_labels, lbd, actualDCF=True, calibratedScore=True)
     # print("============== SVM LINEAR UNBALANCED - SCORE CALIBRATION ===============")
     # SVM_LinearUnbalancedSimulations(training_data, training_labels, K_LinearUnb, C_LinearUnb, actualDCF=True, calibratedScore=True )
     # print("============== SVM LINEAR BALANCED - SCORE CALIBRATION ===============")
-    # SVM_LinearBalancedSimulations(training_data, training_labels, K_LinearB, C_LinearB, actualDCF=True, calibratedScore=True)
+    SVM_LinearBalancedSimulations(training_data, training_labels, K_LinearB, C_LinearB, actualDCF=True, calibratedScore=True)
     # print("============== SVM POLY - SCORE CALIBRATION ===============")
     # SVM_PolySimulations(training_data, training_labels, K_Poly, CPoly, pi_TPolyRBF, c, d, actualDCF=True, calibratedScore=True)
     # print("============== SVM RBF BALANCED - SCORE CALIBRATION ===============")
     # SVM_RBFSimulations(training_data, training_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF, actualDCF=True, calibratedScore=True)
-    # print("============== LR - SCORE CALIBRATION ===============")
-    # LR_simulations(training_data, training_labels, lbd, actualDCF=True, calibratedScore=True)
     # print("============== GMM - SCORE CALIBRATION ===============")
-    # GMM_Simulations(training_data, training_labels, g, alpha=0.1, psi=0.01, actualDCF=True, calibratedScore=True)
+    GMM_Simulations(training_data, training_labels, g, alpha=0.1, psi=0.01, actualDCF=True, calibratedScore=True)
 
     # =============== BAYES ERROR PLOT ==================
-    # print("=============== BAYES ERROR PLOT ==================")
-    # bayes_error_plots_data(training_data, training_labels, MVG, m=None, raw=False, variant="tied")
-    # bayes_error_plots(MVG)
+    # classifiers = [MVG, LR, SVM, GMM]
+    # args = [{"raw": False,
+    #          "m": None,
+    #          "variant": "tied"},
+    #         {"raw": False,
+    #          "m": None,
+    #          "lbd": lbd,
+    #          "pi_T": 0.5},
+    #         {"raw": False,
+    #          "m": None,
+    #          "k": K_LinearB,
+    #          "c": C_LinearB,
+    #          "pi_T": 0.5,
+    #          "balanced": True,
+    #          "kernel_type": "poly",
+    #          "kernel_params": (1, 0)},
+    #         {"raw": False,
+    #          "m": None,
+    #          "G": g,
+    #          "type": "full-cov",
+    #          "alpha": 0.1,
+    #          "psi": 0.1}]
+    #
+    # for i, classifier in enumerate(classifiers):
+    #     bayes_error_plots_data(training_data, training_labels, classifier, **args[i])
+    #
+    # for i, classifier in enumerate(classifiers):
+    #     bayes_error_plots(classifier)
 
     # =============== EXPERIMENTAL RESULT ===============
 

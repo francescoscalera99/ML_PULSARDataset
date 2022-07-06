@@ -5,7 +5,7 @@ from classifiers.Classifier import ClassifierClass
 from utils.matrix_utils import vrow
 # from utils.metrics_utils import compute_min_DCF
 # from utils.utils import k_fold
-from utils.utils import k_fold
+from utils.utils import k_fold, splitData_SingleFold
 
 
 class LR(ClassifierClass):
@@ -78,10 +78,25 @@ class LR(ClassifierClass):
 #     return calibratedScore
 #
 
+# def calibrateScores(scores, evaluationLabels, lambd, prior):
+#     # f(s) = as+b can be interpreted as the llr for the two class hypothesis
+#     # class posterior probability: as+b+log(pi/(1-pi)) = as +b'
+#     calibratedScore, calibratedEvaluationLabels = k_fold(vrow(scores), evaluationLabels, LR, 5, m=None, raw=True,
+#                                                          seed=0, lbd=lambd, pi_T=prior)
+#     calibratedScore = calibratedScore - np.log(prior / (1 - prior))
+#     return calibratedScore, calibratedEvaluationLabels
+
+
 def calibrateScores(scores, evaluationLabels, lambd, prior):
     # f(s) = as+b can be interpreted as the llr for the two class hypothesis
     # class posterior probability: as+b+log(pi/(1-pi)) = as +b'
-    calibratedScore, calibratedEvaluationLabels = k_fold(vrow(scores), evaluationLabels, LR, 5, m=None, raw=True,
-                                                         seed=0, lbd=lambd, pi_T=prior)
-    calibratedScore = calibratedScore - np.log(prior / (1 - prior))
-    return calibratedScore, calibratedEvaluationLabels
+
+    (cal_set, cal_labels), (val_set, val_labels) = splitData_SingleFold(scores, evaluationLabels, seed=0)
+
+    lr = LR(cal_set, cal_labels, lbd=lambd, pi_T=prior)
+    lr.train_model()
+    lr.classify(val_set, None)
+
+    calibrated_scores = lr.get_llrs()
+
+    return calibrated_scores, val_labels
