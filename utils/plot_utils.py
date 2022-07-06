@@ -270,9 +270,11 @@ def plot_tuningLinearSVMUnbalanced():
         "text.usetex": True,
         "font.family": "sans-serif",
         "font.sans-serif": ["Computer Modern Serif"],
-        "axes.titlesize": 17,
-        "axes.labelsize": 15,
-        "legend.fontsize": 12
+        "axes.titlesize": 22,
+        "axes.labelsize": 30,
+        "legend.fontsize": 20,
+        "xtick.labelsize": 30,
+        "ytick.labelsize": 30,
     })
 
     fig, axs = plt.subplots(1, 4, sharey='row')
@@ -284,20 +286,27 @@ def plot_tuningLinearSVMUnbalanced():
                 f"../simulations/linearSVM/unbalanced/new/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}_PCA{str(m)}.npy")
             axs[i].plot(C_values, DCFs, color=colors[j], label=r"$K=" + str(K) + r",\;\widetilde{\pi}=" + str(p) + r"$")
             if m is None:
-                axs[i].set_title(rf'Gaussianized features, $\pi_T=0.5$')
+                axs[i].set_title(rf'Gau, no PCA, $\pi_T=0.5$')
             elif m == False:
-                axs[i].set_title(rf'Raw features, $\pi_T=0.5$')
+                axs[i].set_title(rf'Raw, no PCA, $\pi_T=0.5$')
             else:
-                axs[i].set_title(rf'Gaussianized features, PCA ($m = {m}$), $\pi_T=0.5$')
-            axs[i].legend()
+                axs[i].set_title(rf'Gau, PCA ($m = {m}$), $\pi_T=0.5$')
+            # axs[i].legend()
             axs[i].set_xlabel('$C$')
             axs[i].set_ylabel('$minDCF$')
             axs[i].set_xscale('log')
             axs[i].yaxis.set_tick_params(labelbottom=True)
+            axs[i].set_xticks([10**i for i in range(-2, 3, 2)])
         i += 1
     fig.set_size_inches(20, 5)
     fig.tight_layout()
     fig.show()
+
+    label_params = axs[0].get_legend_handles_labels()
+    figl, axl = plt.subplots(figsize=(6.5, 5))
+    axl.axis(False)
+    axl.legend(*label_params, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
+    figl.show()
 
 
 def plot_tuning_LinearSVMBalanced():
@@ -464,14 +473,14 @@ def bayes_error_plots(classifier):
 
 
 if __name__ == '__main__':
-    # colors = distinctipy.get_colors(6, pastel_factor=0.7, colorblind_type='Deuteranomaly')
+    colors = distinctipy.get_colors(6, pastel_factor=0.7, colorblind_type='Deuteranomaly')
     # print(colors)
-    colors = [(0.48702807223549177, 0.4242891647177821, 0.9480975665882982), (0.9146761531779931, 0.4970424422244128, 0.41460357267068376), (0.843602824944377, 0.6031154951690304, 0.9802318468625552), (0.5887251240359368, 0.9624135405893406, 0.4585532945832182), (0.422567523593921, 0.44218101996887993, 0.5516040738892886), (0.43399916426535, 0.7098723267606655, 0.6255076508970907)]
+    # colors = [(0.48702807223549177, 0.4242891647177821, 0.9480975665882982), (0.9146761531779931, 0.4970424422244128, 0.41460357267068376), (0.843602824944377, 0.6031154951690304, 0.9802318468625552), (0.5887251240359368, 0.9624135405893406, 0.4585532945832182), (0.422567523593921, 0.44218101996887993, 0.5516040738892886), (0.43399916426535, 0.7098723267606655, 0.6255076508970907)]
     # plot_lambda()
     # plot_tuningPolySVM()
     # plot_tuningRBFSVM()
-    # plot_tuningLinearSVMUnbalanced()
-    plot_tuning_LinearSVMBalanced()
+    plot_tuningLinearSVMUnbalanced()
+    # plot_tuning_LinearSVMBalanced()
 
     # print(os.path.abspath("../simulations/GMM/GMM_rawFeature-False_PCA7_diag.npy"))
     # plot_tuningGMM2()
