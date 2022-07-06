@@ -278,7 +278,7 @@ def plot_tuningLinearSVMUnbalanced():
     })
 
     fig, axs = plt.subplots(1, 4, sharey='row')
-    colors = distinctipy.get_colors(6, pastel_factor=0.7)
+    # colors = distinctipy.get_colors(6, pastel_factor=0.7)
     for m in m_values:
         hyperparameters = itertools.product(K_values, priors)
         for j, (K, p) in enumerate(hyperparameters):
@@ -473,9 +473,9 @@ def bayes_error_plots(classifier):
 
 
 if __name__ == '__main__':
-    colors = distinctipy.get_colors(6, pastel_factor=0.7, colorblind_type='Deuteranomaly')
+    # colors = distinctipy.get_colors(6, pastel_factor=0.7, colorblind_type='Deuteranomaly')
     # print(colors)
-    # colors = [(0.48702807223549177, 0.4242891647177821, 0.9480975665882982), (0.9146761531779931, 0.4970424422244128, 0.41460357267068376), (0.843602824944377, 0.6031154951690304, 0.9802318468625552), (0.5887251240359368, 0.9624135405893406, 0.4585532945832182), (0.422567523593921, 0.44218101996887993, 0.5516040738892886), (0.43399916426535, 0.7098723267606655, 0.6255076508970907)]
+    colors = [(0.48702807223549177, 0.4242891647177821, 0.9480975665882982), (0.9146761531779931, 0.4970424422244128, 0.41460357267068376), (0.843602824944377, 0.6031154951690304, 0.9802318468625552), (0.5887251240359368, 0.9624135405893406, 0.4585532945832182), (0.422567523593921, 0.44218101996887993, 0.5516040738892886), (0.43399916426535, 0.7098723267606655, 0.6255076508970907)]
     # plot_lambda()
     # plot_tuningPolySVM()
     # plot_tuningRBFSVM()
