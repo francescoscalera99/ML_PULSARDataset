@@ -91,8 +91,7 @@ def calibrateScores(scores, evaluationLabels, lambd, prior):
     # f(s) = as+b can be interpreted as the llr for the two class hypothesis
     # class posterior probability: as+b+log(pi/(1-pi)) = as +b'
 
-    (cal_set, cal_labels), (val_set, val_labels) = splitData_SingleFold(scores, evaluationLabels, seed=0)
-
+    (cal_set, cal_labels), (val_set, val_labels) = splitData_SingleFold(vrow(scores), evaluationLabels, seed=0)
     lr = LR(cal_set, cal_labels, lbd=lambd, pi_T=prior)
     lr.train_model()
     lr.classify(val_set, None)

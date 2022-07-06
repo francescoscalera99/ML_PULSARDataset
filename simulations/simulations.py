@@ -37,8 +37,8 @@ def MVG_simulations(training_data, training_labels, calibratedScore=False, actua
                 actDCF_cal = []
                 priors_T_logReg = [0.5, 0.1, 0.9]
                 for prior in priors_T_logReg:
-                    score = calibrateScores(llrs, evaluationLabels, 1e-4, prior=prior)
-                    act_DCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
+                    score, labels = calibrateScores(llrs, evaluationLabels, 1e-4, prior=prior)
+                    act_DCF = compute_actual_DCF(score, labels, pi, 1, 1)
                     actDCF_cal.append(round(act_DCF, 3))
                 table.add_row([f"PCA m={m}, variant={variant}, π_tilde={pi}", *actDCF_cal])
                 print(f"PCA m={m}, variant={variant}, π_tilde={pi}", "-->", *actDCF_cal)
@@ -83,8 +83,8 @@ def LR_simulations(training_data, training_labels, lbd, calibratedScore=False, a
                 actDCF_cal = []
                 priors_logReg = [0.5, 0.1, 0.9]
                 for prior in priors_logReg:
-                    score = calibrateScores(llrs, evaluationLabels, 1e-4, prior)
-                    act_DCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
+                    score, labels = calibrateScores(llrs, evaluationLabels, 1e-4, prior)
+                    act_DCF = compute_actual_DCF(score, labels, pi, 1, 1)
                     actDCF_cal.append(round(act_DCF, 3))
                 print(f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T}", "-->", *actDCF_cal)
                 table.add_row([f"PCA m={m}, data: gaussianized, π_tilde={pi}, π_T={pi_T}", *actDCF_cal])
@@ -133,8 +133,8 @@ def SVM_LinearUnbalancedSimulations(training_data, training_labels, K, C, calibr
                 actDCF_cal = []
                 priors_logReg = [0.5, 0.1, 0.9]
                 for prior in priors_logReg:
-                    score = calibrateScores(llrs, evaluationLabels, 1e-4, prior)
-                    act_DCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
+                    score, labels = calibrateScores(llrs, evaluationLabels, 1e-4, prior)
+                    act_DCF = compute_actual_DCF(score, labels, pi, 1, 1)
                     actDCF_cal.append(round(act_DCF, 3))
                 table.add_row([f"PCA m={m} π_tilde={pi}, C ={C}, K{K} --> ", *actDCF_cal])
             else:
@@ -185,8 +185,8 @@ def SVM_LinearBalancedSimulations(training_data, training_labels, K, C, calibrat
                 actDCF_cal = []
                 priors_logReg = [0.5, 0.1, 0.9]
                 for prior in priors_logReg:
-                    score = calibrateScores(llrs, evaluationLabels, 1e-4, prior)
-                    act_DCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
+                    score, labels = calibrateScores(llrs, evaluationLabels, 1e-4, prior)
+                    act_DCF = compute_actual_DCF(score, labels, pi, 1, 1)
                     actDCF_cal.append(round(act_DCF, 3))
                 table.add_row([f"PCA m={m}, pi_T={pi_T}, π_tilde={pi}, C ={C}", *actDCF_cal])
             else:
@@ -234,8 +234,8 @@ def SVM_PolySimulations(training_data, training_labels, K, C, pi_T, c, d, actual
                 actDCF_cal = []
                 priors_logReg = [0.5, 0.1, 0.9]
                 for prior in priors_logReg:
-                    score = calibrateScores(llrs, evaluationLabels, 1e-4, prior)
-                    act_DCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
+                    score, labels = calibrateScores(llrs, evaluationLabels, 1e-4, prior)
+                    act_DCF = compute_actual_DCF(score, labels, pi, 1, 1)
                     actDCF_cal.append(round(act_DCF, 3))
                 table.add_row([f"PCA m={m}, π_tilde={pi}, pi_T = 0.5, C ={C} K={K}, c={c}, d={d}", *actDCF_cal])
             else:
@@ -286,8 +286,8 @@ def SVM_RBFSimulations(training_data, training_labels, K, C, pi_T, gamma, actual
                 actDCF_cal = []
                 priors_logReg = [0.5, 0.1, 0.9]
                 for prior in priors_logReg:
-                    score = calibrateScores(llrs, evaluationLabels, 1e-4, prior)
-                    act_DCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
+                    score, labels = calibrateScores(llrs, evaluationLabels, 1e-4, prior)
+                    act_DCF = compute_actual_DCF(score, labels, pi, 1, 1)
                     actDCF_cal.append(round(act_DCF, 3))
                 table.add_row([f"PCA m={m}, π_tilde={pi}, π_T={pi_T}  C ={C}", *actDCF_cal])
             else:
@@ -333,8 +333,8 @@ def GMM_Simulations(training_data, training_labels, g, alpha, psi, actualDCF=Fal
                 actDCF_cal = []
                 priors_logReg = [0.5, 0.1, 0.9]
                 for prior in priors_logReg:
-                    score = calibrateScores(llrs, evaluationLabels, 1e-4, prior)
-                    act_DCF = compute_actual_DCF(score, evaluationLabels, pi, 1, 1)
+                    score, labels = calibrateScores(llrs, evaluationLabels, 1e-4, prior)
+                    act_DCF = compute_actual_DCF(score, labels, pi, 1, 1)
                     actDCF_cal.append(round(act_DCF, 3))
                 print(f"PCA m={m}, raw data: {raw}, π_tilde={pi}, variant: {variant}, G={g}", "-->", *actDCF_cal)
                 table.add_row([f"PCA m={m}, raw data: {raw}, π_tilde={pi}, variant: {variant}, G={g}", *actDCF_cal])
