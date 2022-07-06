@@ -1,0 +1,40 @@
++-------------------------------------------------------+---------------+--------------+---------------+
+|                    Hyperparameters                    | act DCF (0.5) | actDCF (0.1) | act DCF (0.9) |
++-------------------------------------------------------+---------------+--------------+---------------+
+| PCA m=False, data: gaussianized, π_tilde=0.5, π_T=0.5 |     0.172     |    0.396     |     0.765     |
+| PCA m=False, data: gaussianized, π_tilde=0.5, π_T=0.1 |     0.249     |    0.311     |     0.881     |
+| PCA m=False, data: gaussianized, π_tilde=0.5, π_T=0.9 |     0.196     |    0.506     |     0.516     |
+| PCA m=False, data: gaussianized, π_tilde=0.1, π_T=0.5 |     0.411     |    0.687     |     0.326     |
+| PCA m=False, data: gaussianized, π_tilde=0.1, π_T=0.1 |     0.697     |    0.704     |     0.324     |
+| PCA m=False, data: gaussianized, π_tilde=0.1, π_T=0.9 |     0.566     |    0.863     |     0.392     |
+| PCA m=False, data: gaussianized, π_tilde=0.9, π_T=0.5 |     0.934     |    0.713     |      1.0      |
+| PCA m=False, data: gaussianized, π_tilde=0.9, π_T=0.1 |     0.779     |     0.72     |      1.0      |
+| PCA m=False, data: gaussianized, π_tilde=0.9, π_T=0.9 |     0.921     |    0.643     |     0.999     |
+|  PCA m=None, data: gaussianized, π_tilde=0.5, π_T=0.5 |     0.173     |    0.982     |     0.969     |
+|  PCA m=None, data: gaussianized, π_tilde=0.5, π_T=0.1 |     0.164     |    0.989     |     0.999     |
+|  PCA m=None, data: gaussianized, π_tilde=0.5, π_T=0.9 |     0.168     |     1.0      |     0.629     |
+|  PCA m=None, data: gaussianized, π_tilde=0.1, π_T=0.5 |     0.958     |     1.0      |      0.35     |
+|  PCA m=None, data: gaussianized, π_tilde=0.1, π_T=0.1 |      1.0      |     1.0      |     0.651     |
+|  PCA m=None, data: gaussianized, π_tilde=0.1, π_T=0.9 |     0.954     |     1.0      |     0.449     |
+|  PCA m=None, data: gaussianized, π_tilde=0.9, π_T=0.5 |     0.967     |    0.686     |      1.0      |
+|  PCA m=None, data: gaussianized, π_tilde=0.9, π_T=0.1 |     0.983     |    0.687     |      1.0      |
+|  PCA m=None, data: gaussianized, π_tilde=0.9, π_T=0.9 |     0.926     |    0.718     |     0.999     |
+|   PCA m=7, data: gaussianized, π_tilde=0.5, π_T=0.5   |     0.173     |    0.982     |      0.97     |
+|   PCA m=7, data: gaussianized, π_tilde=0.5, π_T=0.1   |     0.164     |    0.989     |     0.999     |
+|   PCA m=7, data: gaussianized, π_tilde=0.5, π_T=0.9   |     0.168     |     1.0      |     0.629     |
+|   PCA m=7, data: gaussianized, π_tilde=0.1, π_T=0.5   |     0.958     |     1.0      |      0.35     |
+|   PCA m=7, data: gaussianized, π_tilde=0.1, π_T=0.1   |      1.0      |     1.0      |     0.651     |
+|   PCA m=7, data: gaussianized, π_tilde=0.1, π_T=0.9   |     0.954     |     1.0      |     0.449     |
+|   PCA m=7, data: gaussianized, π_tilde=0.9, π_T=0.5   |     0.967     |    0.686     |      1.0      |
+|   PCA m=7, data: gaussianized, π_tilde=0.9, π_T=0.1   |     0.983     |    0.687     |      1.0      |
+|   PCA m=7, data: gaussianized, π_tilde=0.9, π_T=0.9   |     0.926     |    0.718     |     0.999     |
+|   PCA m=5, data: gaussianized, π_tilde=0.5, π_T=0.5   |     0.173     |    0.982     |      0.97     |
+|   PCA m=5, data: gaussianized, π_tilde=0.5, π_T=0.1   |     0.164     |    0.993     |     0.999     |
+|   PCA m=5, data: gaussianized, π_tilde=0.5, π_T=0.9   |     0.168     |     1.0      |     0.629     |
+|   PCA m=5, data: gaussianized, π_tilde=0.1, π_T=0.5   |     0.954     |     1.0      |      0.35     |
+|   PCA m=5, data: gaussianized, π_tilde=0.1, π_T=0.1   |      1.0      |     1.0      |     0.647     |
+|   PCA m=5, data: gaussianized, π_tilde=0.1, π_T=0.9   |     0.958     |     1.0      |     0.449     |
+|   PCA m=5, data: gaussianized, π_tilde=0.9, π_T=0.5   |     0.966     |    0.686     |      1.0      |
+|   PCA m=5, data: gaussianized, π_tilde=0.9, π_T=0.1   |     0.983     |    0.686     |      1.0      |
+|   PCA m=5, data: gaussianized, π_tilde=0.9, π_T=0.9   |     0.926     |    0.718     |     0.999     |
++-------------------------------------------------------+---------------+--------------+---------------+
