@@ -105,19 +105,19 @@ def main():
 
     # =============== SCORE CALIBRATION ===============
     # print("============== MVG - SCORE CALIBRATION =============== ")
-    MVG_simulations(training_data, training_labels, actualDCF=True, calibratedScore=True)
+    # MVG_simulations(training_data, training_labels, actualDCF=True, calibratedScore=True)
     # print("============== LR - SCORE CALIBRATION ===============")
-    LR_simulations(training_data, training_labels, lbd, actualDCF=True, calibratedScore=True)
+    # LR_simulations(training_data, training_labels, lbd, actualDCF=True, calibratedScore=True)
     # print("============== SVM LINEAR UNBALANCED - SCORE CALIBRATION ===============")
     # SVM_LinearUnbalancedSimulations(training_data, training_labels, K_LinearUnb, C_LinearUnb, actualDCF=True, calibratedScore=True )
     # print("============== SVM LINEAR BALANCED - SCORE CALIBRATION ===============")
-    SVM_LinearBalancedSimulations(training_data, training_labels, K_LinearB, C_LinearB, actualDCF=True, calibratedScore=True)
+    # SVM_LinearBalancedSimulations(training_data, training_labels, K_LinearB, C_LinearB, actualDCF=True, calibratedScore=True)
     # print("============== SVM POLY - SCORE CALIBRATION ===============")
     # SVM_PolySimulations(training_data, training_labels, K_Poly, CPoly, pi_TPolyRBF, c, d, actualDCF=True, calibratedScore=True)
     # print("============== SVM RBF BALANCED - SCORE CALIBRATION ===============")
     # SVM_RBFSimulations(training_data, training_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF, actualDCF=True, calibratedScore=True)
     # print("============== GMM - SCORE CALIBRATION ===============")
-    GMM_Simulations(training_data, training_labels, g, alpha=0.1, psi=0.01, actualDCF=True, calibratedScore=True)
+    # GMM_Simulations(training_data, training_labels, g, alpha=0.1, psi=0.01, actualDCF=True, calibratedScore=True)
 
     # =============== BAYES ERROR PLOT ==================
     # classifiers = [MVG, LR, SVM, GMM]
@@ -150,20 +150,20 @@ def main():
     #     bayes_error_plots(classifier)
 
     # =============== EXPERIMENTAL RESULT ===============
-    print("============= MVG EVALUATION =============")
-    MVG_evaluation(training_data, training_labels, testing_data, testing_labels)
-    print("============= LR EVALUATION ===============")
-    LR_evaluation(training_data, training_labels, testing_data, testing_labels, lbd)
+    # print("============= MVG EVALUATION =============")
+    # MVG_evaluation(training_data, training_labels, testing_data, testing_labels)
+    # print("============= LR EVALUATION ===============")
+    # LR_evaluation(training_data, training_labels, testing_data, testing_labels, lbd)
     print("============ SVM LINEAR UNBALANCED EVALUATION ==========")
     SVM_LinearUnbalanced_evaluation(training_data, training_labels, testing_data, testing_labels, K_LinearUnb, C_LinearUnb)
-    print("============ SVM LINEAR BALANCED EVALUATION ==========")
-    SVM_LinearBalanced_evaluation(training_data, training_labels, testing_data, testing_labels, K_LinearB, C_LinearB)
-    print("============ SVM POLY EVALUATION ==========")
-    SVM_Poly_evaluation(training_data, training_labels, testing_data, testing_labels, K_Poly, CPoly, pi_TPolyRBF, c, d)
-    print("============ SVM RBF EVALUATION ==========")
-    SVM_RBF_evaluation(training_data, training_labels, testing_data, testing_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF)
-    print("============ GMM EVALUATION ==========")
-    GMM_evaluation(training_data, training_labels, testing_data, testing_labels, g, alpha=0.1, psi=0.01)
+    # print("============ SVM LINEAR BALANCED EVALUATION ==========")
+    # SVM_LinearBalanced_evaluation(training_data, training_labels, testing_data, testing_labels, K_LinearB, C_LinearB)
+    # print("============ SVM POLY EVALUATION ==========")
+    # SVM_Poly_evaluation(training_data, training_labels, testing_data, testing_labels, K_Poly, CPoly, pi_TPolyRBF, c, d)
+    # print("============ SVM RBF EVALUATION ==========")
+    # SVM_RBF_evaluation(training_data, training_labels, testing_data, testing_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF)
+    # print("============ GMM EVALUATION ==========")
+    # GMM_evaluation(training_data, training_labels, testing_data, testing_labels, g, alpha=0.1, psi=0.01)
 
     # ****************** TURN OFF PC AT END OF SIMULATION (needs sudo) ******************
     # (windows ?)
