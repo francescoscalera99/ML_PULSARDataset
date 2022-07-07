@@ -511,15 +511,72 @@ def bayes_error_plots(classifier):
     plt.savefig(fname=f"outputs/bayes_error_plots/{classifier.__name__}")
     plt.show()
 
+def plot_lambda_evaluation():
+    lbd_values = np.logspace(-8, -5, 20)
+    lbd_values = np.array([0, *lbd_values])
+    lbd_values2 = np.logspace(-5, 5, 50)
+
+    lbd_values = np.array([*lbd_values, *lbd_values2[1:]])
+    m_values = [False, None, 7, 5]
+    prior = [0.5, 0.1, 0.9]
+
+    i = 0
+    fig, axs = plt.subplots(2, 2)
+    fig.set_size_inches(10, 8)
+    # fig.suptitle('Tuning hyperparameter λ')
+    plt.rcParams['text.usetex'] = True
+
+    colors = ['red', 'blue', 'green']
+    for m in m_values:
+        for j, pi in enumerate(prior):
+            DCF1 = np.load(
+                f"../simulations/LR/LR_0_prior_{str(pi).replace('.', '-')}_PCA{str(m)}.npy")
+
+            DCF2 = np.load(
+                f"../simulations/LR/LR_prior_{str(pi).replace('.', '-')}_PCA{str(m)}.npy")
+
+            DCFs = np.array([*DCF1, *DCF2[1:]])
+            DCFs_evaluation = np.load(f"../simulations/evaluation/LR/LR_prior_{str(pi).replace('.', '-')}_PCA{str(m)}.npy")
+
+            axs[i // 2, i % 2].plot(lbd_values, DCFs, color=colors[j], label=r"$\widetilde{\pi}=$" + f"{pi}")
+            axs[i // 2, i % 2].plot(lbd_values, DCFs_evaluation, color=colors[j], label=r"$\widetilde{\pi}=$" + f"{pi} (eval.)")
+            if m == False:
+                axs[i // 2, i % 2].set_title(f'5-fold, Raw features')
+            elif m is None:
+                axs[i // 2, i % 2].set_title(f'5-fold, no PCA')
+            else:
+                axs[i // 2, i % 2].set_title(f'5-fold, PCA (m={m})')
+
+            axs[i // 2, i % 2].set_xlabel('λ')
+            axs[i // 2, i % 2].set_ylabel('minDCF')
+            axs[i // 2, i % 2].set_xscale('log')
+
+            xticks = [1.e-09, 1.e-08, 1.e-06, 1.e-04, 1.e-02, 1.e+00, 1.e+02, 1.e+04, 1.e+06]
+            xlabels = [r"$0$", r"$10^{-8}$", r"$10^{-6}$", r"$10^{-4}$", r"$10^{-2}$", r"$10^0$", r"$10^2$", r"$10^4$",
+                       r"$10^6$"]
+
+            axs[i // 2, i % 2].set_xticks(xticks, xlabels)
+            axs[i // 2, i % 2].get_xaxis().get_major_formatter().labelOnlyBase = False
+        i += 1
+    # fig.set_size_inches(10, 10)
+    # fig.tight_layout()
+    lines_labels = [ax.get_legend_handles_labels() for ax in fig.axes]
+    lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
+    fig.legend(lines[:3], labels[:3], loc=10, prop={'size': 10})
+    # fig.legend(lines[:3], labels[:3], loc=10, prop={'size': 10})
+    # fig.subplots_adjust(wspace=0.3, hspace=0.6)
+    # fig.subplots_adjust(top=0.88)
+    fig.tight_layout()
+    fig.show()
 
 if __name__ == '__main__':
     # colors8 = distinctipy.get_colors(8, pastel_factor=1, colorblind_type='Deuteranomaly')
     # print(colors8)
-    colors6 = [(0.48702807223549177, 0.4242891647177821, 0.9480975665882982), (0.9146761531779931, 0.4970424422244128, 0.41460357267068376), (0.843602824944377, 0.6031154951690304, 0.9802318468625552), (0.5887251240359368, 0.9624135405893406, 0.4585532945832182), (0.422567523593921, 0.44218101996887993, 0.5516040738892886), (0.43399916426535, 0.7098723267606655, 0.6255076508970907)]
+    # colors6 = [(0.48702807223549177, 0.4242891647177821, 0.9480975665882982), (0.9146761531779931, 0.4970424422244128, 0.41460357267068376), (0.843602824944377, 0.6031154951690304, 0.9802318468625552), (0.5887251240359368, 0.9624135405893406, 0.4585532945832182), (0.422567523593921, 0.44218101996887993, 0.5516040738892886), (0.43399916426535, 0.7098723267606655, 0.6255076508970907)]
     # colors8 = [(0.5450484248310105, 0.5130972742328073, 0.5102488831581509), (0.6109330873928905, 0.7193582681286009, 0.9814590256707204), (0.9727770320054765, 0.7854905796839438, 0.5145282365057959), (0.9806065670005477, 0.5066792697066322, 0.7311620666921056), (0.565920914907729, 0.9141080668353584, 0.7641066636691687), (0.5114677713143507, 0.5061193495393317, 0.9951605179132765), (0.5830073483609048, 0.5244350779880778, 0.7931264147573027), (0.5692188040526873, 0.7826586898074446, 0.5098679245540738)]
-    # plot_lambda()
+    plot_lambda()
     # plot_tuningPolySVM()
-    plot_tuningRBFSVM()
+    # plot_tuningRBFSVM()
     # plot_tuningLinearSVMUnbalanced()
     # plot_tuning_LinearSVMBalanced()
 
