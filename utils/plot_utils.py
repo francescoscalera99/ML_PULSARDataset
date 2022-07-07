@@ -203,7 +203,7 @@ def plot_tuningPolySVM():
         "font.sans-serif": ["Computer Modern Serif"],
         "axes.titlesize": 28,
         "axes.labelsize": 30,
-        "legend.fontsize": 13,
+        "legend.fontsize": 15,
         "xtick.labelsize": 30,
         "ytick.labelsize": 30,
     })
@@ -221,7 +221,7 @@ def plot_tuningPolySVM():
             else:
                 axs[i].set_title(f'5-fold, PCA (m = {m})')
             if i == 0:
-                axs[i].legend(ncol=2)
+                axs[i].legend(ncol=1, loc="upper right")
             axs[i].set_xlabel(r"$C$")
             axs[i].set_ylabel(r"$minDCF$")
             axs[i].set_xscale('log')
@@ -247,18 +247,21 @@ def plot_tuningRBFSVM():
     gamma_exp = [-2, -3, -4]
     i = 0
     plt.clf()
-    fig, axs = plt.subplots(1, 3, sharey="all")
+
     # fig.suptitle('RBF SVM')
+    print(plt.rcParams)
     plt.rcParams.update({
         "text.usetex": True,
-        "font.family": "sans-serif",
-        "font.sans-serif": ["Computer Modern Serif"],
         "axes.titlesize": 28,
-        "axes.labelsize": 30,
+        "axes.labelsize": 20,
         "legend.fontsize": 16,
         "xtick.labelsize": 30,
         "ytick.labelsize": 30,
     })
+    print("****************")
+    print(plt.rcParams)
+
+    fig, axs = plt.subplots(1, 3, sharey="all")
 
     # num_colors = len(K_values) * len(gamma_values)
     # colors = distinctipy.get_colors(num_colors, pastel_factor=0.7)
@@ -266,7 +269,7 @@ def plot_tuningRBFSVM():
     for m in m_values:
         hyperparameters = itertools.product(K_values, gamma_exp)
         for j, (K, g_exp) in enumerate(hyperparameters):
-            gamma=10**g_exp
+            gamma = 10 ** g_exp
             DCFs = np.load(
                 f"../simulations/RBF/RBF_K{str(K).replace('.', '-')}_c{str(gamma).replace('.', '-')}_PCA{str(m)}.npy")
             lb = r"$\gamma = 10^{" + str(g_exp) + "}$"
@@ -322,7 +325,8 @@ def plot_tuningLinearSVMUnbalanced():
         for j, (K, p) in enumerate(hyperparameters):
             DCFs = np.load(
                 f"../simulations/linearSVM/unbalanced/new/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}_PCA{str(m)}.npy")
-            axs[i].plot(C_values, DCFs, color=colors[j], label=r"$K=" + str(K) + r",\;\widetilde{\pi}=" + str(p) + r"$", linewidth=3)
+            axs[i].plot(C_values, DCFs, color=colors[j], label=r"$K=" + str(K) + r",\;\widetilde{\pi}=" + str(p) + r"$",
+                        linewidth=3)
             if m is None:
                 axs[i].set_title(rf"Gau, no PCA, $\pi_T=0.5$")
             elif m == False:
@@ -334,7 +338,7 @@ def plot_tuningLinearSVMUnbalanced():
             axs[i].set_ylabel('$minDCF$')
             axs[i].set_xscale('log')
             axs[i].yaxis.set_tick_params(labelbottom=True)
-            axs[i].set_xticks([10**i for i in range(-2, 3, 2)])
+            axs[i].set_xticks([10 ** i for i in range(-2, 3, 2)])
         i += 1
     fig.set_size_inches(20, 5)
     fig.tight_layout()
@@ -375,7 +379,8 @@ def plot_tuning_LinearSVMBalanced():
             for idx, (K, pi) in enumerate(hyperparameters):
                 DCFs = np.load(
                     f"../simulations/linearSVM/balanced/K{str(K).replace('.', '-')}_p{str(pi).replace('.', '-')}_pT{str(pi_T).replace('.', '-')}_PCA{str(m)}.npy")
-                axs[i, j].plot(C_values, DCFs, color=colors[idx], label=rf"$K={K}$,\;" + r"$\widetilde{\pi}=$" + f"{pi}", linewidth=3)
+                axs[i, j].plot(C_values, DCFs, color=colors[idx],
+                               label=rf"$K={K}$,\;" + r"$\widetilde{\pi}=$" + f"{pi}", linewidth=3)
                 if m is None:
                     axs[i, j].set_title('Gau, no PCA' + rf", $\pi_T={pi_T}$")
                 elif m == False:
@@ -462,15 +467,16 @@ def plot_tuningGMM2():
         "text.usetex": True,
         "font.family": "sans-serif",
         "font.sans-serif": ["Computer Modern Serif"],
-        # "axes.titlesize": 22,
-        "xtick.labelsize": 15,
-        "ytick.labelsize": 15,
-        "legend.fontsize": 12
+        "axes.titlesize": 30,
+        "axes.labelsize": 30,
+        "legend.fontsize": 20,
+        "xtick.labelsize": 30,
+        "ytick.labelsize": 30,
     })
 
     fig, axs = plt.subplots(3, 2)
     fig.set_size_inches(15, 10)
-    colors = distinctipy.get_colors(6, pastel_factor=0.7)
+    # colors = distinctipy.get_colors(6, pastel_factor=0.7)
     y = np.arange(0.0, 1.1, 0.2)
 
     for i, (variant, m) in enumerate(itertools.product(variants, m_values)):
@@ -478,7 +484,7 @@ def plot_tuningGMM2():
             pp = '' if p == 0.5 else "_pi" + str(p).replace('.', '-')
             DCFs = np.load(f"../simulations/GMM/GMM_rawFeature-{r}_PCA{m}_{variant}{pp}.npy")
             label = r"$\widetilde{\pi}=$" + f"{p}, {'raw' if r else 'gau'}"
-            axs[i // 2, i % 2].plot(components_values, DCFs, label=label, color=colors[j])
+            axs[i // 2, i % 2].plot(components_values, DCFs, label=label, color=colors6[j], linewidth=2)
             axs[i // 2, i % 2].set_xscale('log', base=2)
             axs[i // 2, i % 2].set_xticks(components_values)
             axs[i // 2, i % 2].set_yticks(y)
@@ -500,15 +506,75 @@ def bayes_error_plots(classifier):
     effPriorLogOdds = np.linspace(-3, 3, 21)
     minDCF = np.load(f"simulations/bayesErrorPlot/{classifier.__name__}_minDCF.npy")
     actDCF = np.load(f"simulations/bayesErrorPlot/{classifier.__name__}_actDCF.npy")
-    actDCF_cal = np.load(f"simulations/bayesErrorPlot/{classifier.__name__}_actDCF_Calibrated.npy")
+    # actDCF_cal = np.load(f"simulations/bayesErrorPlot/{classifier.__name__}_actDCF_Calibrated.npy")
 
     plt.clf()
-    plt.plot(effPriorLogOdds, minDCF, label="minDCF")
-    plt.plot(effPriorLogOdds, actDCF, label="actDCF")
-    plt.plot(effPriorLogOdds, actDCF_cal, label="actDCF (cal.)")
+    plt.rcParams.update({
+        "text.usetex": True,
+        "font.family": "sans-serif",
+        "font.sans-serif": ["Computer Modern Serif"],
+        # "axes.titlesize": 22,
+        "xtick.labelsize": 15,
+        "ytick.labelsize": 15,
+        "axes.labelsize": 18,
+        "legend.fontsize": 12
+    })
+
+    plt.plot(effPriorLogOdds, minDCF, label=r"$minDCF$", color="red")
+    plt.plot(effPriorLogOdds, actDCF, label=r"$actDCF$", color="blue")
+    # plt.plot(effPriorLogOdds, actDCF_cal, label=r"$actDCF$ (cal.)", color="blue", linestyle="dashed")
     plt.legend()
-    plt.title(classifier.__name__)
-    plt.savefig(fname=f"outputs/bayes_error_plots/{classifier.__name__}")
+    # plt.title(classifier.__name__)
+    plt.xlabel(r"$\log{\frac{\widetilde{\pi}}{(1 - \widetilde{\pi})}}$")
+    plt.ylabel(r"$DCF$")
+    plt.savefig(fname=f"outputs/bayes_error_plots/beforecal_{classifier.__name__}")
+    plt.tight_layout()
+    plt.show()
+
+
+def bayes_error_plots2(classifiers, after=False):
+    effPriorLogOdds = np.linspace(-3, 3, 21)
+    plt.clf()
+    plt.rcParams.update({
+        "text.usetex": True,
+        "font.family": "sans-serif",
+        "font.sans-serif": ["Computer Modern Serif"],
+        "axes.titlesize": 20,
+        "xtick.labelsize": 15,
+        "ytick.labelsize": 15,
+        "axes.labelsize": 18,
+        "legend.fontsize": 12
+    })
+
+    fig, axs = plt.subplots(2, 2, sharex="col", sharey="row")
+
+    fig.set_size_inches(10, 8)
+
+    for i, classifier in enumerate(classifiers):
+        minDCF = np.load(f"simulations/bayesErrorPlot/{classifier.__name__}_minDCF.npy")
+        actDCF = np.load(f"simulations/bayesErrorPlot/{classifier.__name__}_actDCF.npy")
+        axs[i // 2, i % 2].plot(effPriorLogOdds, minDCF, label=r"$minDCF$", color="orange", linewidth=2)
+        axs[i // 2, i % 2].plot(effPriorLogOdds, actDCF, label=r"$actDCF$", color="dodgerblue", linewidth=2)
+        if after:
+            actDCF_cal = np.load(f"simulations/bayesErrorPlot/{classifier.__name__}_actDCF_Calibrated.npy")
+            axs[i // 2, i % 2].plot(effPriorLogOdds, actDCF_cal, label=r"$actDCF$ (cal.)", linestyle="dashed",
+                                    color="dodgerblue", linewidth=2)
+        axs[i // 2, i % 2].legend()
+        axs[i // 2, i % 2].set_title(classifier.__name__)
+        axs[i // 2, i % 2].set_xticks(list(range(-3, 4)))
+        axs[i // 2, i % 2].set_yticks(np.arange(0, 1.1, 0.2))
+        axs[i // 2, i % 2].xaxis.set_tick_params(labelbottom=True)
+        axs[i // 2, i % 2].yaxis.set_tick_params(labelbottom=True)
+        if i > 1:
+            axs[i // 2, i % 2].set_xlabel(r"$\log{\frac{\widetilde{\pi}}{(1 - \widetilde{\pi})}}$")
+        if i % 2 == 0:
+            axs[i // 2, i % 2].set_ylabel(r"$DCF$")
+
+    fname = "aftercal" if after else "beforecal"
+
+    fig.tight_layout()
+    fig.subplots_adjust(hspace=0.3, wspace=0.2)
+    fig.savefig(fname=f"outputs/bayes_error_plots/bep_{fname}")
     plt.show()
 
 def plot_lambda_evaluation():
@@ -569,17 +635,26 @@ def plot_lambda_evaluation():
     fig.tight_layout()
     fig.show()
 
+
 if __name__ == '__main__':
     # colors8 = distinctipy.get_colors(8, pastel_factor=1, colorblind_type='Deuteranomaly')
     # print(colors8)
-    # colors6 = [(0.48702807223549177, 0.4242891647177821, 0.9480975665882982), (0.9146761531779931, 0.4970424422244128, 0.41460357267068376), (0.843602824944377, 0.6031154951690304, 0.9802318468625552), (0.5887251240359368, 0.9624135405893406, 0.4585532945832182), (0.422567523593921, 0.44218101996887993, 0.5516040738892886), (0.43399916426535, 0.7098723267606655, 0.6255076508970907)]
-    # colors8 = [(0.5450484248310105, 0.5130972742328073, 0.5102488831581509), (0.6109330873928905, 0.7193582681286009, 0.9814590256707204), (0.9727770320054765, 0.7854905796839438, 0.5145282365057959), (0.9806065670005477, 0.5066792697066322, 0.7311620666921056), (0.565920914907729, 0.9141080668353584, 0.7641066636691687), (0.5114677713143507, 0.5061193495393317, 0.9951605179132765), (0.5830073483609048, 0.5244350779880778, 0.7931264147573027), (0.5692188040526873, 0.7826586898074446, 0.5098679245540738)]
+    colors6 = [(0.48702807223549177, 0.4242891647177821, 0.9480975665882982), (0.9146761531779931, 0.4970424422244128, 0.41460357267068376), (0.843602824944377, 0.6031154951690304, 0.9802318468625552), (0.5887251240359368, 0.9624135405893406, 0.4585532945832182), (0.422567523593921, 0.44218101996887993, 0.5516040738892886), (0.43399916426535, 0.7098723267606655, 0.6255076508970907)]
+    # colors8 = [(0.5450484248310105, 0.5130972742328073, 0.5102488831581509),
+    #            (0.6109330873928905, 0.7193582681286009, 0.9814590256707204),
+    #            (0.9727770320054765, 0.7854905796839438, 0.5145282365057959),
+    #            (0.9806065670005477, 0.5066792697066322, 0.7311620666921056),
+    #            (0.565920914907729, 0.9141080668353584, 0.7641066636691687),
+    #            (0.5114677713143507, 0.5061193495393317, 0.9951605179132765),
+    #            (0.5830073483609048, 0.5244350779880778, 0.7931264147573027),
+    #            (0.5692188040526873, 0.7826586898074446, 0.5098679245540738)]
     # plot_lambda()
     # plot_tuningPolySVM()
     # plot_tuningRBFSVM()
     # plot_tuningLinearSVMUnbalanced()
     # plot_tuning_LinearSVMBalanced()
 
-    # print(os.path.abspath("../simulations/GMM/GMM_rawFeature-False_PCA7_diag.npy"))
-    # plot_tuningGMM2()
+    # print(os.path.abspath("."))
+
+    plot_tuningGMM2()
     pass

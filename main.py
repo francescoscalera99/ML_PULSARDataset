@@ -120,7 +120,7 @@ def main():
     # GMM_Simulations(training_data, training_labels, g, alpha=0.1, psi=0.01, actualDCF=True, calibratedScore=True)
 
     # =============== BAYES ERROR PLOT ==================
-    # classifiers = [MVG, LR, SVM, GMM]
+    classifiers = [MVG, LR, SVM, GMM]
     # args = [{"raw": False,
     #          "m": None,
     #          "variant": "tied"},
@@ -148,6 +148,8 @@ def main():
     #
     # for i, classifier in enumerate(classifiers):
     #     bayes_error_plots(classifier)
+
+    # bayes_error_plots2(classifiers, after=True)
 
     # =============== EXPERIMENTAL RESULT ===============
     # print("============= MVG EVALUATION =============")
