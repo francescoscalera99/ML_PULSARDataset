@@ -136,6 +136,7 @@ def plot_lambda():
     lbd_values2 = np.logspace(-5, 5, 50)
 
     lbd_values = np.array([*lbd_values, *lbd_values2[1:]])
+    len(lbd_values)
     m_values = [False, None, 7, 5]
     prior = [0.5, 0.1, 0.9]
 
@@ -595,14 +596,14 @@ def plot_lambda_evaluation():
     for m in m_values:
         for j, pi in enumerate(prior):
             DCF1 = np.load(
-                f"../simulations/LR/LR_0_prior_{str(pi).replace('.', '-')}_PCA{str(m)}.npy")
+                f"./../simulations/LR/LR_0_prior_{str(pi).replace('.', '-')}_PCA{str(m)}.npy")
 
             DCF2 = np.load(
-                f"../simulations/LR/LR_prior_{str(pi).replace('.', '-')}_PCA{str(m)}.npy")
+                f"./../simulations/LR/LR_prior_{str(pi).replace('.', '-')}_PCA{str(m)}.npy")
 
             DCFs = np.array([*DCF1, *DCF2[1:]])
-            DCFs_evaluation = np.load(f"../simulations/evaluation/LR/LR_prior_{str(pi).replace('.', '-')}_PCA{str(m)}.npy")
-
+            DCFs_evaluation = np.load(f"./../simulations/evaluation/LR/LR_EVAL_prior_{str(pi).replace('.', '-')}_PCA{str(m)}.npy")
+            print(len(DCFs_evaluation))
             axs[i // 2, i % 2].plot(lbd_values, DCFs, color=colors[j], label=r"$\widetilde{\pi}=$" + f"{pi}")
             axs[i // 2, i % 2].plot(lbd_values, DCFs_evaluation, color=colors[j], label=r"$\widetilde{\pi}=$" + f"{pi} (eval.)")
             if m == False:
@@ -634,6 +635,7 @@ def plot_lambda_evaluation():
     fig.tight_layout()
     fig.show()
 
+
 if __name__ == '__main__':
     # colors8 = distinctipy.get_colors(8, pastel_factor=1, colorblind_type='Deuteranomaly')
     # print(colors8)
@@ -647,11 +649,11 @@ if __name__ == '__main__':
                (0.5830073483609048, 0.5244350779880778, 0.7931264147573027),
                (0.5692188040526873, 0.7826586898074446, 0.5098679245540738)]
     # plot_lambda()
-    plot_tuningPolySVM()
+    # plot_tuningPolySVM()
     # plot_tuningRBFSVM()
     # plot_tuningLinearSVMUnbalanced()
     # plot_tuning_LinearSVMBalanced()
-
-    # print(os.path.abspath("../simulations/GMM/GMM_rawFeature-False_PCA7_diag.npy"))
+    print(os.path.abspath("./../simulations"))
+    plot_lambda_evaluation()
     # plot_tuningGMM2()
     pass

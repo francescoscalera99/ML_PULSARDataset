@@ -15,6 +15,7 @@ from simulations.evaluation import MVG_evaluation, LR_evaluation, SVM_LinearUnba
     SVM_LinearBalanced_evaluation, SVM_Poly_evaluation, SVM_RBF_evaluation, GMM_evaluation
 from simulations.simulations import MVG_simulations, GMM_Simulations, SVM_LinearUnbalancedSimulations, \
     SVM_PolySimulations, SVM_RBFSimulations, SVM_LinearBalancedSimulations, LR_simulations
+from simulations.tuning import tuning_lambda
 from utils.metrics_utils import bayes_error_plots_data
 from utils.plot_utils import create_scatterplots, bayes_error_plots
 from utils.utils import load_dataset
@@ -51,7 +52,7 @@ def main():
     # MVG_simulations(training_data, training_labels)
 
     # =============== LOGISTIC REGRESSION ===============
-    # tuning_lambda(training_data, training_labels)
+    tuning_lambda(training_data, training_labels)
     lbd = 1e-7
     # LR_simulations(training_data, training_labels, lbd)
 
