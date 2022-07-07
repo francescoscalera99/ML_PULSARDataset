@@ -101,7 +101,7 @@ def LR_evaluation(training_data, ltr, testing_data, evaluationLabels, lbd, actua
                 dte = PCA(dte_gauss, dtr_gauss, m)
             else:
                 dtr = dtr_gauss
-                dte = dtr_gauss
+                dte = dte_gauss
 
         logReg = LR(dtr, ltr, lbd=lbd, pi_T=pi_T)
         logReg.train_model()
@@ -251,7 +251,7 @@ def SVM_LinearBalanced_evaluation(training_data, ltr, testing_data, evaluationLa
             table.add_row([f"PCA m={m}, pi_T={pi_T}, π_tilde={pi}, C ={C}", round(min_dcf, 3)])
 
     print(table)
-    with open(f"results/evaluation/SVM_linear_unbalanced_EVAL_ACT-{actualDCF}_calibrated-{calibratedScore}.txt", 'w') as f:
+    with open(f"results/evaluation/SVM_linear_balanced_EVAL_ACT-{actualDCF}_calibrated-{calibratedScore}.txt", 'w') as f:
         f.write(str(table))
 
 

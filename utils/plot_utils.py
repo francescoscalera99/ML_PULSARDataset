@@ -576,6 +576,63 @@ def bayes_error_plots2(classifiers, after=False):
     fig.savefig(fname=f"outputs/bayes_error_plots/bep_{fname}")
     plt.show()
 
+def plot_lambda_evaluation():
+    lbd_values = np.logspace(-8, -5, 20)
+    lbd_values = np.array([0, *lbd_values])
+    lbd_values2 = np.logspace(-5, 5, 50)
+
+    lbd_values = np.array([*lbd_values, *lbd_values2[1:]])
+    m_values = [False, None, 7, 5]
+    prior = [0.5, 0.1, 0.9]
+
+    i = 0
+    fig, axs = plt.subplots(2, 2)
+    fig.set_size_inches(10, 8)
+    # fig.suptitle('Tuning hyperparameter λ')
+    plt.rcParams['text.usetex'] = True
+
+    colors = ['red', 'blue', 'green']
+    for m in m_values:
+        for j, pi in enumerate(prior):
+            DCF1 = np.load(
+                f"../simulations/LR/LR_0_prior_{str(pi).replace('.', '-')}_PCA{str(m)}.npy")
+
+            DCF2 = np.load(
+                f"../simulations/LR/LR_prior_{str(pi).replace('.', '-')}_PCA{str(m)}.npy")
+
+            DCFs = np.array([*DCF1, *DCF2[1:]])
+            DCFs_evaluation = np.load(f"../simulations/evaluation/LR/LR_prior_{str(pi).replace('.', '-')}_PCA{str(m)}.npy")
+
+            axs[i // 2, i % 2].plot(lbd_values, DCFs, color=colors[j], label=r"$\widetilde{\pi}=$" + f"{pi}")
+            axs[i // 2, i % 2].plot(lbd_values, DCFs_evaluation, color=colors[j], label=r"$\widetilde{\pi}=$" + f"{pi} (eval.)")
+            if m == False:
+                axs[i // 2, i % 2].set_title(f'5-fold, Raw features')
+            elif m is None:
+                axs[i // 2, i % 2].set_title(f'5-fold, no PCA')
+            else:
+                axs[i // 2, i % 2].set_title(f'5-fold, PCA (m={m})')
+
+            axs[i // 2, i % 2].set_xlabel('λ')
+            axs[i // 2, i % 2].set_ylabel('minDCF')
+            axs[i // 2, i % 2].set_xscale('log')
+
+            xticks = [1.e-09, 1.e-08, 1.e-06, 1.e-04, 1.e-02, 1.e+00, 1.e+02, 1.e+04, 1.e+06]
+            xlabels = [r"$0$", r"$10^{-8}$", r"$10^{-6}$", r"$10^{-4}$", r"$10^{-2}$", r"$10^0$", r"$10^2$", r"$10^4$",
+                       r"$10^6$"]
+
+            axs[i // 2, i % 2].set_xticks(xticks, xlabels)
+            axs[i // 2, i % 2].get_xaxis().get_major_formatter().labelOnlyBase = False
+        i += 1
+    # fig.set_size_inches(10, 10)
+    # fig.tight_layout()
+    lines_labels = [ax.get_legend_handles_labels() for ax in fig.axes]
+    lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
+    fig.legend(lines[:3], labels[:3], loc=10, prop={'size': 10})
+    # fig.legend(lines[:3], labels[:3], loc=10, prop={'size': 10})
+    # fig.subplots_adjust(wspace=0.3, hspace=0.6)
+    # fig.subplots_adjust(top=0.88)
+    fig.tight_layout()
+    fig.show()
 
 if __name__ == '__main__':
     # colors8 = distinctipy.get_colors(8, pastel_factor=1, colorblind_type='Deuteranomaly')

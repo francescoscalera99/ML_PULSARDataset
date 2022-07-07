@@ -16,7 +16,7 @@ from simulations.evaluation import MVG_evaluation, LR_evaluation, SVM_LinearUnba
 from simulations.simulations import MVG_simulations, GMM_Simulations, SVM_LinearUnbalancedSimulations, \
     SVM_PolySimulations, SVM_RBFSimulations, SVM_LinearBalancedSimulations, LR_simulations
 from utils.metrics_utils import bayes_error_plots_data
-from utils.plot_utils import create_scatterplots, bayes_error_plots, bayes_error_plots2
+from utils.plot_utils import create_scatterplots, bayes_error_plots
 from utils.utils import load_dataset
 
 
@@ -149,7 +149,7 @@ def main():
     # for i, classifier in enumerate(classifiers):
     #     bayes_error_plots(classifier)
 
-    bayes_error_plots2(classifiers, after=True)
+    # bayes_error_plots2(classifiers, after=True)
 
     # =============== EXPERIMENTAL RESULT ===============
     # print("============= MVG EVALUATION =============")
