@@ -468,14 +468,14 @@ def plot_tuningGMM2():
         "font.family": "sans-serif",
         "font.sans-serif": ["Computer Modern Serif"],
         "axes.titlesize": 30,
-        "axes.labelsize": 30,
+        "axes.labelsize": 20,
         "legend.fontsize": 20,
-        "xtick.labelsize": 30,
-        "ytick.labelsize": 30,
+        "xtick.labelsize": 20,
+        "ytick.labelsize": 20,
     })
 
     fig, axs = plt.subplots(3, 2)
-    fig.set_size_inches(15, 10)
+    fig.set_size_inches(12, 10)
     # colors = distinctipy.get_colors(6, pastel_factor=0.7)
     y = np.arange(0.0, 1.1, 0.2)
 
@@ -484,7 +484,7 @@ def plot_tuningGMM2():
             pp = '' if p == 0.5 else "_pi" + str(p).replace('.', '-')
             DCFs = np.load(f"../simulations/GMM/GMM_rawFeature-{r}_PCA{m}_{variant}{pp}.npy")
             label = r"$\widetilde{\pi}=$" + f"{p}, {'raw' if r else 'gau'}"
-            axs[i // 2, i % 2].plot(components_values, DCFs, label=label, color=colors6[j], linewidth=2)
+            axs[i // 2, i % 2].plot(components_values, DCFs, label=label, color=colors6[j], linewidth=3)
             axs[i // 2, i % 2].set_xscale('log', base=2)
             axs[i // 2, i % 2].set_xticks(components_values)
             axs[i // 2, i % 2].set_yticks(y)
@@ -496,10 +496,18 @@ def plot_tuningGMM2():
             pca = f"PCA ($m={m}$)" if m is not None else "no PCA"
             axs[i // 2, i % 2].set_title(rf"{v}, {pca}", size=20)
 
-        axs[i // 2, i % 2].legend(loc='upper right', framealpha=0.5)
+        # axs[i // 2, i % 2].legend(loc='upper right', framealpha=0.5)
 
     fig.tight_layout()
-    plt.show()
+    # plt.show()
+    fig.savefig(fname="../outputs/tuning_GMM2", dpi=180)
+
+    label_params = axs[0, 0].get_legend_handles_labels()
+    figl, axl = plt.subplots(figsize=(6.5, 5))
+    axl.axis(False)
+    axl.legend(*label_params, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
+    # figl.show()
+    figl.savefig(fname="../outputs/tuning_GMM_legend")
 
 
 def bayes_error_plots(classifier):
@@ -596,14 +604,13 @@ def plot_lambda_evaluation():
     for m in m_values:
         for j, pi in enumerate(prior):
             DCF1 = np.load(
-                f"../simulations/LR/LR_0_prior_{str(pi).replace('.', '-')}_PCA{str(m)}.npy")
+                f"./../simulations/LR/LR_0_prior_{str(pi).replace('.', '-')}_PCA{str(m)}.npy")
 
             DCF2 = np.load(
-                f"../simulations/LR/LR_prior_{str(pi).replace('.', '-')}_PCA{str(m)}.npy")
+                f"./../simulations/LR/LR_prior_{str(pi).replace('.', '-')}_PCA{str(m)}.npy")
 
             DCFs = np.array([*DCF1, *DCF2[1:]])
-            DCFs_evaluation = np.load(f"../simulations/evaluation/LR/LR_prior_{str(pi).replace('.', '-')}_PCA{str(m)}.npy")
-
+            DCFs_evaluation = np.load(f"./../simulations/evaluation/LR/LR_EVAL_prior_{str(pi).replace('.', '-')}_PCA{str(m)}.npy")
             axs[i // 2, i % 2].plot(lbd_values, DCFs, color=colors[j], label=r"$\widetilde{\pi}=$" + f"{pi}")
             axs[i // 2, i % 2].plot(lbd_values, DCFs_evaluation, color=colors[j], label=r"$\widetilde{\pi}=$" + f"{pi} (eval.)")
             if m == False:
