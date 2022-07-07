@@ -484,7 +484,7 @@ def plot_tuningGMM2():
             pp = '' if p == 0.5 else "_pi" + str(p).replace('.', '-')
             DCFs = np.load(f"../simulations/GMM/GMM_rawFeature-{r}_PCA{m}_{variant}{pp}.npy")
             label = r"$\widetilde{\pi}=$" + f"{p}, {'raw' if r else 'gau'}"
-            axs[i // 2, i % 2].plot(components_values, DCFs, label=label, color=colors6[j], linewidth=2)
+            axs[i // 2, i % 2].plot(components_values, DCFs, label=label, color=colors6[j], linewidth=3)
             axs[i // 2, i % 2].set_xscale('log', base=2)
             axs[i // 2, i % 2].set_xticks(components_values)
             axs[i // 2, i % 2].set_yticks(y)
@@ -500,14 +500,14 @@ def plot_tuningGMM2():
 
     fig.tight_layout()
     # plt.show()
-    fig.savefig(fname="tuning_GMM")
+    fig.savefig(fname="../outputs/tuning_GMM2", dpi=180)
 
     label_params = axs[0, 0].get_legend_handles_labels()
     figl, axl = plt.subplots(figsize=(6.5, 5))
     axl.axis(False)
     axl.legend(*label_params, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
     # figl.show()
-    figl.savefig(fname="tuning_GMM_legend")
+    figl.savefig(fname="../outputs/tuning_GMM_legend")
 
 
 def bayes_error_plots(classifier):
