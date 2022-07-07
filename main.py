@@ -6,7 +6,7 @@ import numpy as np
 
 from classifiers.GMM2 import tuning_componentsGMM, GMM
 # from classifiers.LR import tuning_lambda
-from classifiers.LR import LR
+from classifiers.LR import LR, tuning_lambda_evaluation
 from classifiers.MVG import MVG
 from classifiers.SVM import tuning_parameters_PolySVM, tuning_parameters_RBFSVM, tuning_parameters_LinearSVMBalanced, \
     SVM
@@ -154,8 +154,8 @@ def main():
     # MVG_evaluation(training_data, training_labels, testing_data, testing_labels)
     # print("============= LR EVALUATION ===============")
     # LR_evaluation(training_data, training_labels, testing_data, testing_labels, lbd)
-    print("============ SVM LINEAR UNBALANCED EVALUATION ==========")
-    SVM_LinearUnbalanced_evaluation(training_data, training_labels, testing_data, testing_labels, K_LinearUnb, C_LinearUnb)
+    # print("============ SVM LINEAR UNBALANCED EVALUATION ==========")
+    # SVM_LinearUnbalanced_evaluation(training_data, training_labels, testing_data, testing_labels, K_LinearUnb, C_LinearUnb)
     # print("============ SVM LINEAR BALANCED EVALUATION ==========")
     # SVM_LinearBalanced_evaluation(training_data, training_labels, testing_data, testing_labels, K_LinearB, C_LinearB)
     # print("============ SVM POLY EVALUATION ==========")
@@ -164,6 +164,9 @@ def main():
     # SVM_RBF_evaluation(training_data, training_labels, testing_data, testing_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF)
     # print("============ GMM EVALUATION ==========")
     # GMM_evaluation(training_data, training_labels, testing_data, testing_labels, g, alpha=0.1, psi=0.01)
+
+    # =============== TUNING HYPERPARAMETERS - EXPERIMENTAL RESULT ===============
+    tuning_lambda_evaluation(training_data, training_labels, testing_data, testing_labels)
 
     # ****************** TURN OFF PC AT END OF SIMULATION (needs sudo) ******************
     # (windows ?)

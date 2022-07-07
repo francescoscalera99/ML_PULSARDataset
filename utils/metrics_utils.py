@@ -1,8 +1,7 @@
 import numpy as np
 
-from classifiers.LR import calibrateScores
 from utils.matrix_utils import vrow
-from utils.utils import k_fold
+from utils.utils import k_fold, splitData_SingleFold
 
 
 def build_confusion_matrix(testing_labels: np.ndarray, predicted_labels: np.ndarray) -> np.ndarray:
@@ -62,6 +61,9 @@ def compute_actual_DCF(llr, labels, prior, Cfn, Cfp):
     actDCF = compute_normalizeDCF(OBD, prior, Cfn, Cfp)
 
     return actDCF
+
+
+
 
 
 def bayes_error_plots_data(training_data, training_labels, classifier, Cfn=1, Cfp=1, **kwargs):
