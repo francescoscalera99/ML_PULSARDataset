@@ -19,7 +19,8 @@ from simulations.tuning import tuning_parameters_LinearSVMUnbalanced_evaluation,
     tuning_parameters_LinearSVMBalanced_evaluation, tuning_parameters_PolySVM_evaluation, \
     tuning_parameters_RBFSVM_evaluation, tuning_componentsGMM_evaluation, tuning_lambda_evaluation
 from utils.metrics_utils import bayes_error_plots_data
-from utils.plot_utils import create_scatterplots, bayes_error_plots, plot_lambda_evaluation, create_heatmap2
+from utils.plot_utils import create_scatterplots, bayes_error_plots, plot_lambda_evaluation, create_heatmap2, \
+    plot_tuningPolySVM_evaluation, plot_tuningRBFSVM_evaluation, plot_tuningGMM_evaluation
 from utils.utils import load_dataset
 
 
@@ -30,6 +31,8 @@ def get_same_distrib_partition(dtr, ltr, perc=0.1, num_samples=1000):
     ltr2 = ltr[idx_t]
 
     return dtr2, ltr2
+
+
 
 
 def main():
@@ -174,15 +177,15 @@ def main():
 
     # =============== TUNING HYPERPARAMETERS - EXPERIMENTAL RESULT ===============
     # tuning_lambda_evaluation(training_data, training_labels, testing_data, testing_labels)
-    plot_lambda_evaluation()
+    # plot_lambda_evaluation()
     # tuning_parameters_LinearSVMUnbalanced_evaluation(training_data, training_labels, testing_data, testing_labels)
     # plot_tuningLinearSVMUnbalanced_evaluation()
     # tuning_parameters_LinearSVMBalanced_evaluation(training_data, training_labels, testing_data, testing_labels)
     # plot_tuning_LinearSVMBalanced_evaluation()
     # tuning_parameters_PolySVM_evaluation(training_data, training_labels, testing_data, testing_labels)
-    plot_tuningPolySVM_evaluation()
+    # plot_tuningPolySVM_evaluation()
     # tuning_parameters_RBFSVM_evaluation(training_data, training_labels, testing_data, testing_labels)
-    plot_tuningRBFSVM_evaluation()
+    # plot_tuningRBFSVM_evaluation()
     # tuning_componentsGMM_evaluation(training_data, training_labels, testing_data, testing_labels)
     plot_tuningGMM_evaluation()
 

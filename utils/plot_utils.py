@@ -1027,7 +1027,7 @@ def plot_tuningRBFSVM_evaluation():
     # figl.show()
 
 
-def plot_tuningGMM2_evaluation():
+def plot_tuningGMM_evaluation():
     variants = ['full-cov', 'diag', 'tied']
     raw = [True, False]
     m_values = [None, 7]
@@ -1114,12 +1114,12 @@ if __name__ == '__main__':
     # plot_lambda()
     # plot_tuningPolySVM()
     # plot_tuningRBFSVM()
-    print(os.path.abspath("."))
+    # print(os.path.abspath("."))
 
-    plot_tuningLinearSVMUnbalanced_evaluation()
-    plot_tuning_LinearSVMBalanced_evaluation()
-    plot_tuningPolySVM_evaluation()
-    plot_tuningRBFSVM_evaluation()
+    # plot_tuningLinearSVMUnbalanced_evaluation()
+    # plot_tuning_LinearSVMBalanced_evaluation()
+    # plot_tuningPolySVM_evaluation()
+    # plot_tuningRBFSVM_evaluation()
     # plot_lambda_evaluation()
 
 
