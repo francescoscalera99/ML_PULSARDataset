@@ -1115,10 +1115,9 @@ if __name__ == '__main__':
 
     # plot_tuningLinearSVMUnbalanced_evaluation()
     # plot_tuning_LinearSVMBalanced_evaluation()
-    # plot_tuningPolySVM_evaluation()
-    plot_tuningRBFSVM_evaluation()
+    plot_tuningPolySVM_evaluation()
+    # plot_tuningRBFSVM_evaluation()
     # plot_lambda_evaluation()
-
 
     # plot_tuningGMM2()
     pass
