@@ -974,7 +974,6 @@ def plot_tuningRBFSVM_evaluation():
     plt.clf()
 
     # fig.suptitle('RBF SVM')
-    print(plt.rcParams)
     plt.rcParams.update({
         "text.usetex": True,
         "axes.titlesize": 28,
@@ -983,8 +982,6 @@ def plot_tuningRBFSVM_evaluation():
         "xtick.labelsize": 30,
         "ytick.labelsize": 30,
     })
-    print("****************")
-    print(plt.rcParams)
 
     fig, axs = plt.subplots(1, 3, sharey="all")
 
@@ -998,10 +995,10 @@ def plot_tuningRBFSVM_evaluation():
             DCFs = np.load(
                 f"../simulations/RBF/RBF_K{str(K).replace('.', '-')}_c{str(gamma).replace('.', '-')}_PCA{str(m)}.npy")
             DCFs_evaluation = np.load(
-                f"../simulations/evaluation/RBF/RBF_K{str(K).replace('.', '-')}_c{str(gamma).replace('.', '-')}_PCA{str(m)}.npy")
+                f"../simulations/evaluation/RBF/RBF_K{str(K).replace('.', '-')}_gamma{str(gamma).replace('.', '-')}_PCA{str(m)}.npy")
             lb = r"$\gamma = 10^{" + str(g_exp) + "}$"
             axs[i].plot(C_values, DCFs, color=colors6[j], label=rf"$K={K}$, " + lb, linewidth=2.5)
-            axs[i].plot(C_values, DCFs_evaluation, linestyle="dashed", color=colors6[j], label=rf"$K={K}$, " + lb + "(eval.)", linewidth=2.5)
+            axs[i].plot(C_values, DCFs_evaluation, linestyle="dashed", color=colors6[j], label=rf"$K={K}$, " + lb + " (eval.)", linewidth=2.5)
             if m == False:
                 axs[i].set_title(f'5-fold, Raw features')
             else:
@@ -1119,7 +1116,7 @@ if __name__ == '__main__':
     # plot_tuningLinearSVMUnbalanced_evaluation()
     # plot_tuning_LinearSVMBalanced_evaluation()
     # plot_tuningPolySVM_evaluation()
-    # plot_tuningRBFSVM_evaluation()
+    plot_tuningRBFSVM_evaluation()
     # plot_lambda_evaluation()
 
 
