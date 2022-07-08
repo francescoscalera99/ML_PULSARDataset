@@ -174,17 +174,17 @@ def main():
 
     # =============== TUNING HYPERPARAMETERS - EXPERIMENTAL RESULT ===============
     # tuning_lambda_evaluation(training_data, training_labels, testing_data, testing_labels)
-    # plot_lambda_evaluation()
+    plot_lambda_evaluation()
     # tuning_parameters_LinearSVMUnbalanced_evaluation(training_data, training_labels, testing_data, testing_labels)
     # plot_tuningLinearSVMUnbalanced_evaluation()
     # tuning_parameters_LinearSVMBalanced_evaluation(training_data, training_labels, testing_data, testing_labels)
     # plot_tuning_LinearSVMBalanced_evaluation()
     # tuning_parameters_PolySVM_evaluation(training_data, training_labels, testing_data, testing_labels)
-    # plot_tuningPolySVM_evaluation()
+    plot_tuningPolySVM_evaluation()
     # tuning_parameters_RBFSVM_evaluation(training_data, training_labels, testing_data, testing_labels)
-    # plot_tuningRBFSVM_evaluation()
+    plot_tuningRBFSVM_evaluation()
     # tuning_componentsGMM_evaluation(training_data, training_labels, testing_data, testing_labels)
-    # plot_tuningGMM_evaluation()
+    plot_tuningGMM_evaluation()
 
     # ****************** TURN OFF PC AT END OF SIMULATION (needs sudo) ******************
     # (windows ?)
