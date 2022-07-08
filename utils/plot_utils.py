@@ -638,6 +638,124 @@ def plot_lambda_evaluation():
     fig.savefig(fname="../outputs/evaluation/lambda", dpi=180)
 
 
+def plot_tuningLinearSVMUnbalanced_evaluation():
+    C_values = np.logspace(-3, 3, 20)
+    m_values = [False, None, 7, 5]
+    K_values = [1.0]
+    priors = [0.5, 0.1, 0.9]
+
+    i = 0
+
+    plt.rcParams.update({
+        "text.usetex": True,
+        "font.family": "sans-serif",
+        "font.sans-serif": ["Computer Modern Serif"],
+        "axes.titlesize": 22,
+        "axes.labelsize": 30,
+        "legend.fontsize": 20,
+        "xtick.labelsize": 30,
+        "ytick.labelsize": 30,
+    })
+
+    fig, axs = plt.subplots(1, 4, sharey='row')
+    # colors = distinctipy.get_colors(6, pastel_factor=0.7)
+    for m in m_values:
+        hyperparameters = itertools.product(K_values, priors)
+        for j, (K, p) in enumerate(hyperparameters):
+            DCFs = np.load(
+                f"../simulations/linearSVM/unbalanced/new/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}_PCA{str(m)}.npy")
+            DCFs_evaluation = np.load(
+                f"../simulations/evaluation/linearSVM/unbalanced/new/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}_PCA{str(m)}.npy")
+            axs[i].plot(C_values, DCFs, color=colors6[j], label=r"$K=" + str(K) + r",\;\widetilde{\pi}=" + str(p) + r"$",
+                        linewidth=3)
+            axs[i].plot(C_values, DCFs_evaluation, linestyle="dashed", color=colors6[j],
+                        label=r"$K=" + str(K) + r",\;\widetilde{\pi}=" + str(p) + r"$" + "(eval.)",
+                        linewidth=3)
+            if m is None:
+                axs[i].set_title(rf"Gau, no PCA, $\pi_T=0.5$")
+            elif m == False:
+                axs[i].set_title(rf"Raw, no PCA, $\pi_T=0.5$")
+            else:
+                axs[i].set_title(rf"Gau, PCA ($m = {m}$), $\pi_T=0.5$")
+            # axs[i].legend()
+            axs[i].set_xlabel('$C$')
+            axs[i].set_ylabel('$minDCF$')
+            axs[i].set_xscale('log')
+            axs[i].yaxis.set_tick_params(labelbottom=True)
+            axs[i].set_xticks([10 ** i for i in range(-2, 3, 2)])
+        i += 1
+    fig.set_size_inches(20, 5)
+    fig.tight_layout()
+    fig.show()
+
+    label_params = axs[0].get_legend_handles_labels()
+    figl, axl = plt.subplots(figsize=(6.5, 5))
+    axl.axis(False)
+    axl.legend(*label_params, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
+    figl.show()
+
+
+def plot_tuning_LinearSVMBalanced_evaluation():
+    C_values = np.logspace(-3, 3, 20)
+    m_values = [False, None, 7, 5]
+    pi_T_values = [0.5, 0.1, 0.9]
+    K_values = [1.0]
+    prior = [0.5, 0.1, 0.9]
+
+    plt.rcParams.update({
+        "text.usetex": True,
+        "font.family": "sans-serif",
+        "font.sans-serif": ["Computer Modern Serif"],
+        "axes.titlesize": 30,
+        "axes.labelsize": 30,
+        "legend.fontsize": 20,
+        "xtick.labelsize": 30,
+        "ytick.labelsize": 30,
+    })
+
+    i = 0
+    fig, axs = plt.subplots(4, 3, sharey='all')
+
+    for m in m_values:
+        j = 0
+        for pi_T in pi_T_values:
+            hyperparameters = itertools.product(K_values, prior)
+            for idx, (K, pi) in enumerate(hyperparameters):
+                DCFs = np.load(
+                    f"../simulations/linearSVM/balanced/K{str(K).replace('.', '-')}_p{str(pi).replace('.', '-')}_pT{str(pi_T).replace('.', '-')}_PCA{str(m)}.npy")
+                DCFs_evaluation = np.load(
+                    f"../simulations/evaluation/linearSVM/balanced/K{str(K).replace('.', '-')}_p{str(pi).replace('.', '-')}_pT{str(pi_T).replace('.', '-')}_PCA{str(m)}.npy")
+                axs[i, j].plot(C_values, DCFs, color=colors6[idx],
+                               label=rf"$K={K}$,\;" + r"$\widetilde{\pi}=$" + f"{pi}", linewidth=3)
+                axs[i, j].plot(C_values, DCFs_evaluation, linestyle="dashed", color=colors6[idx],
+                               label=rf"$K={K}$,\;" + r"$\widetilde{\pi}=$" + f"{pi}", linewidth=3)
+                if m is None:
+                    axs[i, j].set_title('Gau, no PCA' + rf", $\pi_T={pi_T}$")
+                elif m == False:
+                    axs[i, j].set_title('Raw, no PCA, ' + rf"$\pi_T={pi_T}$")
+                else:
+                    axs[i, j].set_title('Gau, PCA ' + rf"($m = {m}$), $\pi_T={pi_T}$")
+                # axs[i, j].legend()
+                axs[i, j].set_xlabel(r"$C$")
+                axs[i, j].set_ylabel(r"$minDCF$")
+                axs[i, j].set_xscale('log')
+                axs[i, j].yaxis.set_tick_params(labelbottom=True)
+            j += 1
+        i += 1
+
+    fig.set_size_inches(20, 20)
+    fig.tight_layout()
+
+    label_params = axs[0, 0].get_legend_handles_labels()
+
+    figl, axl = plt.subplots(figsize=(6.5, 5))
+    axl.axis(False)
+    axl.legend(*label_params, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
+    figl.show()
+
+    fig.show()
+
+
 if __name__ == '__main__':
 
     # DO NOT COMMENT
@@ -655,21 +773,21 @@ if __name__ == '__main__':
 
     # colors8 = distinctipy.get_colors(8, pastel_factor=1, colorblind_type='Deuteranomaly')
     # print(colors8)
-    # colors6 = [(0.48702807223549177, 0.4242891647177821, 0.9480975665882982), (0.9146761531779931, 0.4970424422244128, 0.41460357267068376), (0.843602824944377, 0.6031154951690304, 0.9802318468625552), (0.5887251240359368, 0.9624135405893406, 0.4585532945832182), (0.422567523593921, 0.44218101996887993, 0.5516040738892886), (0.43399916426535, 0.7098723267606655, 0.6255076508970907)]
-    # colors8 = [(0.5450484248310105, 0.5130972742328073, 0.5102488831581509),
-    #            (0.6109330873928905, 0.7193582681286009, 0.9814590256707204),
-    #            (0.9727770320054765, 0.7854905796839438, 0.5145282365057959),
-    #            (0.9806065670005477, 0.5066792697066322, 0.7311620666921056),
-    #            (0.565920914907729, 0.9141080668353584, 0.7641066636691687),
-    #            (0.5114677713143507, 0.5061193495393317, 0.9951605179132765),
-    #            (0.5830073483609048, 0.5244350779880778, 0.7931264147573027),
-    #            (0.5692188040526873, 0.7826586898074446, 0.5098679245540738)]
+    colors6 = [(0.48702807223549177, 0.4242891647177821, 0.9480975665882982), (0.9146761531779931, 0.4970424422244128, 0.41460357267068376), (0.843602824944377, 0.6031154951690304, 0.9802318468625552), (0.5887251240359368, 0.9624135405893406, 0.4585532945832182), (0.422567523593921, 0.44218101996887993, 0.5516040738892886), (0.43399916426535, 0.7098723267606655, 0.6255076508970907)]
+    colors8 = [(0.5450484248310105, 0.5130972742328073, 0.5102488831581509),
+               (0.6109330873928905, 0.7193582681286009, 0.9814590256707204),
+               (0.9727770320054765, 0.7854905796839438, 0.5145282365057959),
+               (0.9806065670005477, 0.5066792697066322, 0.7311620666921056),
+               (0.565920914907729, 0.9141080668353584, 0.7641066636691687),
+               (0.5114677713143507, 0.5061193495393317, 0.9951605179132765),
+               (0.5830073483609048, 0.5244350779880778, 0.7931264147573027),
+               (0.5692188040526873, 0.7826586898074446, 0.5098679245540738)]
     # plot_lambda()
     # plot_tuningPolySVM()
     # plot_tuningRBFSVM()
-    # plot_tuningLinearSVMUnbalanced()
-    # plot_tuning_LinearSVMBalanced()
-    plot_lambda_evaluation()
+    plot_tuningLinearSVMUnbalanced_evaluation()
+    plot_tuning_LinearSVMBalanced_evaluation()
+    # plot_lambda_evaluation()
     # print(os.path.abspath("."))
 
     # plot_tuningGMM2()
