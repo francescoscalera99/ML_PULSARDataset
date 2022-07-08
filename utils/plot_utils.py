@@ -5,10 +5,7 @@ import distinctipy
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-import matplotlib.font_manager
-
-
-# from preprocessing.preprocessing import gaussianize
+import matplotlib
 
 
 def plot_histogram(array, labels, titles, nbins: int = 10) -> None:
@@ -64,6 +61,156 @@ def create_heatmap(dataset, labels, cmap='Reds', title=None):
     fig.tight_layout()
     fig.show()
     fig.savefig(fname=f'outputs/gauss_heatmap')
+
+
+def create_heatmap2(dataset, labels, cmap='Reds', title=None):
+    plt.rcParams.update({
+        "text.usetex": True,
+        "font.family": "sans-serif",
+        "font.sans-serif": ["Computer Modern Serif"],
+        "axes.titlesize": 20,
+        "xtick.labelsize": 15,
+        "ytick.labelsize": 15,
+        "axes.labelsize": 18,
+        "legend.fontsize": 18,
+        "figure.dpi": 180
+    })
+
+    fig, ax = plt.subplots(1, 3, figsize=(14, 4))
+
+    data_map1 = np.abs(np.corrcoef(dataset))
+    im1, cbar1 = heatmap(data_map1, [i for i in range(8)], [i for i in range(8)], ax=ax[0], cmap="Greys")
+    annotate_heatmap(im1, size=13, fontweight="bold")
+
+    data_map2 = np.abs(np.corrcoef(dataset[:, labels == 1]))
+    im2, cbar2 = heatmap(data_map2, [i for i in range(8)], [i for i in range(8)], ax=ax[1], cmap="Oranges")
+    annotate_heatmap(im2, size=13, fontweight="bold")
+
+    data_map3 = np.abs(np.corrcoef(dataset[:, labels == 0]))
+    im3, cbar3 = heatmap(data_map3, [i for i in range(8)], [i for i in range(8)], ax=ax[2], cmap="Blues")
+    annotate_heatmap(im3, size=13, fontweight="bold")
+
+    fig.tight_layout()
+    plt.show()
+
+
+def heatmap(data, row_labels, col_labels, ax=None,
+            cbar_kw=None, cbarlabel="", **kwargs):
+    """
+    Create a heatmap from a numpy array and two lists of labels.
+
+    Parameters
+    ----------
+    data
+        A 2D numpy array of shape (M, N).
+    row_labels
+        A list or array of length M with the labels for the rows.
+    col_labels
+        A list or array of length N with the labels for the columns.
+    ax
+        A `matplotlib.axes.Axes` instance to which the heatmap is plotted.  If
+        not provided, use current axes or create a new one.  Optional.
+    cbar_kw
+        A dictionary with arguments to `matplotlib.Figure.colorbar`.  Optional.
+    cbarlabel
+        The label for the colorbar.  Optional.
+    **kwargs
+        All other arguments are forwarded to `imshow`.
+    """
+
+    if cbar_kw is None:
+        cbar_kw = {}
+    if not ax:
+        ax = plt.gca()
+
+    # Plot the heatmap
+    im = ax.imshow(data, **kwargs)
+
+    # Create colorbar
+    cbar = ax.figure.colorbar(im, ax=ax, **cbar_kw)
+    cbar.ax.set_ylabel(cbarlabel, va="bottom")
+    cbar.outline.set_linewidth(0)
+
+    # Show all ticks and label them with the respective list entries.
+    ax.set_xticks(np.arange(data.shape[1]), labels=col_labels)
+    ax.set_yticks(np.arange(data.shape[0]), labels=row_labels)
+
+    # Let the horizontal axes labeling appear on top.
+    ax.tick_params(top=True, bottom=False,
+                   labeltop=True, labelbottom=False)
+
+    # Rotate the tick labels and set their alignment.
+    plt.setp(ax.get_xticklabels(), ha="right",
+             rotation_mode="anchor")
+
+    # Turn spines off and create white grid.
+    ax.spines[:].set_visible(False)
+
+    ax.set_xticks(np.arange(data.shape[1] + 1) - .5, minor=True)
+    ax.set_yticks(np.arange(data.shape[0] + 1) - .5, minor=True)
+    # ax.grid(which="minor", color="w", linestyle='-', linewidth=0)
+    ax.tick_params(which="minor", bottom=False, left=False)
+
+    return im, cbar
+
+
+def annotate_heatmap(im, data=None, valfmt="{x:.2f}",
+                     textcolors=("black", "white"),
+                     threshold=None, **textkw):
+    """
+    A function to annotate a heatmap.
+
+    Parameters
+    ----------
+    im
+        The AxesImage to be labeled.
+    data
+        Data used to annotate.  If None, the image's data is used.  Optional.
+    valfmt
+        The format of the annotations inside the heatmap.  This should either
+        use the string format method, e.g. "$ {x:.2f}", or be a
+        `matplotlib.ticker.Formatter`.  Optional.
+    textcolors
+        A pair of colors.  The first is used for values below a threshold,
+        the second for those above.  Optional.
+    threshold
+        Value in data units according to which the colors from textcolors are
+        applied.  If None (the default) uses the middle of the colormap as
+        separation.  Optional.
+    **kwargs
+        All other arguments are forwarded to each call to `text` used to create
+        the text labels.
+    """
+
+    if not isinstance(data, (list, np.ndarray)):
+        data = im.get_array()
+
+    # Normalize the threshold to the images color range.
+    if threshold is not None:
+        threshold = im.norm(threshold)
+    else:
+        threshold = im.norm(data.max()) / 2.
+
+    # Set default alignment to center, but allow it to be
+    # overwritten by textkw.
+    kw = dict(horizontalalignment="center",
+              verticalalignment="center")
+    kw.update(textkw)
+
+    # Get the formatter in case a string is supplied
+    if isinstance(valfmt, str):
+        valfmt = matplotlib.ticker.StrMethodFormatter(valfmt)
+
+    # Loop over the data and create a `Text` for each "pixel".
+    # Change the text's color depending on the data.
+    texts = []
+    for i in range(data.shape[0]):
+        for j in range(data.shape[1]):
+            kw.update(color=textcolors[int(im.norm(data[i, j]) > threshold)])
+            text = im.axes.text(j, i, valfmt(data[i, j], None), **kw)
+            texts.append(text)
+
+    return texts
 
 
 def create_scatterplots(training_data, training_labels, datatype=None):
@@ -325,7 +472,8 @@ def plot_tuningLinearSVMUnbalanced():
         for j, (K, p) in enumerate(hyperparameters):
             DCFs = np.load(
                 f"../simulations/linearSVM/unbalanced/new/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}_PCA{str(m)}.npy")
-            axs[i].plot(C_values, DCFs, color=colors[j], label=r"$K=" + str(K) + r",\;\widetilde{\pi}=" + str(p) + r"$",
+            axs[i].plot(C_values, DCFs, color=colors6[j],
+                        label=r"$K=" + str(K) + r",\;\widetilde{\pi}=" + str(p) + r"$",
                         linewidth=3)
             if m is None:
                 axs[i].set_title(rf"Gau, no PCA, $\pi_T=0.5$")
@@ -379,7 +527,7 @@ def plot_tuning_LinearSVMBalanced():
             for idx, (K, pi) in enumerate(hyperparameters):
                 DCFs = np.load(
                     f"../simulations/linearSVM/balanced/K{str(K).replace('.', '-')}_p{str(pi).replace('.', '-')}_pT{str(pi_T).replace('.', '-')}_PCA{str(m)}.npy")
-                axs[i, j].plot(C_values, DCFs, color=colors[idx],
+                axs[i, j].plot(C_values, DCFs, color=colors6[idx],
                                label=rf"$K={K}$,\;" + r"$\widetilde{\pi}=$" + f"{pi}", linewidth=3)
                 if m is None:
                     axs[i, j].set_title('Gau, no PCA' + rf", $\pi_T={pi_T}$")
@@ -602,9 +750,12 @@ def plot_lambda_evaluation():
             DCFs = np.load(
                 f"./../simulations/LR/LR_prior_{str(pi).replace('.', '-')}_PCA{str(m)}.npy")
 
-            DCFs_evaluation = np.load(f"./../simulations/evaluation/LR/LR_EVAL_prior_{str(pi).replace('.', '-')}_PCA{str(m)}.npy")
-            axs[i // 2, i % 2].plot(lbd_values, DCFs, color=colors[j], label=r"$\widetilde{\pi}=" + f"{pi}$", linestyle="dashed")
-            axs[i // 2, i % 2].plot(lbd_values, DCFs_evaluation, color=colors[j], label=r"$\widetilde{\pi}=" + f"{pi}$ (eval.)")
+            DCFs_evaluation = np.load(
+                f"./../simulations/evaluation/LR/LR_EVAL_prior_{str(pi).replace('.', '-')}_PCA{str(m)}.npy")
+            axs[i // 2, i % 2].plot(lbd_values, DCFs, color=colors[j], label=r"$\widetilde{\pi}=" + f"{pi}$",
+                                    linestyle="dashed")
+            axs[i // 2, i % 2].plot(lbd_values, DCFs_evaluation, color=colors[j],
+                                    label=r"$\widetilde{\pi}=" + f"{pi}$ (eval.)")
             if m == False:
                 axs[i // 2, i % 2].set_title(f'5-fold, Raw features')
             elif m is None:
@@ -663,9 +814,9 @@ def plot_tuningLinearSVMUnbalanced_evaluation():
         hyperparameters = itertools.product(K_values, priors)
         for j, (K, p) in enumerate(hyperparameters):
             DCFs = np.load(
-                f"../simulations/linearSVM/unbalanced/new/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}_PCA{str(m)}.npy")
+                f"./../simulations/linearSVM/unbalanced/new/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}_PCA{str(m)}.npy")
             DCFs_evaluation = np.load(
-                f"../simulations/evaluation/linearSVM/unbalanced/new/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}_PCA{str(m)}.npy")
+                f"../simulations/evaluation/linearSVM/unbalanced/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}_PCA{str(m)}.npy")
             axs[i].plot(C_values, DCFs, color=colors6[j], label=r"$K=" + str(K) + r",\;\widetilde{\pi}=" + str(p) + r"$",
                         linewidth=3)
             axs[i].plot(C_values, DCFs_evaluation, linestyle="dashed", color=colors6[j],
@@ -757,7 +908,6 @@ def plot_tuning_LinearSVMBalanced_evaluation():
 
 
 if __name__ == '__main__':
-
     # DO NOT COMMENT
     plt.rcParams.update({
         "text.usetex": True,
@@ -773,7 +923,12 @@ if __name__ == '__main__':
 
     # colors8 = distinctipy.get_colors(8, pastel_factor=1, colorblind_type='Deuteranomaly')
     # print(colors8)
-    colors6 = [(0.48702807223549177, 0.4242891647177821, 0.9480975665882982), (0.9146761531779931, 0.4970424422244128, 0.41460357267068376), (0.843602824944377, 0.6031154951690304, 0.9802318468625552), (0.5887251240359368, 0.9624135405893406, 0.4585532945832182), (0.422567523593921, 0.44218101996887993, 0.5516040738892886), (0.43399916426535, 0.7098723267606655, 0.6255076508970907)]
+    colors6 = [(0.48702807223549177, 0.4242891647177821, 0.9480975665882982),
+               (0.9146761531779931, 0.4970424422244128, 0.41460357267068376),
+               (0.843602824944377, 0.6031154951690304, 0.9802318468625552),
+               (0.5887251240359368, 0.9624135405893406, 0.4585532945832182),
+               (0.422567523593921, 0.44218101996887993, 0.5516040738892886),
+               (0.43399916426535, 0.7098723267606655, 0.6255076508970907)]
     colors8 = [(0.5450484248310105, 0.5130972742328073, 0.5102488831581509),
                (0.6109330873928905, 0.7193582681286009, 0.9814590256707204),
                (0.9727770320054765, 0.7854905796839438, 0.5145282365057959),
@@ -785,10 +940,12 @@ if __name__ == '__main__':
     # plot_lambda()
     # plot_tuningPolySVM()
     # plot_tuningRBFSVM()
+    print(os.path.abspath("."))
+
     plot_tuningLinearSVMUnbalanced_evaluation()
     plot_tuning_LinearSVMBalanced_evaluation()
     # plot_lambda_evaluation()
-    # print(os.path.abspath("."))
+
 
     # plot_tuningGMM2()
     pass

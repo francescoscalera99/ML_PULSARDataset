@@ -19,9 +19,7 @@ from simulations.tuning import tuning_parameters_LinearSVMUnbalanced_evaluation,
     tuning_parameters_LinearSVMBalanced_evaluation, tuning_parameters_PolySVM_evaluation, \
     tuning_parameters_RBFSVM_evaluation, tuning_componentsGMM_evaluation, tuning_lambda_evaluation
 from utils.metrics_utils import bayes_error_plots_data
-from utils.plot_utils import create_scatterplots, bayes_error_plots, plot_lambda_evaluation, \
-    plot_tuningPolySVM_evaluation, plot_tuningRBFSVM_evaluation, plot_tuningLinearSVMUnbalanced_evaluation, \
-    plot_tuning_LinearSVMBalanced_evaluation, plot_tuningGMM_evaluation
+from utils.plot_utils import create_scatterplots, bayes_error_plots, plot_lambda_evaluation, create_heatmap2
 from utils.utils import load_dataset
 
 
@@ -48,6 +46,8 @@ def main():
     # =============== FEATURE ANALYSIS ===============
     # plot_histogram(training_data, training_labels, titles)
     # create_heatmap(training_data, training_labels)
+
+    create_heatmap2(training_data, training_labels,)
 
     # create_scatterplots(training_data, training_labels)
     # data = PCA(training_data, training_data, 7)
@@ -176,9 +176,9 @@ def main():
     # tuning_lambda_evaluation(training_data, training_labels, testing_data, testing_labels)
     # plot_lambda_evaluation()
     # tuning_parameters_LinearSVMUnbalanced_evaluation(training_data, training_labels, testing_data, testing_labels)
-    plot_tuningLinearSVMUnbalanced_evaluation()
+    # plot_tuningLinearSVMUnbalanced_evaluation()
     # tuning_parameters_LinearSVMBalanced_evaluation(training_data, training_labels, testing_data, testing_labels)
-    plot_tuning_LinearSVMBalanced_evaluation()
+    # plot_tuning_LinearSVMBalanced_evaluation()
     # tuning_parameters_PolySVM_evaluation(training_data, training_labels, testing_data, testing_labels)
     # plot_tuningPolySVM_evaluation()
     # tuning_parameters_RBFSVM_evaluation(training_data, training_labels, testing_data, testing_labels)
