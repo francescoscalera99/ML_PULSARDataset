@@ -6,7 +6,7 @@ import numpy as np
 
 from classifiers.GMM2 import tuning_componentsGMM, GMM
 # from classifiers.LR import tuning_lambda
-from classifiers.LR import LR, tuning_lambda_evaluation
+from classifiers.LR import LR
 from classifiers.MVG import MVG
 from classifiers.SVM import tuning_parameters_PolySVM, tuning_parameters_RBFSVM, tuning_parameters_LinearSVMBalanced, \
     SVM
@@ -17,9 +17,11 @@ from simulations.simulations import MVG_simulations, GMM_Simulations, SVM_Linear
     SVM_PolySimulations, SVM_RBFSimulations, SVM_LinearBalancedSimulations, LR_simulations
 from simulations.tuning import tuning_parameters_LinearSVMUnbalanced_evaluation, \
     tuning_parameters_LinearSVMBalanced_evaluation, tuning_parameters_PolySVM_evaluation, \
-    tuning_parameters_RBFSVM_evaluation, tuning_componentsGMM_evaluation
+    tuning_parameters_RBFSVM_evaluation, tuning_componentsGMM_evaluation, tuning_lambda_evaluation
 from utils.metrics_utils import bayes_error_plots_data
-from utils.plot_utils import create_scatterplots, bayes_error_plots
+from utils.plot_utils import create_scatterplots, bayes_error_plots, plot_lambda_evaluation, \
+    plot_tuningPolySVM_evaluation, plot_tuningRBFSVM_evaluation, plot_tuningLinearSVMUnbalanced_evaluation, \
+    plot_tuning_LinearSVMBalanced_evaluation, plot_tuningGMM_evaluation
 from utils.utils import load_dataset
 
 
@@ -171,12 +173,18 @@ def main():
     # GMM_evaluation(training_data, training_labels, testing_data, testing_labels, g, alpha=0.1, psi=0.01)
 
     # =============== TUNING HYPERPARAMETERS - EXPERIMENTAL RESULT ===============
-    tuning_lambda_evaluation(training_data, training_labels, testing_data, testing_labels)
-    tuning_parameters_LinearSVMUnbalanced_evaluation(training_data, training_labels, testing_data, testing_labels)
-    tuning_parameters_LinearSVMBalanced_evaluation(training_data, training_labels, testing_data, testing_labels)
-    tuning_parameters_PolySVM_evaluation(training_data, training_labels, testing_data, testing_labels)
-    tuning_parameters_RBFSVM_evaluation(training_data, training_labels, testing_data, testing_labels)
-    tuning_componentsGMM_evaluation(training_data, training_labels, testing_data, testing_labels)
+    # tuning_lambda_evaluation(training_data, training_labels, testing_data, testing_labels)
+    plot_lambda_evaluation()
+    # tuning_parameters_LinearSVMUnbalanced_evaluation(training_data, training_labels, testing_data, testing_labels)
+    plot_tuningLinearSVMUnbalanced_evaluation()
+    # tuning_parameters_LinearSVMBalanced_evaluation(training_data, training_labels, testing_data, testing_labels)
+    plot_tuning_LinearSVMBalanced_evaluation()
+    # tuning_parameters_PolySVM_evaluation(training_data, training_labels, testing_data, testing_labels)
+    plot_tuningPolySVM_evaluation()
+    # tuning_parameters_RBFSVM_evaluation(training_data, training_labels, testing_data, testing_labels)
+    plot_tuningRBFSVM_evaluation()
+    # tuning_componentsGMM_evaluation(training_data, training_labels, testing_data, testing_labels)
+    plot_tuningGMM_evaluation()
 
     # ****************** TURN OFF PC AT END OF SIMULATION (needs sudo) ******************
     # (windows ?)
