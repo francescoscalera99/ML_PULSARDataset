@@ -20,7 +20,7 @@ from simulations.tuning import tuning_parameters_LinearSVMUnbalanced_evaluation,
     tuning_parameters_RBFSVM_evaluation, tuning_componentsGMM_evaluation, tuning_lambda_evaluation
 from utils.metrics_utils import bayes_error_plots_data
 from utils.plot_utils import create_scatterplots, bayes_error_plots, plot_lambda_evaluation, create_heatmap2, \
-    plot_tuningPolySVM_evaluation, plot_tuningRBFSVM_evaluation, plot_tuningGMM_evaluation
+    plot_tuningPolySVM_evaluation, plot_tuningRBFSVM_evaluation, plot_tuningGMM_evaluation, bayes_error_plots2
 from utils.utils import load_dataset
 
 
@@ -127,35 +127,37 @@ def main():
 
     # =============== BAYES ERROR PLOT ==================
     classifiers = [MVG, LR, SVM, GMM]
-    # args = [{"raw": False,
-    #          "m": None,
-    #          "variant": "tied"},
-    #         {"raw": False,
-    #          "m": None,
-    #          "lbd": lbd,
-    #          "pi_T": 0.5},
-    #         {"raw": False,
-    #          "m": None,
-    #          "k": K_LinearB,
-    #          "c": C_LinearB,
-    #          "pi_T": 0.5,
-    #          "balanced": True,
-    #          "kernel_type": "poly",
-    #          "kernel_params": (1, 0)},
-    #         {"raw": False,
-    #          "m": None,
-    #          "G": g,
-    #          "type": "full-cov",
-    #          "alpha": 0.1,
-    #          "psi": 0.1}]
-    #
-    # for i, classifier in enumerate(classifiers):
-    #     bayes_error_plots_data(training_data, training_labels, classifier, **args[i])
+    args = [{"raw": False,
+             "m": 7,
+             "variant": "tied"},
+            {"raw": False,
+             "m": 7,
+             "lbd": lbd,
+             "pi_T": 0.5},
+            {"raw": False,
+             "m": 7,
+             "k": K_LinearB,
+             "c": C_LinearB,
+             "pi_T": 0.5,
+             "balanced": True,
+             "kernel_type": "poly",
+             "kernel_params": (1, 0)},
+            {"raw": False,
+             "m": 7,
+             "G": g,
+             "type": "full-cov",
+             "alpha": 0.1,
+             "psi": 0.1}]
+
+    for i, classifier in enumerate(classifiers):
+        print(f"{'*'*30} bep {i+1}/{len(classifiers)} {'*'*30}")
+        bayes_error_plots_data(training_data, training_labels, classifier, **args[i])
     #
     # for i, classifier in enumerate(classifiers):
     #     bayes_error_plots(classifier)
-
-    # bayes_error_plots2(classifiers, after=True)
+    print(f"plotting...")
+    for a in [True, False]:
+        bayes_error_plots2(classifiers, after=a)
 
     # =============== EXPERIMENTAL RESULT ===============
     # print("============= MVG EVALUATION =============")

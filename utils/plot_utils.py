@@ -731,7 +731,7 @@ def bayes_error_plots2(classifiers, after=False):
     fig.tight_layout()
     fig.subplots_adjust(hspace=0.3, wspace=0.2)
     fig.savefig(fname=f"outputs/bayes_error_plots/bep_{fname}")
-    plt.show()
+    fig.show()
 
 
 def plot_lambda_evaluation():
@@ -1041,41 +1041,201 @@ def plot_tuningGMM_evaluation():
         "ytick.labelsize": 20,
     })
 
-    fig, axs = plt.subplots(3, 2)
-    fig.set_size_inches(12, 10)
+    fig1, axs1 = plt.subplots(3, 2)
+    fig1.set_size_inches(12, 10)
+
+    fig2, axs2 = plt.subplots(3, 2)
+    fig2.set_size_inches(12, 10)
+
+    y = np.arange(0.0, 1.1, 0.2)
+
+    axs = [axs1, axs2]
+
+    for i, (variant, m) in enumerate(itertools.product(variants, m_values)):
+        for j, (p, r) in enumerate(itertools.product(pis, raw)):
+            pp = '' if p == 0.5 else "_pi" + str(p).replace('.', '-')
+            DCFs = np.load(f"../simulations/GMM/GMM_rawFeature-{r}_PCA{m}_{variant}{pp}.npy")
+            DCFs_evaluation = np.load(f"../simulations/evaluation/GMM/GMM_rawFeature-{r}_PCA{m}_{variant}_pi{str(p).replace('.', '-')}.npy")
+            label = r"$\widetilde{\pi}=$" + f"{p}, {'raw' if r else 'gau'}"
+            axs[int(r)][i // 2, i % 2].plot(components_values, DCFs, label=label, color=colors6[j], linewidth=3)
+            axs[int(r)][i // 2, i % 2].plot(components_values, DCFs_evaluation, linestyle="dashed", label=label+"(eval.)", color=colors6[j], linewidth=3)
+            axs[int(r)][i // 2, i % 2].set_xscale('log', base=2)
+            axs[int(r)][i // 2, i % 2].set_xticks(components_values)
+            axs[int(r)][i // 2, i % 2].set_yticks(y)
+            if i // 2 == 2:
+                axs[int(r)][i // 2, i % 2].set_xlabel("Number of components")
+            if i % 2 == 0:
+                axs[int(r)][i // 2, i % 2].set_ylabel(r"$DCF$")
+            v = 'tied full-cov' if variant == 'tied' else variant
+
+            pca = f"PCA ($m={m}$)" if m is not None else "no PCA"
+            axs[int(r)][i // 2, i % 2].set_title(rf"{v}, {pca}", size=20)
+
+        # axs[i // 2, i % 2].legend(loc='upper right', framealpha=0.5)
+
+    fig1.tight_layout()
+    fig1.show()
+    fig1.savefig(fname="../outputs/evaluation/tuning_GMM2_gau", dpi=180)
+
+    fig2.tight_layout()
+    fig2.show()
+    fig2.savefig(fname="../outputs/evaluation/tuning_GMM2_raw", dpi=180)
+
+    label_params1 = axs1[0, 0].get_legend_handles_labels()
+    figl1, axl1 = plt.subplots(figsize=(6.5, 10))
+    axl1.axis(False)
+    axl1.legend(*label_params1, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
+    figl1.show()
+    figl1.savefig(fname="../outputs/evaluation/tuning_GMM_legend_gau")
+
+    label_params2 = axs2[0, 0].get_legend_handles_labels()
+    figl2, axl2 = plt.subplots(figsize=(6.5, 10))
+    axl2.axis(False)
+    axl2.legend(*label_params2, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
+    figl2.show()
+    figl2.savefig(fname="../outputs/evaluation/tuning_GMM_legend_raw")
+
+
+def plot_tuningGMM_evaluation3():
+    variants = ['full-cov', 'diag', 'tied']
+    raw = [True, False]
+    m_values = [7]
+    pis = [0.5, 0.1, 0.9]
+    components_values = [2 ** i for i in range(9)]
+    plt.rcParams.update({
+        "text.usetex": True,
+        "font.family": "sans-serif",
+        "font.sans-serif": ["Computer Modern Serif"],
+        "axes.titlesize": 30,
+        "axes.labelsize": 20,
+        "legend.fontsize": 20,
+        "xtick.labelsize": 20,
+        "ytick.labelsize": 20,
+    })
+
+    fig1, axs = plt.subplots(3, 2)
+    fig1.set_size_inches(12, 10)
+
     y = np.arange(0.0, 1.1, 0.2)
 
     for i, (variant, m) in enumerate(itertools.product(variants, m_values)):
         for j, (p, r) in enumerate(itertools.product(pis, raw)):
             pp = '' if p == 0.5 else "_pi" + str(p).replace('.', '-')
             DCFs = np.load(f"../simulations/GMM/GMM_rawFeature-{r}_PCA{m}_{variant}{pp}.npy")
-            DCFs_evaluation = np.load(f"../simulations/evaluation/GMM/GMM_rawFeature-{r}_PCA{m}_{variant}{pp}.npy")
-            label = r"$\widetilde{\pi}=$" + f"{p}, {'raw' if r else 'gau'}"
-            axs[i // 2, i % 2].plot(components_values, DCFs, label=label, color=colors6[j], linewidth=3)
-            axs[i // 2, i % 2].plot(components_values, DCFs_evaluation, linestyle="dashed", label=label+"(eval.)", color=colors6[j], linewidth=3)
-            axs[i // 2, i % 2].set_xscale('log', base=2)
-            axs[i // 2, i % 2].set_xticks(components_values)
-            axs[i // 2, i % 2].set_yticks(y)
+            DCFs_evaluation = np.load(f"../simulations/evaluation/GMM/GMM_rawFeature-{r}_PCA{m}_{variant}_pi{str(p).replace('.', '-')}.npy")
+            label = r"$\widetilde{\pi}=$" + f"{p} "
+            axs[i, 1-int(r)].plot(components_values, DCFs, label=label, color=colors3[j//2], linewidth=3)
+            axs[i, 1-int(r)].plot(components_values, DCFs_evaluation, linestyle="dashed", label=label+"(eval.)", color=colors3[j//2], linewidth=3)
+            axs[i, 1-int(r)].set_xscale('log', base=2)
+            axs[i, 1-int(r)].set_xticks(components_values)
+            axs[i, 1-int(r)].set_yticks(y)
             if i // 2 == 2:
-                axs[i // 2, i % 2].set_xlabel("Number of components")
-
+                axs[i, 1-int(r)].set_xlabel("Number of components")
+            if i % 2 == 0:
+                axs[i, 1-int(r)].set_ylabel(r"$DCF$")
             v = 'tied full-cov' if variant == 'tied' else variant
 
             pca = f"PCA ($m={m}$)" if m is not None else "no PCA"
-            axs[i // 2, i % 2].set_title(rf"{v}, {pca}", size=20)
+            axs[i, 1-int(r)].set_title(rf"{v}, {pca}, {'raw' if r else 'gau'}", size=20)
 
         # axs[i // 2, i % 2].legend(loc='upper right', framealpha=0.5)
 
-    fig.tight_layout()
-    # plt.show()
-    fig.savefig(fname="../outputs/evaluation/tuning_GMM2", dpi=180)
+    fig1.tight_layout()
+    fig1.show()
+    fig1.savefig(fname="../outputs/evaluation/tuning_GMM2_PCA7", dpi=180)
 
-    label_params = axs[0, 0].get_legend_handles_labels()
-    figl, axl = plt.subplots(figsize=(6.5, 5))
-    axl.axis(False)
-    axl.legend(*label_params, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
-    # figl.show()
-    figl.savefig(fname="../outputs/evaluation/tuning_GMM_legend")
+    label_params1 = axs[0, 0].get_legend_handles_labels()
+    figl1, axl1 = plt.subplots(figsize=(5.5, 5.2))
+    axl1.axis(False)
+    axl1.legend(*label_params1, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
+    figl1.show()
+    figl1.savefig(fname="../outputs/evaluation/tuning_GMM_legend_PCA7")
+
+
+def plot_tuningGMM_evaluation2():
+    variants = ['full-cov', 'diag', 'tied']
+    raw = [True, False]
+    m_values = [None, 7]
+    pis = [0.5, 0.1, 0.9]
+    components_values = [2 ** i for i in range(9)]
+    plt.rcParams.update({
+        "text.usetex": True,
+        "font.family": "sans-serif",
+        "font.sans-serif": ["Computer Modern Serif"],
+        "axes.titlesize": 30,
+        "axes.labelsize": 20,
+        "legend.fontsize": 20,
+        "xtick.labelsize": 20,
+        "ytick.labelsize": 20,
+    })
+
+    fig1, axs1 = plt.subplots(3, 2)
+    fig1.set_size_inches(12, 10)
+
+    fig2, axs2 = plt.subplots(3, 2)
+    fig2.set_size_inches(12, 10)
+
+    fig3, axs3 = plt.subplots(3, 2)
+    fig3.set_size_inches(12, 10)
+
+    y = np.arange(0.0, 1.1, 0.2)
+
+    axs = [axs1, axs2, axs3]
+
+    for i, (variant, m) in enumerate(itertools.product(variants, m_values)):
+        for j, (p, r) in enumerate(itertools.product(pis, raw)):
+            pp = '' if p == 0.5 else "_pi" + str(p).replace('.', '-')
+            DCFs = np.load(f"../simulations/GMM/GMM_rawFeature-{r}_PCA{m}_{variant}{pp}.npy")
+            DCFs_evaluation = np.load(f"../simulations/evaluation/GMM/GMM_rawFeature-{r}_PCA{m}_{variant}_pi{str(p).replace('.', '-')}.npy")
+            label = r"$\widetilde{\pi}=$" + f"{p}, {'raw' if r else 'gau'}"
+            axs[pis.index(p)][i // 2, i % 2].plot(components_values, DCFs, label=label, color=colors6[j], linewidth=3)
+            axs[pis.index(p)][i // 2, i % 2].plot(components_values, DCFs_evaluation, linestyle="dashed", label=label+"(eval.)", color=colors6[j], linewidth=3)
+            axs[pis.index(p)][i // 2, i % 2].set_xscale('log', base=2)
+            axs[pis.index(p)][i // 2, i % 2].set_xticks(components_values)
+            axs[pis.index(p)][i // 2, i % 2].set_yticks(y)
+            if i // 2 == 2:
+                axs[pis.index(p)][i // 2, i % 2].set_xlabel("Number of components")
+            if i % 2 == 0:
+                axs[pis.index(p)][i // 2, i % 2].set_ylabel(r"$DCF$")
+            v = 'tied full-cov' if variant == 'tied' else variant
+
+            pca = f"PCA ($m={m}$)" if m is not None else "no PCA"
+            axs[pis.index(p)][i // 2, i % 2].set_title(rf"{v}, {pca}", size=20)
+
+        # axs[i // 2, i % 2].legend(loc='upper right', framealpha=0.5)
+
+    fig1.tight_layout()
+    fig1.show()
+    fig1.savefig(fname="../outputs/evaluation/tuning_GMM2_pi0-5", dpi=180)
+
+    fig2.tight_layout()
+    fig2.show()
+    fig2.savefig(fname="../outputs/evaluation/tuning_GMM2_pi0-1", dpi=180)
+
+    fig3.tight_layout()
+    fig3.show()
+    fig3.savefig(fname="../outputs/evaluation/tuning_GMM2_pi0-9", dpi=180)
+
+    label_params1 = axs1[0, 0].get_legend_handles_labels()
+    figl1, axl1 = plt.subplots(figsize=(6.5, 10))
+    axl1.axis(False)
+    axl1.legend(*label_params1, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
+    figl1.show()
+    figl1.savefig(fname="../outputs/evaluation/tuning_GMM_legend_pi0-5")
+
+    label_params2 = axs2[0, 0].get_legend_handles_labels()
+    figl2, axl2 = plt.subplots(figsize=(6.5, 10))
+    axl2.axis(False)
+    axl2.legend(*label_params2, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
+    figl2.show()
+    figl2.savefig(fname="../outputs/evaluation/tuning_GMM_legend_pi0-1")
+
+    label_params3 = axs3[0, 0].get_legend_handles_labels()
+    figl3, axl3 = plt.subplots(figsize=(6.5, 10))
+    axl3.axis(False)
+    axl3.legend(*label_params3, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
+    figl3.show()
+    figl3.savefig(fname="../outputs/evaluation/tuning_GMM_legend_pi0-9")
 
 
 if __name__ == '__main__':
@@ -1092,8 +1252,13 @@ if __name__ == '__main__':
         "figure.dpi": 180
     })
 
-    # colors8 = distinctipy.get_colors(8, pastel_factor=1, colorblind_type='Deuteranomaly')
-    # print(colors8)
+    # colors3 = distinctipy.get_colors(3, pastel_factor=1, colorblind_type='Deuteranomaly')
+    # print(colors3)
+
+    colors3 = [(0.5348547306212659, 0.5139339239248601, 0.5268686469375292),
+               (0.9927895402526214, 0.7352147015471453, 0.5581049747178046),
+               (0.524907193614528, 0.7671952975947081, 0.976588025007669)]
+
     colors6 = [(0.48702807223549177, 0.4242891647177821, 0.9480975665882982),
                (0.9146761531779931, 0.4970424422244128, 0.41460357267068376),
                (0.843602824944377, 0.6031154951690304, 0.9802318468625552),
@@ -1115,9 +1280,9 @@ if __name__ == '__main__':
 
     # plot_tuningLinearSVMUnbalanced_evaluation()
     # plot_tuning_LinearSVMBalanced_evaluation()
-    plot_tuningPolySVM_evaluation()
+    # plot_tuningPolySVM_evaluation()
     # plot_tuningRBFSVM_evaluation()
     # plot_lambda_evaluation()
-
+    plot_tuningGMM_evaluation3()
     # plot_tuningGMM2()
     pass
