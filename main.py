@@ -33,8 +33,6 @@ def get_same_distrib_partition(dtr, ltr, perc=0.1, num_samples=1000):
     return dtr2, ltr2
 
 
-
-
 def main():
     (training_data, training_labels), (testing_data, testing_labels) = load_dataset()
     # titles = ['1. Mean of the integrated profile',
@@ -186,7 +184,7 @@ def main():
     # plot_tuningPolySVM_evaluation()
     # tuning_parameters_RBFSVM_evaluation(training_data, training_labels, testing_data, testing_labels)
     # plot_tuningRBFSVM_evaluation()
-    tuning_componentsGMM_evaluation(training_data, training_labels, testing_data, testing_labels)
+    # tuning_componentsGMM_evaluation(training_data, training_labels, testing_data, testing_labels)
     # plot_tuningGMM_evaluation()
 
     # ****************** TURN OFF PC AT END OF SIMULATION (needs sudo) ******************

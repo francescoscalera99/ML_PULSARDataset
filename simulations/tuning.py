@@ -119,7 +119,8 @@ def tuning_parameters_LinearSVMBalanced_evaluation(training_data, ltr, testing_d
 
 def tuning_parameters_PolySVM_evaluation(training_data, ltr, testing_data, evaluationLabels):
     # m_values = [False, None, 7, 5]
-    m_values = [7, 5]
+    # m_values = [7, 5]
+    m_values = [False, None]
     C_values = np.logspace(-3, 3, 20)
     K_values = [1.0]
     c_values = [0, 1, 10, 15]
