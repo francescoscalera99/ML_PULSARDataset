@@ -7,6 +7,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import matplotlib
 
+from utils.metrics_utils import compute_FPRs_TPRs
+from utils.utils import k_fold
+
 
 def plot_histogram(array, labels, titles, nbins: int = 10) -> None:
     """
@@ -1150,6 +1153,22 @@ def plot_tuningGMM_evaluation3():
     axl1.legend(*label_params1, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
     figl1.show()
     figl1.savefig(fname="../outputs/evaluation/tuning_GMM_legend_PCA7")
+
+
+def ROC_curve(training_data, training_labels, classifiers, args):
+    plt.figure()
+    colors = distinctipy.get_colors(len(classifiers))
+    for i, classifier in enumerate(classifiers):
+        score, labels = k_fold(training_data, training_labels, classifier, 5, **args[i])
+        FPRs, TPRs = compute_FPRs_TPRs(score, labels)
+        plt.plot(FPRs, TPRs, color=colors[i], label=f"{classifier.__name__}")
+    plt.title("ROC curve")
+    plt.xlabel("FPR")
+    plt.ylabel("TPR")
+    plt.legend()
+    plt.grid()
+    plt.show()
+    plt.savefig('results/ROC/ROC_training.png')
 
 
 def plot_tuningGMM_evaluation2():

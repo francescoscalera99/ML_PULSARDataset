@@ -20,7 +20,8 @@ from simulations.tuning import tuning_parameters_LinearSVMUnbalanced_evaluation,
     tuning_parameters_RBFSVM_evaluation, tuning_componentsGMM_evaluation, tuning_lambda_evaluation
 from utils.metrics_utils import bayes_error_plots_data
 from utils.plot_utils import create_scatterplots, bayes_error_plots, plot_lambda_evaluation, create_heatmap2, \
-    plot_tuningPolySVM_evaluation, plot_tuningRBFSVM_evaluation, plot_tuningGMM_evaluation, bayes_error_plots2
+    plot_tuningPolySVM_evaluation, plot_tuningRBFSVM_evaluation, plot_tuningGMM_evaluation, bayes_error_plots2, \
+    ROC_curve
 from utils.utils import load_dataset
 
 
@@ -149,16 +150,15 @@ def main():
              "alpha": 0.1,
              "psi": 0.1}]
 
-    for i, classifier in enumerate(classifiers):
-        print(f"{'*'*30} bep {i+1}/{len(classifiers)} {'*'*30}")
-        bayes_error_plots_data(training_data, training_labels, classifier, **args[i])
-    #
     # for i, classifier in enumerate(classifiers):
-    #     bayes_error_plots(classifier)
-    print(f"plotting...")
-    for a in [True, False]:
-        bayes_error_plots2(classifiers, after=a)
-
+    #     print(f"{'*'*30} bep {i+1}/{len(classifiers)} {'*'*30}")
+    #     bayes_error_plots_data(training_data, training_labels, classifier, **args[i])
+    # #
+    # # for i, classifier in enumerate(classifiers):
+    # #     bayes_error_plots(classifier)
+    # print(f"plotting...")
+    # for a in [True, False]:
+    #     bayes_error_plots2(classifiers, after=a)
     # =============== EXPERIMENTAL RESULT ===============
     # print("============= MVG EVALUATION =============")
     # MVG_evaluation(training_data, training_labels, testing_data, testing_labels)
@@ -174,7 +174,7 @@ def main():
     # SVM_RBF_evaluation(training_data, training_labels, testing_data, testing_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF)
     # print("============ GMM EVALUATION ==========")
     # GMM_evaluation(training_data, training_labels, testing_data, testing_labels, g, alpha=0.1, psi=0.01)
-
+    ROC_curve(training_data, training_labels, classifiers, args)
     # =============== TUNING HYPERPARAMETERS - EXPERIMENTAL RESULT ===============
     # tuning_lambda_evaluation(training_data, training_labels, testing_data, testing_labels)
     # plot_lambda_evaluation()
