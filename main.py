@@ -50,7 +50,7 @@ def main():
     # plot_histogram(training_data, training_labels, titles)
     # create_heatmap(training_data, training_labels)
 
-    create_heatmap2(training_data, training_labels,)
+    # create_heatmap2(training_data, training_labels,)
 
     # create_scatterplots(training_data, training_labels)
     # data = PCA(training_data, training_data, 7)
@@ -186,8 +186,8 @@ def main():
     # plot_tuningPolySVM_evaluation()
     # tuning_parameters_RBFSVM_evaluation(training_data, training_labels, testing_data, testing_labels)
     # plot_tuningRBFSVM_evaluation()
-    # tuning_componentsGMM_evaluation(training_data, training_labels, testing_data, testing_labels)
-    plot_tuningGMM_evaluation()
+    tuning_componentsGMM_evaluation(training_data, training_labels, testing_data, testing_labels)
+    # plot_tuningGMM_evaluation()
 
     # ****************** TURN OFF PC AT END OF SIMULATION (needs sudo) ******************
     # (windows ?)
