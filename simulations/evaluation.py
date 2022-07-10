@@ -47,6 +47,7 @@ def MVG_evaluation(training_data, ltr, testing_data, evaluationLabels, actualDCF
         mvg.classify(dte, None)
 
         llrs = mvg.get_llrs()
+        del mvg
 
         if actualDCF:
             if calibratedScore:
@@ -108,6 +109,7 @@ def LR_evaluation(training_data, ltr, testing_data, evaluationLabels, lbd, actua
         logReg.classify(dte, None)
 
         llrs = logReg.get_llrs()
+        del logReg
 
         if actualDCF:
             if calibratedScore:
@@ -167,6 +169,7 @@ def SVM_LinearUnbalanced_evaluation(training_data, ltr, testing_data, evaluation
         svm.classify(dte, None)
 
         llrs = svm.get_llrs()
+        del svm
 
         if actualDCF:
             if calibratedScore:
@@ -230,6 +233,7 @@ def SVM_LinearBalanced_evaluation(training_data, ltr, testing_data, evaluationLa
         svm.classify(dte, None)
 
         llrs = svm.get_llrs()
+        del svm
 
         if actualDCF:
             if calibratedScore:
@@ -290,6 +294,7 @@ def SVM_Poly_evaluation(training_data, ltr, testing_data, evaluationLabels, K, C
         svm.classify(dte, None)
 
         llrs = svm.get_llrs()
+        del svm
 
         if actualDCF:
             if calibratedScore:
@@ -351,6 +356,7 @@ def SVM_RBF_evaluation(training_data, ltr, testing_data, evaluationLabels, K, C,
         svm.classify(dte, None)
 
         llrs = svm.get_llrs()
+        del svm
 
         if actualDCF:
             if calibratedScore:
@@ -418,6 +424,7 @@ def GMM_evaluation(training_data, ltr, testing_data, evaluationLabels, g, alpha,
         gmm.classify(dte, None)
 
         llrs = gmm.get_llrs()
+        del gmm
 
         if actualDCF:
             if calibratedScore:

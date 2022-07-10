@@ -101,6 +101,9 @@ def main():
     g = 16
     # GMM_Simulations(training_data, training_labels, g, alpha=0.1, psi=0.01)
 
+    # =============== ROC CURVE (BEST CLASSIFIER) ===============
+    # ROC_curve(training_data, training_labels, classifiers, args)
+
     # =============== COMPUTING ACTUAL DCF ===============
     # MVG_simulations(training_data, training_labels, actualDCF=True, calibrateScore=False)
     # LR_simulations(training_data, training_labels, lbd, actualDCF=True)
@@ -127,54 +130,48 @@ def main():
     # GMM_Simulations(training_data, training_labels, g, alpha=0.1, psi=0.01, actualDCF=True, calibratedScore=True)
 
     # =============== BAYES ERROR PLOT ==================
-    classifiers = [MVG, LR, SVM, GMM]
-    args = [{"raw": False,
-             "m": 7,
-             "variant": "tied"},
-            {"raw": False,
-             "m": 7,
-             "lbd": lbd,
-             "pi_T": 0.5},
-            {"raw": False,
-             "m": 7,
-             "k": K_LinearB,
-             "c": C_LinearB,
-             "pi_T": 0.5,
-             "balanced": True,
-             "kernel_type": "poly",
-             "kernel_params": (1, 0)},
-            {"raw": False,
-             "m": 7,
-             "G": g,
-             "type": "full-cov",
-             "alpha": 0.1,
-             "psi": 0.1}]
+    # classifiers = [MVG, LR, SVM, GMM]
+    # args = [{"raw": False,
+    #          "m": 7,
+    #          "variant": "tied"},
+    #         {"raw": False,
+    #          "m": 7,
+    #          "lbd": lbd,
+    #          "pi_T": 0.5},
+    #         {"raw": False,
+    #          "m": 7,
+    #          "k": K_LinearB,
+    #          "c": C_LinearB,
+    #          "pi_T": 0.5,
+    #          "balanced": True,
+    #          "kernel_type": "poly",
+    #          "kernel_params": (1, 0)},
+    #         {"raw": False,
+    #          "m": 7,
+    #          "G": g,
+    #          "type": "full-cov",
+    #          "alpha": 0.1,
+    #          "psi": 0.1}]
 
     # for i, classifier in enumerate(classifiers):
     #     print(f"{'*'*30} bep {i+1}/{len(classifiers)} {'*'*30}")
     #     bayes_error_plots_data(training_data, training_labels, classifier, **args[i])
-    # #
-    # # for i, classifier in enumerate(classifiers):
-    # #     bayes_error_plots(classifier)
+    #
+    # for i, classifier in enumerate(classifiers):
+    #     bayes_error_plots(classifier)
     # print(f"plotting...")
     # for a in [True, False]:
     #     bayes_error_plots2(classifiers, after=a)
+
     # =============== EXPERIMENTAL RESULT ===============
-    # print("============= MVG EVALUATION =============")
     # MVG_evaluation(training_data, training_labels, testing_data, testing_labels)
-    # print("============= LR EVALUATION ===============")
     # LR_evaluation(training_data, training_labels, testing_data, testing_labels, lbd)
-    # print("============ SVM LINEAR UNBALANCED EVALUATION ==========")
     # SVM_LinearUnbalanced_evaluation(training_data, training_labels, testing_data, testing_labels, K_LinearUnb, C_LinearUnb)
-    # print("============ SVM LINEAR BALANCED EVALUATION ==========")
     # SVM_LinearBalanced_evaluation(training_data, training_labels, testing_data, testing_labels, K_LinearB, C_LinearB)
-    # print("============ SVM POLY EVALUATION ==========")
     # SVM_Poly_evaluation(training_data, training_labels, testing_data, testing_labels, K_Poly, CPoly, pi_TPolyRBF, c, d)
-    # print("============ SVM RBF EVALUATION ==========")
     # SVM_RBF_evaluation(training_data, training_labels, testing_data, testing_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF)
-    # print("============ GMM EVALUATION ==========")
     # GMM_evaluation(training_data, training_labels, testing_data, testing_labels, g, alpha=0.1, psi=0.01)
-    ROC_curve(training_data, training_labels, classifiers, args)
+
     # =============== TUNING HYPERPARAMETERS - EXPERIMENTAL RESULT ===============
     # tuning_lambda_evaluation(training_data, training_labels, testing_data, testing_labels)
     # plot_lambda_evaluation()
@@ -188,6 +185,22 @@ def main():
     # plot_tuningRBFSVM_evaluation()
     # tuning_componentsGMM_evaluation(training_data, training_labels, testing_data, testing_labels)
     # plot_tuningGMM_evaluation()
+
+    # =============== ACTUAL DCF - EXPERIMENTAL RESULT ===============
+    # print("MVG ACTDCF")
+    # MVG_evaluation(training_data, training_labels, testing_data, testing_labels, actualDCF=True)
+    # print("LR ACTDCF")
+    # LR_evaluation(training_data, training_labels, testing_data, testing_labels, lbd, actualDCF=True)
+    # print("SVM LINEAR UNBALANCED ACTDCF")
+    # SVM_LinearUnbalanced_evaluation(training_data, training_labels, testing_data, testing_labels, K_LinearUnb, C_LinearUnb, actualDCF=True)
+    # print("SVM LINEAR BALANCED ACTDCF")
+    # SVM_LinearBalanced_evaluation(training_data, training_labels, testing_data, testing_labels, K_LinearB, C_LinearB, actualDCF=True)
+    # print("SVM POLY ACTDCF")
+    # SVM_Poly_evaluation(training_data, training_labels, testing_data, testing_labels, K_Poly, CPoly, pi_TPolyRBF, c, d, actualDCF=True)
+    # print("SVM RBF ACTDCF")
+    # SVM_RBF_evaluation(training_data, training_labels, testing_data, testing_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF, actualDCF=True)
+    print("GMM ACTDCF")
+    GMM_evaluation(training_data, training_labels, testing_data, testing_labels, g, alpha=0.1, psi=0.01, actualDCF=True)
 
     # ****************** TURN OFF PC AT END OF SIMULATION (needs sudo) ******************
     # (windows ?)
