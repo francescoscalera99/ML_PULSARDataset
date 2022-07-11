@@ -10,7 +10,7 @@ from classifiers.LR import LR
 from classifiers.MVG import MVG
 from classifiers.SVM import tuning_parameters_PolySVM, tuning_parameters_RBFSVM, tuning_parameters_LinearSVMBalanced, \
     SVM
-from preprocessing.preprocessing import PCA
+from preprocessing.preprocessing import PCA, gaussianize
 from simulations.evaluation import MVG_evaluation, LR_evaluation, SVM_LinearUnbalanced_evaluation, \
     SVM_LinearBalanced_evaluation, SVM_Poly_evaluation, SVM_RBF_evaluation, GMM_evaluation
 from simulations.simulations import MVG_simulations, GMM_Simulations, SVM_LinearUnbalancedSimulations, \
@@ -19,8 +19,9 @@ from simulations.tuning import tuning_parameters_LinearSVMUnbalanced_evaluation,
     tuning_parameters_LinearSVMBalanced_evaluation, tuning_parameters_PolySVM_evaluation, \
     tuning_parameters_RBFSVM_evaluation, tuning_componentsGMM_evaluation, tuning_lambda_evaluation
 from utils.metrics_utils import bayes_error_plots_data
-from utils.plot_utils import create_scatterplots, bayes_error_plots, plot_lambda_evaluation, create_heatmap2, \
-    plot_tuningPolySVM_evaluation, plot_tuningRBFSVM_evaluation, plot_tuningGMM_evaluation, bayes_error_plots2
+from utils.plot_utils import create_scatterplots, bayes_error_plots, plot_lambda_evaluation, create_heatmap, \
+    plot_tuningPolySVM_evaluation, plot_tuningRBFSVM_evaluation, plot_tuningGMM_evaluation, bayes_error_plots, \
+    create_heatmap
 from utils.utils import load_dataset
 
 
@@ -46,9 +47,7 @@ def main():
 
     # =============== FEATURE ANALYSIS ===============
     # plot_histogram(training_data, training_labels, titles)
-    # create_heatmap(training_data, training_labels)
-
-    # create_heatmap2(training_data, training_labels,)
+    create_heatmap(training_data, training_labels)
 
     # create_scatterplots(training_data, training_labels)
     # data = PCA(training_data, training_data, 7)
@@ -126,38 +125,35 @@ def main():
     # GMM_Simulations(training_data, training_labels, g, alpha=0.1, psi=0.01, actualDCF=True, calibratedScore=True)
 
     # =============== BAYES ERROR PLOT ==================
-    classifiers = [MVG, LR, SVM, GMM]
-    args = [{"raw": False,
-             "m": 7,
-             "variant": "tied"},
-            {"raw": False,
-             "m": 7,
-             "lbd": lbd,
-             "pi_T": 0.5},
-            {"raw": False,
-             "m": 7,
-             "k": K_LinearB,
-             "c": C_LinearB,
-             "pi_T": 0.5,
-             "balanced": True,
-             "kernel_type": "poly",
-             "kernel_params": (1, 0)},
-            {"raw": False,
-             "m": 7,
-             "G": g,
-             "type": "full-cov",
-             "alpha": 0.1,
-             "psi": 0.1}]
-
-    for i, classifier in enumerate(classifiers):
-        print(f"{'*'*30} bep {i+1}/{len(classifiers)} {'*'*30}")
-        bayes_error_plots_data(training_data, training_labels, classifier, **args[i])
+    # classifiers = [MVG, LR, SVM, GMM]
+    # args = [{"raw": False,
+    #          "m": 7,
+    #          "variant": "tied"},
+    #         {"raw": False,
+    #          "m": 7,
+    #          "lbd": lbd,
+    #          "pi_T": 0.5},
+    #         {"raw": False,
+    #          "m": 7,
+    #          "k": K_LinearB,
+    #          "c": C_LinearB,
+    #          "pi_T": 0.5,
+    #          "balanced": True,
+    #          "kernel_type": "poly",
+    #          "kernel_params": (1, 0)},
+    #         {"raw": False,
+    #          "m": 7,
+    #          "G": g,
+    #          "type": "full-cov",
+    #          "alpha": 0.1,
+    #          "psi": 0.1}]
     #
     # for i, classifier in enumerate(classifiers):
-    #     bayes_error_plots(classifier)
-    print(f"plotting...")
-    for a in [True, False]:
-        bayes_error_plots2(classifiers, after=a)
+    #     print(f"{'*'*30} bep {i+1}/{len(classifiers)} {'*'*30}")
+    #     bayes_error_plots_data(training_data, training_labels, classifier, **args[i])
+    # print(f"plotting...")
+    # for a in [True, False]:
+    #     bayes_error_plots2(classifiers, after=a)
 
     # =============== EXPERIMENTAL RESULT ===============
     # print("============= MVG EVALUATION =============")

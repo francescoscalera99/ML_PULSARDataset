@@ -64,9 +64,6 @@ def compute_actual_DCF(llr, labels, prior, Cfn, Cfp):
     return actDCF
 
 
-
-
-
 def bayes_error_plots_data(training_data, training_labels, classifier, Cfn=1, Cfp=1, **kwargs):
     effPriorLogOdds = np.linspace(-3, 3, 21)
     effPrior = 1 / (1 + np.exp(-effPriorLogOdds))
