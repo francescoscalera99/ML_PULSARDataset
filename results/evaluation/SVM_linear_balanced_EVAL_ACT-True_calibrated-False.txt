@@ -1,0 +1,40 @@
++---------------------------------------------+---------+
+|               Hyperparameters               | act DCF |
++---------------------------------------------+---------+
+| PCA m=False, pi_T=0.5, π_tilde=0.5, C =0.02 |  0.542  |
+| PCA m=False, pi_T=0.1, π_tilde=0.5, C =0.02 |   0.31  |
+| PCA m=False, pi_T=0.9, π_tilde=0.5, C =0.02 |  1.004  |
+| PCA m=False, pi_T=0.5, π_tilde=0.1, C =0.02 |  1.733  |
+| PCA m=False, pi_T=0.1, π_tilde=0.1, C =0.02 |  0.589  |
+| PCA m=False, pi_T=0.9, π_tilde=0.1, C =0.02 |  8.886  |
+| PCA m=False, pi_T=0.5, π_tilde=0.9, C =0.02 |  0.928  |
+| PCA m=False, pi_T=0.1, π_tilde=0.9, C =0.02 |   0.69  |
+| PCA m=False, pi_T=0.9, π_tilde=0.9, C =0.02 |  1.078  |
+|  PCA m=None, pi_T=0.5, π_tilde=0.5, C =0.02 |  0.125  |
+|  PCA m=None, pi_T=0.1, π_tilde=0.5, C =0.02 |  0.166  |
+|  PCA m=None, pi_T=0.9, π_tilde=0.5, C =0.02 |  0.352  |
+|  PCA m=None, pi_T=0.5, π_tilde=0.1, C =0.02 |   0.77  |
+|  PCA m=None, pi_T=0.1, π_tilde=0.1, C =0.02 |  0.957  |
+|  PCA m=None, pi_T=0.9, π_tilde=0.1, C =0.02 |  0.326  |
+|  PCA m=None, pi_T=0.5, π_tilde=0.9, C =0.02 |  0.669  |
+|  PCA m=None, pi_T=0.1, π_tilde=0.9, C =0.02 |  0.553  |
+|  PCA m=None, pi_T=0.9, π_tilde=0.9, C =0.02 |  0.936  |
+|   PCA m=7, pi_T=0.5, π_tilde=0.5, C =0.02   |  0.126  |
+|   PCA m=7, pi_T=0.1, π_tilde=0.5, C =0.02   |  0.166  |
+|   PCA m=7, pi_T=0.9, π_tilde=0.5, C =0.02   |  0.351  |
+|   PCA m=7, pi_T=0.5, π_tilde=0.1, C =0.02   |  0.763  |
+|   PCA m=7, pi_T=0.1, π_tilde=0.1, C =0.02   |  0.958  |
+|   PCA m=7, pi_T=0.9, π_tilde=0.1, C =0.02   |  0.327  |
+|   PCA m=7, pi_T=0.5, π_tilde=0.9, C =0.02   |  0.668  |
+|   PCA m=7, pi_T=0.1, π_tilde=0.9, C =0.02   |  0.551  |
+|   PCA m=7, pi_T=0.9, π_tilde=0.9, C =0.02   |  0.936  |
+|   PCA m=5, pi_T=0.5, π_tilde=0.5, C =0.02   |  0.124  |
+|   PCA m=5, pi_T=0.1, π_tilde=0.5, C =0.02   |  0.167  |
+|   PCA m=5, pi_T=0.9, π_tilde=0.5, C =0.02   |  0.356  |
+|   PCA m=5, pi_T=0.5, π_tilde=0.1, C =0.02   |  0.776  |
+|   PCA m=5, pi_T=0.1, π_tilde=0.1, C =0.02   |  0.951  |
+|   PCA m=5, pi_T=0.9, π_tilde=0.1, C =0.02   |  0.393  |
+|   PCA m=5, pi_T=0.5, π_tilde=0.9, C =0.02   |   0.66  |
+|   PCA m=5, pi_T=0.1, π_tilde=0.9, C =0.02   |   0.55  |
+|   PCA m=5, pi_T=0.9, π_tilde=0.9, C =0.02   |  0.938  |
++---------------------------------------------+---------+

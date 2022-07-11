@@ -64,6 +64,25 @@ def compute_actual_DCF(llr, labels, prior, Cfn, Cfp):
     return actDCF
 
 
+def compute_FNR_FPR(optimal_bayes_decisions):
+    return (optimal_bayes_decisions[0, 1] / (optimal_bayes_decisions[0, 1] + optimal_bayes_decisions[1, 1]),
+            optimal_bayes_decisions[1, 0] / (optimal_bayes_decisions[0, 0] + optimal_bayes_decisions[1, 0]))
+
+
+def compute_FPRs_TPRs(llr, labels):
+    tresholds = np.hstack(([-np.inf], llr, [np.inf]))
+    tresholds.sort()
+    FPRs = []
+    TPRs = []
+    for treshold in tresholds:
+        pred = np.int32(llr > treshold)
+        OBD = compute_OBD(pred, labels)
+        (FNR, FPR) = compute_FNR_FPR(OBD)
+        FPRs.append(FPR)
+        TPRs.append(1 - FNR)
+    return FPRs, TPRs
+
+
 def bayes_error_plots_data(training_data, training_labels, classifier, Cfn=1, Cfp=1, **kwargs):
     effPriorLogOdds = np.linspace(-3, 3, 21)
     effPrior = 1 / (1 + np.exp(-effPriorLogOdds))
