@@ -28,7 +28,7 @@ def create_heatmap(dataset, labels, cmap='Reds', title=None):
     sns.heatmap(heatmap, cmap='Blues', annot=True, ax=axs[2])
     fig.tight_layout()
     fig.show()
-    fig.savefig(fname=f'outputs/gauss_heatmap')
+    fig.savefig(fname=f'plots/gauss_heatmap')
 
 
 
@@ -55,7 +55,7 @@ def create_scatterplots(training_data, training_labels, datatype=None):
         plt.legend()
         plt.title(f"Plot {n + 1}")
         # plt.show()
-        plt.savefig(fname=f'outputs/scatter/{datatype}Figure{n + 1}')
+        plt.savefig(fname=f'plots/scatter/{datatype}Figure{n + 1}')
         plt.cla()
 
 
@@ -133,7 +133,7 @@ def bayes_error_plots(classifier):
     # plt.title(classifier.__name__)
     plt.xlabel(r"$\log{\frac{\widetilde{\pi}}{(1 - \widetilde{\pi})}}$")
     plt.ylabel(r"$DCF$")
-    plt.savefig(fname=f"outputs/bayes_error_plots/beforecal_{classifier.__name__}")
+    plt.savefig(fname=f"plots/bayes_error_plots/beforecal_{classifier.__name__}")
     plt.tight_layout()
     plt.show()
 
@@ -189,25 +189,25 @@ def plot_tuningGMM_evaluation():
 
     fig1.tight_layout()
     fig1.show()
-    fig1.savefig(fname="../outputs/evaluation/tuning_GMM2_gau", dpi=180)
+    fig1.savefig(fname="../plots/evaluation/tuning_GMM2_gau", dpi=180)
 
     fig2.tight_layout()
     fig2.show()
-    fig2.savefig(fname="../outputs/evaluation/tuning_GMM2_raw", dpi=180)
+    fig2.savefig(fname="../plots/evaluation/tuning_GMM2_raw", dpi=180)
 
     label_params1 = axs1[0, 0].get_legend_handles_labels()
     figl1, axl1 = plt.subplots(figsize=(6.5, 10))
     axl1.axis(False)
     axl1.legend(*label_params1, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
     figl1.show()
-    figl1.savefig(fname="../outputs/evaluation/tuning_GMM_legend_gau")
+    figl1.savefig(fname="../plots/evaluation/tuning_GMM_legend_gau")
 
     label_params2 = axs2[0, 0].get_legend_handles_labels()
     figl2, axl2 = plt.subplots(figsize=(6.5, 10))
     axl2.axis(False)
     axl2.legend(*label_params2, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
     figl2.show()
-    figl2.savefig(fname="../outputs/evaluation/tuning_GMM_legend_raw")
+    figl2.savefig(fname="../plots/evaluation/tuning_GMM_legend_raw")
 
 
 def plot_tuningGMM_evaluation2():
@@ -264,33 +264,33 @@ def plot_tuningGMM_evaluation2():
 
     fig1.tight_layout()
     fig1.show()
-    fig1.savefig(fname="../outputs/evaluation/tuning_GMM2_pi0-5", dpi=180)
+    fig1.savefig(fname="../plots/evaluation/tuning_GMM2_pi0-5", dpi=180)
 
     fig2.tight_layout()
     fig2.show()
-    fig2.savefig(fname="../outputs/evaluation/tuning_GMM2_pi0-1", dpi=180)
+    fig2.savefig(fname="../plots/evaluation/tuning_GMM2_pi0-1", dpi=180)
 
     fig3.tight_layout()
     fig3.show()
-    fig3.savefig(fname="../outputs/evaluation/tuning_GMM2_pi0-9", dpi=180)
+    fig3.savefig(fname="../plots/evaluation/tuning_GMM2_pi0-9", dpi=180)
 
     label_params1 = axs1[0, 0].get_legend_handles_labels()
     figl1, axl1 = plt.subplots(figsize=(6.5, 10))
     axl1.axis(False)
     axl1.legend(*label_params1, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
     figl1.show()
-    figl1.savefig(fname="../outputs/evaluation/tuning_GMM_legend_pi0-5")
+    figl1.savefig(fname="../plots/evaluation/tuning_GMM_legend_pi0-5")
 
     label_params2 = axs2[0, 0].get_legend_handles_labels()
     figl2, axl2 = plt.subplots(figsize=(6.5, 10))
     axl2.axis(False)
     axl2.legend(*label_params2, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
     figl2.show()
-    figl2.savefig(fname="../outputs/evaluation/tuning_GMM_legend_pi0-1")
+    figl2.savefig(fname="../plots/evaluation/tuning_GMM_legend_pi0-1")
 
     label_params3 = axs3[0, 0].get_legend_handles_labels()
     figl3, axl3 = plt.subplots(figsize=(6.5, 10))
     axl3.axis(False)
     axl3.legend(*label_params3, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
     figl3.show()
-    figl3.savefig(fname="../outputs/evaluation/tuning_GMM_legend_pi0-9")
+    figl3.savefig(fname="../plots/evaluation/tuning_GMM_legend_pi0-9")

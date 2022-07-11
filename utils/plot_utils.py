@@ -37,7 +37,7 @@ def plot_histogram(array, labels, titles, nbins: int = 10) -> None:
                )
     fig.tight_layout()
     fig.show()
-    fig.savefig(fname=f'outputs/gauss_features')
+    fig.savefig(fname=f'plots/gauss_features')
 
 
 def create_heatmap(dataset, labels):
@@ -78,7 +78,7 @@ def create_heatmap(dataset, labels):
     fig.tight_layout()
     fig.subplots_adjust(hspace=0.2)
     fig.show()
-    fig.savefig(fname=f"outputs/dataset/heatmaps")
+    fig.savefig(fname=f"plots/dataset/heatmaps")
 
 
 def heatmap(data, row_labels, col_labels, ax=None,
@@ -233,7 +233,7 @@ def create_scatterplots(training_data, training_labels):
         f.suptitle(f"Plot {n + 1}")
         # plt.show()
         f.tight_layout()
-        f.savefig(fname=f'outputs/scatter/Figure{n + 1}')
+        f.savefig(fname=f'plots/scatter/Figure{n + 1}')
         plt.close(f)
 
 
@@ -559,14 +559,14 @@ def plot_tuningGMM():
 
     fig.tight_layout()
     # plt.show()
-    fig.savefig(fname="../outputs/tuning_GMM2", dpi=180)
+    fig.savefig(fname="../plots/tuning_GMM2", dpi=180)
 
     label_params = axs[0, 0].get_legend_handles_labels()
     figl, axl = plt.subplots(figsize=(6.5, 5))
     axl.axis(False)
     axl.legend(*label_params, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
     # figl.show()
-    figl.savefig(fname="../outputs/tuning_GMM_legend")
+    figl.savefig(fname="../plots/tuning_GMM_legend")
 
 
 def bayes_error_plots(classifiers, after=False):
@@ -611,7 +611,7 @@ def bayes_error_plots(classifiers, after=False):
 
     fig.tight_layout()
     fig.subplots_adjust(hspace=0.3, wspace=0.2)
-    fig.savefig(fname=f"outputs/bayes_error_plots/bep_{fname}")
+    fig.savefig(fname=f"plots/bayes_error_plots/bep_{fname}")
     fig.show()
 
 
@@ -667,7 +667,7 @@ def plot_lambda_evaluation():
     fig.subplots_adjust(hspace=0.7)
     fig.show()
 
-    fig.savefig(fname="../outputs/evaluation/lambda", dpi=180)
+    fig.savefig(fname="../plots/evaluation/lambda", dpi=180)
 
 
 def plot_tuningLinearSVMUnbalanced_evaluation():
@@ -786,7 +786,7 @@ def plot_tuning_LinearSVMBalanced_evaluation():
     figl.show()
 
     fig.show()
-    fig.savefig(fname="../outputs/evaluation/tuning_SVM_linear_balanced", dpi=180)
+    fig.savefig(fname="../plots/evaluation/tuning_SVM_linear_balanced", dpi=180)
 
 
 def plot_tuningPolySVM_evaluation():
@@ -843,7 +843,7 @@ def plot_tuningPolySVM_evaluation():
     axl.legend(*label_params, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
     figl.show()
 
-    fig.savefig(fname="../outputs/evaluation/tuning_PolySVM_evaluation", dpi=180)
+    fig.savefig(fname="../plots/evaluation/tuning_PolySVM_evaluation", dpi=180)
 
 
 def plot_tuningRBFSVM_evaluation():
@@ -897,7 +897,7 @@ def plot_tuningRBFSVM_evaluation():
     fig.tight_layout()
     fig.subplots_adjust(top=0.88)
     fig.show()
-    fig.savefig(fname="../outputs/evaluation/tuning_RBFSVM_evaluation", dpi=180)
+    fig.savefig(fname="../plots/evaluation/tuning_RBFSVM_evaluation", dpi=180)
     # label_params = axs[0].get_legend_handles_labels()
     # figl, axl = plt.subplots(figsize=(6.5, 7))
     # axl.axis(False)
@@ -951,30 +951,41 @@ def plot_tuningGMM_evaluation():
 
     fig1.tight_layout()
     fig1.show()
-    fig1.savefig(fname="../outputs/evaluation/tuning_GMM2_PCA7", dpi=180)
+    fig1.savefig(fname="../plots/evaluation/tuning_GMM2_PCA7", dpi=180)
 
     label_params1 = axs[0, 0].get_legend_handles_labels()
     figl1, axl1 = plt.subplots(figsize=(5.5, 5.2))
     axl1.axis(False)
     axl1.legend(*label_params1, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
     figl1.show()
-    figl1.savefig(fname="../outputs/evaluation/tuning_GMM_legend_PCA7")
+    figl1.savefig(fname="../plots/evaluation/tuning_GMM_legend_PCA7")
 
 
 def ROC_curve(training_data, training_labels, classifiers, args):
-    plt.figure()
+    plt.rcParams.update({
+        "text.usetex": True,
+        "font.family": "sans-serif",
+        "font.sans-serif": ["Computer Modern Serif"],
+        "axes.titlesize": 20,
+        "xtick.labelsize": 15,
+        "ytick.labelsize": 15,
+        "axes.labelsize": 18,
+        "legend.fontsize": 18,
+        "figure.dpi": 180
+    })
+    f, ax = plt.subplots()
     colors = distinctipy.get_colors(len(classifiers))
     for i, classifier in enumerate(classifiers):
         score, labels = k_fold(training_data, training_labels, classifier, 5, **args[i])
         FPRs, TPRs = compute_FPRs_TPRs(score, labels)
-        plt.plot(FPRs, TPRs, color=colors[i], label=f"{classifier.__name__}")
-    plt.title("ROC curve")
-    plt.xlabel("FPR")
-    plt.ylabel("TPR")
+        ax.plot(FPRs, TPRs, color=colors[i], label=f"{classifier.__name__}")
+    ax.set_title("ROC curve")
+    ax.set_xlabel("FPR")
+    ax.set_ylabel("TPR")
     plt.legend()
     plt.grid()
-    plt.show()
-    plt.savefig('results/ROC/ROC_training.png')
+    f.show()
+    f.savefig('plots/ROC/ROC_training.png')
 
 
 def plot_tuningGMM_evaluation2():
@@ -1031,36 +1042,36 @@ def plot_tuningGMM_evaluation2():
 
     fig1.tight_layout()
     fig1.show()
-    fig1.savefig(fname="../outputs/evaluation/tuning_GMM2_pi0-5", dpi=180)
+    fig1.savefig(fname="../plots/evaluation/tuning_GMM2_pi0-5", dpi=180)
 
     fig2.tight_layout()
     fig2.show()
-    fig2.savefig(fname="../outputs/evaluation/tuning_GMM2_pi0-1", dpi=180)
+    fig2.savefig(fname="../plots/evaluation/tuning_GMM2_pi0-1", dpi=180)
 
     fig3.tight_layout()
     fig3.show()
-    fig3.savefig(fname="../outputs/evaluation/tuning_GMM2_pi0-9", dpi=180)
+    fig3.savefig(fname="../plots/evaluation/tuning_GMM2_pi0-9", dpi=180)
 
     label_params1 = axs1[0, 0].get_legend_handles_labels()
     figl1, axl1 = plt.subplots(figsize=(6.5, 10))
     axl1.axis(False)
     axl1.legend(*label_params1, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
     figl1.show()
-    figl1.savefig(fname="../outputs/evaluation/tuning_GMM_legend_pi0-5")
+    figl1.savefig(fname="../plots/evaluation/tuning_GMM_legend_pi0-5")
 
     label_params2 = axs2[0, 0].get_legend_handles_labels()
     figl2, axl2 = plt.subplots(figsize=(6.5, 10))
     axl2.axis(False)
     axl2.legend(*label_params2, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
     figl2.show()
-    figl2.savefig(fname="../outputs/evaluation/tuning_GMM_legend_pi0-1")
+    figl2.savefig(fname="../plots/evaluation/tuning_GMM_legend_pi0-1")
 
     label_params3 = axs3[0, 0].get_legend_handles_labels()
     figl3, axl3 = plt.subplots(figsize=(6.5, 10))
     axl3.axis(False)
     axl3.legend(*label_params3, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
     figl3.show()
-    figl3.savefig(fname="../outputs/evaluation/tuning_GMM_legend_pi0-9")
+    figl3.savefig(fname="../plots/evaluation/tuning_GMM_legend_pi0-9")
 
 
 if __name__ == '__main__':
