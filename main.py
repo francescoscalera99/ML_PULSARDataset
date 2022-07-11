@@ -52,6 +52,7 @@ def main():
     # create_scatterplots(training_data, training_labels)
     # data = PCA(training_data, training_data, 7)
     # create_scatterplots(training_data, training_labels)
+
     # =============== MULTIVARIATE GAUSSIAN CLASSIFIER ===============
     # MVG_simulations(training_data, training_labels)
 
@@ -185,6 +186,20 @@ def main():
     # tuning_componentsGMM_evaluation(training_data, training_labels, testing_data, testing_labels)
     # plot_tuningGMM_evaluation()
 
+    lbd = 1e-7
+    K_LinearB = 1.0  # This values comes from tuning of hyperparameters
+    C_LinearB = 2e-2
+
+    K_Poly = 1.0
+    CPoly = 1e-2
+    c = 15
+    d = 2
+
+    K_RBF = 0
+    gamma_RBF = 1e-3
+    C_RBF = 1e-1
+
+    g = 16
     # =============== ACTUAL DCF - EXPERIMENTAL RESULT ===============
     # print("MVG ACTDCF")
     # MVG_evaluation(training_data, training_labels, testing_data, testing_labels, actualDCF=True)
@@ -200,6 +215,16 @@ def main():
     # SVM_RBF_evaluation(training_data, training_labels, testing_data, testing_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF, actualDCF=True)
     # print("GMM ACTDCF")
     # GMM_evaluation(training_data, training_labels, testing_data, testing_labels, g, alpha=0.1, psi=0.01, actualDCF=True)
+
+    # =============== SCORE CALIBRATION - EXPERIMENTAL RESULT ===============
+    print("MVG ACTDCF")
+    MVG_evaluation(training_data, training_labels, testing_data, testing_labels, actualDCF=True, calibratedScore=True)
+    print("LR ACTDCF")
+    LR_evaluation(training_data, training_labels, testing_data, testing_labels, lbd, actualDCF=True, calibratedScore=True)
+    print("SVM LINEAR BALANCED ACTDCF")
+    SVM_LinearBalanced_evaluation(training_data, training_labels, testing_data, testing_labels, K_LinearB, C_LinearB, actualDCF=True, calibratedScore=True)
+    print("GMM ACTDCF")
+    GMM_evaluation(training_data, training_labels, testing_data, testing_labels, g, alpha=0.1, psi=0.01, actualDCF=True, calibratedScore=True)
 
     # ****************** TURN OFF PC AT END OF SIMULATION (needs sudo) ******************
     # (windows ?)
