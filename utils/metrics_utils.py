@@ -3,6 +3,7 @@ import numpy as np
 from classifiers.LR import calibrateScores
 from utils.matrix_utils import vrow
 from utils.utils import k_fold, splitData_SingleFold
+from classifiers.Classifier import ClassifierClass
 
 
 def build_confusion_matrix(testing_labels: np.ndarray, predicted_labels: np.ndarray) -> np.ndarray:
@@ -103,6 +104,33 @@ def bayes_error_plots_data(training_data, training_labels, classifier, Cfn=1, Cf
     np.save(f"simulations/bayesErrorPlot/{classifier.__name__}_actDCF", np.array(actDCFs))
     np.save(f"simulations/bayesErrorPlot/{classifier.__name__}_minDCF", np.array(minDCFs))
     np.save(f"simulations/bayesErrorPlot/{classifier.__name__}_actDCF_Calibrated", np.array(actDCFs_cal))
+    return actDCFs, minDCFs, actDCFs_cal
+
+
+def bayes_error_plots_data_evaluation(training_data, training_labels, testing_data, testing_labels, classifier, Cfn=1, Cfp=1, **kwargs):
+    effPriorLogOdds = np.linspace(-3, 3, 21)
+    effPrior = 1 / (1 + np.exp(-effPriorLogOdds))
+
+    actDCFs = []
+    actDCFs_cal = []
+    minDCFs = []
+
+    c = classifier(training_data, training_labels, **kwargs)
+    c.train_model(**kwargs)
+    c.classify(testing_data, None)
+
+    score = c.get_llrs()
+
+    calibrated_score, ordered_labels = calibrateScores(vrow(score), testing_labels, lambd=1e-6, prior=0.5)
+    for e in effPrior:
+        actDCFs.append(compute_actual_DCF(score, testing_labels, e, Cfn, Cfp))
+        minDCFs.append(compute_min_DCF(score, testing_labels, e, Cfn, Cfp))
+        actDCFs_cal.append(compute_actual_DCF(calibrated_score, ordered_labels, e, Cfn, Cfp))
+
+    print("Saving files...")
+    np.save(f"simulations/evaluation/bayesErrorPlot/{classifier.__name__}_actDCF", np.array(actDCFs))
+    np.save(f"simulations/evaluation/bayesErrorPlot/{classifier.__name__}_minDCF", np.array(minDCFs))
+    np.save(f"simulations/evaluation/bayesErrorPlot/{classifier.__name__}_actDCF_Calibrated", np.array(actDCFs_cal))
     return actDCFs, minDCFs, actDCFs_cal
 
 
