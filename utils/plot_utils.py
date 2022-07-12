@@ -1,15 +1,12 @@
 import itertools
-import os
 
 import distinctipy
-import numpy as np
-import matplotlib.pyplot as plt
 import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
 
 from utils.metrics_utils import compute_FPRs_TPRs
 from utils.utils import k_fold
-from classifiers.Classifier import ClassifierClass
-
 
 
 def plot_histogram(array, labels, titles, nbins: int = 10) -> None:

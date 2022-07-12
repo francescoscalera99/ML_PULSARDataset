@@ -1,4 +1,5 @@
 import itertools
+
 import numpy as np
 
 from classifiers.GMM2 import GMM
@@ -6,7 +7,6 @@ from classifiers.LR import LR
 from classifiers.SVM import SVM
 from preprocessing.preprocessing import gaussianize, PCA
 from utils.metrics_utils import compute_min_DCF
-from utils.utils import k_fold
 
 
 def tuning_lambda_evaluation(training_data, training_labels, testing_data, testing_labels):
