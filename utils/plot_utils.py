@@ -5,9 +5,9 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
-from metrics_utils import compute_FPRs_TPRs
 from preprocessing.preprocessing import gaussianize
-from utils import k_fold
+from utils.metrics_utils import compute_FPRs_TPRs
+from utils.utils import k_fold
 
 
 def plot_histogram(array, labels, titles, nbins: int = 10) -> None:
@@ -602,7 +602,7 @@ def bayes_error_plots(classifiers, after=False, evaluation=False):
         axs[i // 2, i % 2].legend()
         axs[i // 2, i % 2].set_title(classifier.__name__)
         axs[i // 2, i % 2].set_xticks(list(range(-3, 4)))
-        #axs[i // 2, i % 2].set_yticks(np.arange(0, 1.1, 0.2))
+        # axs[i // 2, i % 2].set_yticks(np.arange(0, 1.1, 0.2))
         axs[i // 2, i % 2].xaxis.set_tick_params(labelbottom=True)
         axs[i // 2, i % 2].yaxis.set_tick_params(labelbottom=True)
         if i > 1:
