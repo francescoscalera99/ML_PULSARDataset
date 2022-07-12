@@ -400,7 +400,7 @@ def GMM_evaluation(training_data, ltr, testing_data, evaluationLabels, g, alpha,
     n_iter = len(variants) * len(effective_priors) * len(ms) * len(raws)
 
     for i, (m, pi, variant, raw) in enumerate(hyperparameters):
-        print(f"Iteration {i + 1}/{n_iter}: ", end="")
+        print(f"Iteration {i + 1}/{n_iter}: ")
 
         if raw:
             if m is not None:
