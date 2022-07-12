@@ -5,9 +5,9 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
-from utils.metrics_utils import compute_FPRs_TPRs
+from metrics_utils import compute_FPRs_TPRs
 from preprocessing.preprocessing import gaussianize
-from utils.utils import k_fold
+from utils import k_fold
 
 
 def plot_histogram(array, labels, titles, nbins: int = 10) -> None:
@@ -625,6 +625,61 @@ def plot_lambda_evaluation():
     lbd_values = np.logspace(-8, 5, 70)
     lbd_values = np.array([0, *lbd_values])
 
+    m_values = [False, 7]
+    prior = [0.5, 0.1, 0.9]
+
+    fig, axs = plt.subplots(1, 2)
+    fig.set_size_inches(10, 5)
+
+    colors = ['red', 'blue', 'green']
+    for i, m in enumerate(m_values):
+        for j, pi in enumerate(prior):
+            DCFs = np.load(
+                f"./../simulations/LR/LR_prior_{str(pi).replace('.', '-')}_PCA{str(m)}.npy")
+
+            DCFs_evaluation = np.load(
+                f"./../simulations/evaluation/LR/LR_EVAL_prior_{str(pi).replace('.', '-')}_PCA{str(m)}.npy")
+            axs[i].plot(lbd_values, DCFs, color=colors[j], label=r"$\widetilde{\pi}=" + f"{pi}$",
+                                    linestyle="dashed")
+            axs[i].plot(lbd_values, DCFs_evaluation, color=colors[j],
+                                    label=r"$\widetilde{\pi}=" + f"{pi}$ (eval.)")
+            if m == False:
+                axs[i].set_title(f'5-fold, Raw features')
+            elif m is None:
+                axs[i].set_title(f'5-fold, no PCA')
+            else:
+                axs[i].set_title(f'5-fold, PCA (m={m})')
+
+            axs[i].set_xlabel(r'$\lambda$')
+            axs[i].set_ylabel(r'$minDCF$')
+            axs[i].set_xscale('log')
+
+            xticks = [1.e-09, 1.e-08, 1.e-06, 1.e-04, 1.e-02, 1.e+00, 1.e+02, 1.e+04, 1.e+06]
+            xlabels = [r"$0$", r"$10^{-8}$", r"$10^{-6}$", r"$10^{-4}$", r"$10^{-2}$", r"$10^0$", r"$10^2$", r"$10^4$",
+                       r"$10^6$"]
+
+            axs[i].set_xticks(xticks, xlabels)
+            axs[i].get_xaxis().get_major_formatter().labelOnlyBase = False
+        i += 1
+    # fig.set_size_inches(10, 10)
+    # fig.tight_layout()
+    lines_labels = [ax.get_legend_handles_labels() for ax in fig.axes]
+    lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
+    fig.legend(lines[:6], labels[:6], loc=8, ncol=3)
+    # fig.legend(lines[:3], labels[:3], loc=10, prop={'size': 10})
+
+    fig.tight_layout()
+    fig.subplots_adjust(bottom=0.3)
+    fig.subplots_adjust(hspace=0.7)
+    fig.show()
+
+    fig.savefig(fname="../plots/evaluation/lambda", dpi=180)
+
+
+def plot_lambda_evaluation2():
+    lbd_values = np.logspace(-8, 5, 70)
+    lbd_values = np.array([0, *lbd_values])
+
     m_values = [False, None, 7, 5]
     prior = [0.5, 0.1, 0.9]
 
@@ -1162,7 +1217,7 @@ def plot_main():
     # plot_tuning_LinearSVMBalanced_evaluation()
     # plot_tuningPolySVM_evaluation()
     # plot_tuningRBFSVM_evaluation()
-    # plot_lambda_evaluation()
+    plot_lambda_evaluation()
     # plot_tuningGMM_evaluation()
     # plot_tuningGMM2()
 

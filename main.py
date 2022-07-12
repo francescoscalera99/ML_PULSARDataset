@@ -21,7 +21,7 @@ from utils.metrics_utils import bayes_error_plots_data, bayes_error_plots_data_e
 from utils.plot_utils import create_scatterplots, bayes_error_plots, plot_lambda_evaluation, \
     plot_tuningPolySVM_evaluation, plot_tuningRBFSVM_evaluation, plot_tuningGMM_evaluation, \
     ROC_curve, ROC_curve_evaluation, generate_ROC_data, plot_tuningLinearSVMUnbalanced_evaluation, \
-    plot_tuning_LinearSVMBalanced_evaluation, create_heatmap
+    plot_tuning_LinearSVMBalanced_evaluation, create_heatmap, plot_main
 from utils.utils import load_dataset
 
 
@@ -161,8 +161,8 @@ def main():
     #     print(f"{'*'*30} bep {i+1}/{len(classifiers)} {'*'*30}")
     #     bayes_error_plots_data(training_data, training_labels, classifier, **args[i])
     # print(f"plotting...")
-    for a in [True, False]:
-        bayes_error_plots(classifiers, after=a)
+    # for a in [True, False]:
+    #     bayes_error_plots(classifiers, after=a)
 
     # =============== EXPERIMENTAL RESULT ===============
     # MVG_evaluation(training_data, training_labels, testing_data, testing_labels)
