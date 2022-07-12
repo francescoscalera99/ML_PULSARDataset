@@ -18,7 +18,7 @@ from simulations.simulations import MVG_simulations, GMM_Simulations, SVM_Linear
 from simulations.tuning import tuning_parameters_LinearSVMUnbalanced_evaluation, \
     tuning_parameters_LinearSVMBalanced_evaluation, tuning_parameters_PolySVM_evaluation, \
     tuning_parameters_RBFSVM_evaluation, tuning_componentsGMM_evaluation, tuning_lambda_evaluation
-from utils.metrics_utils import bayes_error_plots_data
+from utils.metrics_utils import bayes_error_plots_data, bayes_error_plots_data_evaluation
 from utils.plot_utils import create_scatterplots, bayes_error_plots, plot_lambda_evaluation, \
     plot_tuningPolySVM_evaluation, plot_tuningRBFSVM_evaluation, plot_tuningGMM_evaluation, \
     ROC_curve
@@ -127,7 +127,8 @@ def main():
 
     # =============== ROC CURVE (BEST CLASSIFIER) ===============
     classifiers = [MVG, LR, SVM, GMM]
-    args = [{"raw": False,
+    args = [
+        {"raw": False,
              "m": 7,
              "variant": "tied"},
             {"raw": False,
@@ -149,7 +150,7 @@ def main():
              "alpha": 0.1,
              "psi": 0.1}]
 
-    ROC_curve(training_data, training_labels, classifiers, args)
+    # ROC_curve(training_data, training_labels, classifiers, args)
 
     # =============== BAYES ERROR PLOT ==================
     # for i, classifier in enumerate(classifiers):
@@ -201,30 +202,27 @@ def main():
 
     g = 16
     # =============== ACTUAL DCF - EXPERIMENTAL RESULT ===============
-    # print("MVG ACTDCF")
     # MVG_evaluation(training_data, training_labels, testing_data, testing_labels, actualDCF=True)
-    # print("LR ACTDCF")
     # LR_evaluation(training_data, training_labels, testing_data, testing_labels, lbd, actualDCF=True)
-    # print("SVM LINEAR UNBALANCED ACTDCF")
     # SVM_LinearUnbalanced_evaluation(training_data, training_labels, testing_data, testing_labels, K_LinearUnb, C_LinearUnb, actualDCF=True)
-    # print("SVM LINEAR BALANCED ACTDCF")
     # SVM_LinearBalanced_evaluation(training_data, training_labels, testing_data, testing_labels, K_LinearB, C_LinearB, actualDCF=True)
-    # print("SVM POLY ACTDCF")
     # SVM_Poly_evaluation(training_data, training_labels, testing_data, testing_labels, K_Poly, CPoly, pi_TPolyRBF, c, d, actualDCF=True)
-    # print("SVM RBF ACTDCF")
     # SVM_RBF_evaluation(training_data, training_labels, testing_data, testing_labels, K_RBF, C_RBF, pi_TPolyRBF, gamma_RBF, actualDCF=True)
-    # print("GMM ACTDCF")
     # GMM_evaluation(training_data, training_labels, testing_data, testing_labels, g, alpha=0.1, psi=0.01, actualDCF=True)
 
     # =============== SCORE CALIBRATION - EXPERIMENTAL RESULT ===============
-    print("MVG ACTDCF")
-    MVG_evaluation(training_data, training_labels, testing_data, testing_labels, actualDCF=True, calibratedScore=True)
-    print("LR ACTDCF")
-    LR_evaluation(training_data, training_labels, testing_data, testing_labels, lbd, actualDCF=True, calibratedScore=True)
-    print("SVM LINEAR BALANCED ACTDCF")
-    SVM_LinearBalanced_evaluation(training_data, training_labels, testing_data, testing_labels, K_LinearB, C_LinearB, actualDCF=True, calibratedScore=True)
-    print("GMM ACTDCF")
-    GMM_evaluation(training_data, training_labels, testing_data, testing_labels, g, alpha=0.1, psi=0.01, actualDCF=True, calibratedScore=True)
+    # MVG_evaluation(training_data, training_labels, testing_data, testing_labels, actualDCF=True, calibratedScore=True)
+    # LR_evaluation(training_data, training_labels, testing_data, testing_labels, lbd, actualDCF=True, calibratedScore=True)
+    # SVM_LinearBalanced_evaluation(training_data, training_labels, testing_data, testing_labels, K_LinearB, C_LinearB, actualDCF=True, calibratedScore=True)
+    # GMM_evaluation(training_data, training_labels, testing_data, testing_labels, g, alpha=0.1, psi=0.01, actualDCF=True, calibratedScore=True)
+
+    # =============== BAYES ERROR PLOT - EXPERIMENTAL RESULT ===============
+    for i, classifier in enumerate(classifiers):
+        print(f"{'*'*30} bep {i+1}/{len(classifiers)} {'*'*30}")
+        bayes_error_plots_data_evaluation(training_data, training_labels, testing_data, testing_labels, classifier, **args[i])
+    print(f"plotting...")
+    for a in [True, False]:
+        bayes_error_plots(classifiers, after=a)
 
     # ****************** TURN OFF PC AT END OF SIMULATION (needs sudo) ******************
     # (windows ?)
