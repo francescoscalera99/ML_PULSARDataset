@@ -579,7 +579,7 @@ def bayes_error_plots(classifiers, after=False, evaluation=False):
         "axes.titlesize": 20,
         "xtick.labelsize": 15,
         "ytick.labelsize": 15,
-        "axes.labelsize": 20,
+        "axes.labelsize": 25,
         "legend.fontsize": 18,
         "figure.dpi": 180
     })
