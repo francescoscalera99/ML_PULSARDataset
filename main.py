@@ -126,30 +126,30 @@ def main():
     # GMM_Simulations(training_data, training_labels, g, alpha=0.1, psi=0.01, actualDCF=True, calibratedScore=True)
 
     # =============== ROC CURVE (BEST CLASSIFIER) ===============
-    classifiers = [MVG, LR, SVM, GMM]
-    args = [{"raw": False,
-             "m": 7,
-             "variant": "tied"},
-            {"raw": False,
-             "m": 7,
-             "lbd": lbd,
-             "pi_T": 0.5},
-            {"raw": False,
-             "m": 7,
-             "k": K_LinearB,
-             "c": C_LinearB,
-             "pi_T": 0.5,
-             "balanced": True,
-             "kernel_type": "poly",
-             "kernel_params": (1, 0)},
-            {"raw": False,
-             "m": 7,
-             "G": g,
-             "type": "full-cov",
-             "alpha": 0.1,
-             "psi": 0.1}]
-
-    ROC_curve(training_data, training_labels, classifiers, args)
+    # classifiers = [MVG, LR, SVM, GMM]
+    # args = [{"raw": False,
+    #          "m": 7,
+    #          "variant": "tied"},
+    #         {"raw": False,
+    #          "m": 7,
+    #          "lbd": lbd,
+    #          "pi_T": 0.5},
+    #         {"raw": False,
+    #          "m": 7,
+    #          "k": K_LinearB,
+    #          "c": C_LinearB,
+    #          "pi_T": 0.5,
+    #          "balanced": True,
+    #          "kernel_type": "poly",
+    #          "kernel_params": (1, 0)},
+    #         {"raw": False,
+    #          "m": 7,
+    #          "G": g,
+    #          "type": "full-cov",
+    #          "alpha": 0.1,
+    #          "psi": 0.1}]
+    #
+    # ROC_curve(training_data, training_labels, classifiers, args)
 
     # =============== BAYES ERROR PLOT ==================
     # for i, classifier in enumerate(classifiers):
@@ -217,14 +217,16 @@ def main():
     # GMM_evaluation(training_data, training_labels, testing_data, testing_labels, g, alpha=0.1, psi=0.01, actualDCF=True)
 
     # =============== SCORE CALIBRATION - EXPERIMENTAL RESULT ===============
-    print("MVG ACTDCF")
-    MVG_evaluation(training_data, training_labels, testing_data, testing_labels, actualDCF=True, calibratedScore=True)
-    print("LR ACTDCF")
-    LR_evaluation(training_data, training_labels, testing_data, testing_labels, lbd, actualDCF=True, calibratedScore=True)
-    print("SVM LINEAR BALANCED ACTDCF")
-    SVM_LinearBalanced_evaluation(training_data, training_labels, testing_data, testing_labels, K_LinearB, C_LinearB, actualDCF=True, calibratedScore=True)
+    # print("MVG ACTDCF")
+    # MVG_evaluation(training_data, training_labels, testing_data, testing_labels, actualDCF=True, calibratedScore=True)
+    # print("LR ACTDCF")
+    # LR_evaluation(training_data, training_labels, testing_data, testing_labels, lbd, actualDCF=True, calibratedScore=True)
+    # print("SVM LINEAR BALANCED ACTDCF")
+    # SVM_LinearBalanced_evaluation(training_data, training_labels, testing_data, testing_labels, K_LinearB, C_LinearB, actualDCF=True, calibratedScore=True)
     print("GMM ACTDCF")
     GMM_evaluation(training_data, training_labels, testing_data, testing_labels, g, alpha=0.1, psi=0.01, actualDCF=True, calibratedScore=True)
+    print("MVG ACTDCF")
+    MVG_evaluation(training_data, training_labels, testing_data, testing_labels, actualDCF=True, calibratedScore=True)
 
     # ****************** TURN OFF PC AT END OF SIMULATION (needs sudo) ******************
     # (windows ?)
