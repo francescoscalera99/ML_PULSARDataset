@@ -59,7 +59,7 @@ def main():
     # =============== LOGISTIC REGRESSION ===============
     # tuning_lambda(training_data, training_labels)
     lbd = 1e-7
-    # LR_simulations(training_data, training_labels, lbd)
+    LR_simulations(training_data, training_labels, lbd)
 
     # =============== SUPPORT VECTOR MACHINE ===============
     # print("LINEAR SVM - TUNING PARAMETERS")

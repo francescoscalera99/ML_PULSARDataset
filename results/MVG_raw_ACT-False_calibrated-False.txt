@@ -4,36 +4,28 @@
 | Raw features, PCA m=7, variant=full-cov, π_tilde=0.1 -> min dcf |   0.3   |
 | Raw features, PCA m=7, variant=full-cov, π_tilde=0.5 -> min dcf |  0.171  |
 | Raw features, PCA m=7, variant=full-cov, π_tilde=0.9 -> min dcf |  0.714  |
-
 | Raw features, PCA m=5, variant=full-cov, π_tilde=0.1 -> min dcf |  0.428  |
 | Raw features, PCA m=5, variant=full-cov, π_tilde=0.5 -> min dcf |   0.18  |
 | Raw features, PCA m=5, variant=full-cov, π_tilde=0.9 -> min dcf |  0.731  |
-
-    | Raw features, PCA m=4, variant=full-cov, π_tilde=0.1 -> min dcf |  0.439  |
-    | Raw features, PCA m=4, variant=full-cov, π_tilde=0.5 -> min dcf |  0.184  |
-    | Raw features, PCA m=4, variant=full-cov, π_tilde=0.9 -> min dcf |  0.695  |
-
+| Raw features, PCA m=4, variant=full-cov, π_tilde=0.1 -> min dcf |  0.439  |
+| Raw features, PCA m=4, variant=full-cov, π_tilde=0.5 -> min dcf |  0.184  |
+| Raw features, PCA m=4, variant=full-cov, π_tilde=0.9 -> min dcf |  0.695  |
 |   Raw features, PCA m=7, variant=diag, π_tilde=0.1 -> min dcf   |  0.632  |
 |   Raw features, PCA m=7, variant=diag, π_tilde=0.5 -> min dcf   |  0.219  |
 |   Raw features, PCA m=7, variant=diag, π_tilde=0.9 -> min dcf   |  0.821  |
-
 |   Raw features, PCA m=5, variant=diag, π_tilde=0.1 -> min dcf   |  0.607  |
 |   Raw features, PCA m=5, variant=diag, π_tilde=0.5 -> min dcf   |  0.201  |
 |   Raw features, PCA m=5, variant=diag, π_tilde=0.9 -> min dcf   |  0.784  |
-
-    |   Raw features, PCA m=4, variant=diag, π_tilde=0.1 -> min dcf   |  0.604  |
-    |   Raw features, PCA m=4, variant=diag, π_tilde=0.5 -> min dcf   |  0.198  |
-    |   Raw features, PCA m=4, variant=diag, π_tilde=0.9 -> min dcf   |  0.779  |
-
+|   Raw features, PCA m=4, variant=diag, π_tilde=0.1 -> min dcf   |  0.604  |
+|   Raw features, PCA m=4, variant=diag, π_tilde=0.5 -> min dcf   |  0.198  |
+|   Raw features, PCA m=4, variant=diag, π_tilde=0.9 -> min dcf   |  0.779  |
 |   Raw features, PCA m=7, variant=tied, π_tilde=0.1 -> min dcf   |   0.28  |
 |   Raw features, PCA m=7, variant=tied, π_tilde=0.5 -> min dcf   |  0.152  |
 |   Raw features, PCA m=7, variant=tied, π_tilde=0.9 -> min dcf   |  0.609  |
-
 |   Raw features, PCA m=5, variant=tied, π_tilde=0.1 -> min dcf   |  0.313  |
 |   Raw features, PCA m=5, variant=tied, π_tilde=0.5 -> min dcf   |  0.178  |
 |   Raw features, PCA m=5, variant=tied, π_tilde=0.9 -> min dcf   |   0.6   |
-
-    |   Raw features, PCA m=4, variant=tied, π_tilde=0.1 -> min dcf   |  0.315  |
-    |   Raw features, PCA m=4, variant=tied, π_tilde=0.5 -> min dcf   |  0.172  |
-    |   Raw features, PCA m=4, variant=tied, π_tilde=0.9 -> min dcf   |  0.603  |
+|   Raw features, PCA m=4, variant=tied, π_tilde=0.1 -> min dcf   |  0.315  |
+|   Raw features, PCA m=4, variant=tied, π_tilde=0.5 -> min dcf   |  0.172  |
+|   Raw features, PCA m=4, variant=tied, π_tilde=0.9 -> min dcf   |  0.603  |
 +-----------------------------------------------------------------+---------+

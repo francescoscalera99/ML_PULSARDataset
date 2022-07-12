@@ -5,9 +5,9 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
-from metrics_utils import compute_FPRs_TPRs
+from utils.metrics_utils import compute_FPRs_TPRs
 from preprocessing.preprocessing import gaussianize
-from utils import k_fold
+from utils.utils import k_fold
 
 
 def plot_histogram(array, labels, titles, nbins: int = 10) -> None:
