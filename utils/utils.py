@@ -1,7 +1,7 @@
 import numpy as np
 
-from preprocessing.preprocessing import PCA, gaussianize
 from classifiers.Classifier import ClassifierClass
+from preprocessing.preprocessing import PCA, gaussianize
 
 
 def load_dataset(path: str = './') -> tuple:

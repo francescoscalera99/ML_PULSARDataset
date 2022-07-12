@@ -1,7 +1,7 @@
 import numpy as np
+from scipy.stats import norm
 
 from utils.matrix_utils import vcol
-from scipy.stats import norm
 
 
 def PCA(dataset, training_data, m):
