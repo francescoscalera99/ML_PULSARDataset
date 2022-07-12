@@ -571,7 +571,7 @@ def plot_tuningGMM():
     figl.savefig(fname="../plots/tuning_GMM_legend")
 
 
-def bayes_error_plots(classifiers, after=False):
+def bayes_error_plots(classifiers, after=False, evaluation=False):
     effPriorLogOdds = np.linspace(-3, 3, 21)
     plt.clf()
     plt.rcParams.update({
@@ -582,26 +582,29 @@ def bayes_error_plots(classifiers, after=False):
         "xtick.labelsize": 15,
         "ytick.labelsize": 15,
         "axes.labelsize": 18,
-        "legend.fontsize": 12
+        "legend.fontsize": 18,
+        "figure.dpi": 180
     })
 
     fig, axs = plt.subplots(2, 2, sharex="col", sharey="row")
 
     fig.set_size_inches(10, 8)
 
+    folder = "/evaluation" if evaluation else ""
+
     for i, classifier in enumerate(classifiers):
-        minDCF = np.load(f"simulations/bayesErrorPlot/{classifier.__name__}_minDCF.npy")
-        actDCF = np.load(f"simulations/bayesErrorPlot/{classifier.__name__}_actDCF.npy")
+        minDCF = np.load(f"simulations{folder}/bayesErrorPlot/{classifier.__name__}_minDCF.npy")
+        actDCF = np.load(f"simulations{folder}/bayesErrorPlot/{classifier.__name__}_actDCF.npy")
         axs[i // 2, i % 2].plot(effPriorLogOdds, minDCF, label=r"$minDCF$", color="orange", linewidth=2)
         axs[i // 2, i % 2].plot(effPriorLogOdds, actDCF, label=r"$actDCF$", color="dodgerblue", linewidth=2)
         if after:
-            actDCF_cal = np.load(f"simulations/bayesErrorPlot/{classifier.__name__}_actDCF_Calibrated.npy")
+            actDCF_cal = np.load(f"simulations{folder}/bayesErrorPlot/{classifier.__name__}_actDCF_Calibrated.npy")
             axs[i // 2, i % 2].plot(effPriorLogOdds, actDCF_cal, label=r"$actDCF$ (cal.)", linestyle="dashed",
                                     color="dodgerblue", linewidth=2)
         axs[i // 2, i % 2].legend()
         axs[i // 2, i % 2].set_title(classifier.__name__)
         axs[i // 2, i % 2].set_xticks(list(range(-3, 4)))
-        axs[i // 2, i % 2].set_yticks(np.arange(0, 1.1, 0.2))
+        #axs[i // 2, i % 2].set_yticks(np.arange(0, 1.1, 0.2))
         axs[i // 2, i % 2].xaxis.set_tick_params(labelbottom=True)
         axs[i // 2, i % 2].yaxis.set_tick_params(labelbottom=True)
         if i > 1:
@@ -610,6 +613,9 @@ def bayes_error_plots(classifiers, after=False):
             axs[i // 2, i % 2].set_ylabel(r"$DCF$")
 
     fname = "aftercal" if after else "beforecal"
+
+    if evaluation:
+        fname += "_eval"
 
     fig.tight_layout()
     fig.subplots_adjust(hspace=0.3, wspace=0.2)

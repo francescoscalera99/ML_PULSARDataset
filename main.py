@@ -237,7 +237,7 @@ def main():
     #     bayes_error_plots_data_evaluation(training_data, training_labels, testing_data, testing_labels, classifier, **args[i])
     # print(f"plotting...")
     for a in [True, False]:
-        bayes_error_plots(classifiers, after=a)
+        bayes_error_plots(classifiers, after=a, evaluation=True)
 
     # ****************** TURN OFF PC AT END OF SIMULATION (needs sudo) ******************
     # (windows ?)
