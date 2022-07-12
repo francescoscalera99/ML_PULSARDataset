@@ -1,27 +1,12 @@
 #!/Users/riccardo/VENV/python3_9/bin/python3.9
 
-import itertools
-
 import numpy as np
 
-from classifiers.GMM2 import tuning_componentsGMM, GMM
+from classifiers.GMM2 import GMM
 from classifiers.LR import LR
 from classifiers.MVG import MVG
-from classifiers.SVM import tuning_parameters_PolySVM, tuning_parameters_RBFSVM, tuning_parameters_LinearSVMBalanced, \
-    SVM
-from preprocessing.preprocessing import PCA, gaussianize
-from simulations.evaluation import MVG_evaluation, LR_evaluation, SVM_LinearUnbalanced_evaluation, \
-    SVM_LinearBalanced_evaluation, SVM_Poly_evaluation, SVM_RBF_evaluation, GMM_evaluation
-from simulations.simulations import MVG_simulations, GMM_Simulations, SVM_LinearUnbalancedSimulations, \
-    SVM_PolySimulations, SVM_RBFSimulations, SVM_LinearBalancedSimulations, LR_simulations
-from simulations.tuning import tuning_parameters_LinearSVMUnbalanced_evaluation, \
-    tuning_parameters_LinearSVMBalanced_evaluation, tuning_parameters_PolySVM_evaluation, \
-    tuning_parameters_RBFSVM_evaluation, tuning_componentsGMM_evaluation, tuning_lambda_evaluation
-from utils.metrics_utils import bayes_error_plots_data, bayes_error_plots_data_evaluation
-from utils.plot_utils import create_scatterplots, bayes_error_plots, plot_lambda_evaluation, \
-    plot_tuningPolySVM_evaluation, plot_tuningRBFSVM_evaluation, plot_tuningGMM_evaluation, \
-    ROC_curve, ROC_curve_evaluation, generate_ROC_data, plot_tuningLinearSVMUnbalanced_evaluation, \
-    plot_tuning_LinearSVMBalanced_evaluation, create_heatmap, plot_main
+from classifiers.SVM import SVM
+from utils.plot_utils import bayes_error_plots
 from utils.utils import load_dataset
 
 
@@ -163,6 +148,7 @@ def main():
     # print(f"plotting...")
     # for a in [True, False]:
     #     bayes_error_plots(classifiers, after=a)
+    bayes_error_plots(classifiers, after=True, evaluation=True)
 
     # =============== EXPERIMENTAL RESULT ===============
     # MVG_evaluation(training_data, training_labels, testing_data, testing_labels)
