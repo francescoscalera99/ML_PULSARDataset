@@ -21,7 +21,7 @@ from simulations.tuning import tuning_parameters_LinearSVMUnbalanced_evaluation,
 from utils.metrics_utils import bayes_error_plots_data, bayes_error_plots_data_evaluation
 from utils.plot_utils import create_scatterplots, bayes_error_plots, plot_lambda_evaluation, \
     plot_tuningPolySVM_evaluation, plot_tuningRBFSVM_evaluation, plot_tuningGMM_evaluation, \
-    ROC_curve, ROC_curve_evaluation
+    ROC_curve, ROC_curve_evaluation, generate_ROC_data
 from utils.utils import load_dataset
 
 
@@ -129,28 +129,28 @@ def main():
     classifiers = [MVG, LR, SVM, GMM]
     args = [
         {"raw": False,
-             "m": 7,
-             "variant": "tied"},
-            {"raw": False,
-             "m": 7,
-             "lbd": lbd,
-             "pi_T": 0.5},
-            {"raw": False,
-             "m": 7,
-             "k": K_LinearB,
-             "c": C_LinearB,
-             "pi_T": 0.5,
-             "balanced": True,
-             "kernel_type": "poly",
-             "kernel_params": (1, 0)},
-            {"raw": False,
-             "m": 7,
-             "G": g,
-             "type": "full-cov",
-             "alpha": 0.1,
-             "psi": 0.1}]
+         "m": 7,
+         "variant": "tied"},
+        {"raw": False,
+         "m": 7,
+         "lbd": lbd,
+         "pi_T": 0.5},
+        {"raw": False,
+         "m": 7,
+         "k": K_LinearB,
+         "c": C_LinearB,
+         "pi_T": 0.5,
+         "balanced": True,
+         "kernel_type": "poly",
+         "kernel_params": (1, 0)},
+        {"raw": False,
+         "m": 7,
+         "G": g,
+         "type": "full-cov",
+         "alpha": 0.1,
+         "psi": 0.1}]
 
-    ROC_curve(training_data, training_labels, classifiers, args)
+    # ROC_curve(training_data, training_labels, classifiers, args)
 
     # =============== BAYES ERROR PLOT ==================
     # for i, classifier in enumerate(classifiers):
@@ -217,15 +217,27 @@ def main():
     # GMM_evaluation(training_data, training_labels, testing_data, testing_labels, g, alpha=0.1, psi=0.01, actualDCF=True, calibratedScore=True)
 
     # =============== ROC - EXPERIMENTAL RESULT ===============
-    # ROC_curve_evaluation(training_data, training_labels, testing_data, testing_labels, classifiers, args)
+    # classifiers2 = list(reversed(classifiers))
+    # args2 = list(reversed(args))
+    dtr = gaussianize(training_data, training_data)
+    dte = gaussianize(training_data, testing_data)
+
+    dtr7 = PCA(dtr, dtr, 7)
+    dte7 = PCA(dte, dtr, 7)
+
+    # for i, c in enumerate(classifiers):
+    #     print(f"Starting {c.__name__}...")
+    #     generate_ROC_data(dtr7, training_labels, dte7, testing_labels, c, args[i])
+
+    ROC_curve_evaluation(classifiers)
 
     # =============== BAYES ERROR PLOT - EXPERIMENTAL RESULT ===============
     # for i, classifier in enumerate(classifiers):
     #     print(f"{'*'*30} bep {i+1}/{len(classifiers)} {'*'*30}")
     #     bayes_error_plots_data_evaluation(training_data, training_labels, testing_data, testing_labels, classifier, **args[i])
     # print(f"plotting...")
-    # for a in [True, False]:
-    #     bayes_error_plots(classifiers, after=a)
+    for a in [True, False]:
+        bayes_error_plots(classifiers, after=a)
 
     # ****************** TURN OFF PC AT END OF SIMULATION (needs sudo) ******************
     # (windows ?)

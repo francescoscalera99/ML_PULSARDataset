@@ -990,7 +990,17 @@ def ROC_curve(training_data, training_labels, classifiers, args):
     f.savefig('plots/ROC/ROC_training.png')
 
 
-def ROC_curve_evaluation(training_data, training_labels, testing_data, testing_labels, classifiers, args):
+def generate_ROC_data(training_data, training_labels, testing_data, testing_labels, classifier, args):
+    c = classifier(training_data, training_labels, **args)
+    c.train_model(**args)
+    c.classify(testing_data, None)
+    score = c.get_llrs()
+    FPRs, TPRs = compute_FPRs_TPRs(score, testing_labels)
+    np.save(f"simulations/evaluation/ROC/{classifier.__name__}_TPRs", TPRs)
+    np.save(f"simulations/evaluation/ROC/{classifier.__name__}_FPRs", FPRs)
+
+
+def ROC_curve_evaluation(classifiers):
     plt.rcParams.update({
         "text.usetex": True,
         "font.family": "sans-serif",
@@ -1005,11 +1015,8 @@ def ROC_curve_evaluation(training_data, training_labels, testing_data, testing_l
     f, ax = plt.subplots()
     colors = distinctipy.get_colors(len(classifiers))
     for i, classifier in enumerate(classifiers):
-        c = classifier(training_data, training_labels, args[i])
-        c.train_model(args[i])
-        c.classify(testing_data, None)
-        score = c.get_llrs()
-        FPRs, TPRs = compute_FPRs_TPRs(score, testing_labels)
+        FPRs = np.load(f"simulations/evaluation/ROC/{classifier.__name__}_FPRs.npy")
+        TPRs = np.load(f"simulations/evaluation/ROC/{classifier.__name__}_TPRs.npy")
         ax.plot(FPRs, TPRs, color=colors[i], label=f"{classifier.__name__}")
     ax.set_title("ROC curve")
     ax.set_xlabel("FPR")
