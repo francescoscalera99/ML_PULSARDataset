@@ -629,7 +629,7 @@ def plot_lambda_evaluation():
     prior = [0.5, 0.1, 0.9]
 
     fig, axs = plt.subplots(1, 2)
-    fig.set_size_inches(10, 5)
+    fig.set_size_inches(13, 4)
 
     colors = ['red', 'blue', 'green']
     for i, m in enumerate(m_values):
@@ -665,11 +665,11 @@ def plot_lambda_evaluation():
     # fig.tight_layout()
     lines_labels = [ax.get_legend_handles_labels() for ax in fig.axes]
     lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
-    fig.legend(lines[:6], labels[:6], loc=8, ncol=3)
+    fig.legend(lines[:6], labels[:6], loc=7, ncol=1)
     # fig.legend(lines[:3], labels[:3], loc=10, prop={'size': 10})
 
     fig.tight_layout()
-    fig.subplots_adjust(bottom=0.3)
+    fig.subplots_adjust(right=0.8)
     fig.subplots_adjust(hspace=0.7)
     fig.show()
 
