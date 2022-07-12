@@ -5,7 +5,6 @@ import itertools
 import numpy as np
 
 from classifiers.GMM2 import tuning_componentsGMM, GMM
-# from classifiers.LR import tuning_lambda
 from classifiers.LR import LR
 from classifiers.MVG import MVG
 from classifiers.SVM import tuning_parameters_PolySVM, tuning_parameters_RBFSVM, tuning_parameters_LinearSVMBalanced, \
@@ -237,8 +236,8 @@ def main():
     #     print(f"{'*'*30} bep {i+1}/{len(classifiers)} {'*'*30}")
     #     bayes_error_plots_data_evaluation(training_data, training_labels, testing_data, testing_labels, classifier, **args[i])
     # print(f"plotting...")
-    for a in [True, False]:
-        bayes_error_plots(classifiers, after=a, evaluation=True)
+    # for a in [True, False]:
+    #     bayes_error_plots(classifiers, after=a, evaluation=True)
 
     # ****************** TURN OFF PC AT END OF SIMULATION (needs sudo) ******************
     # (windows ?)

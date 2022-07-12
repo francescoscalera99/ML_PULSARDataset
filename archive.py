@@ -3,7 +3,18 @@
 # in case.                                                                                                             #
 # ******************************************************************************************************************** #
 
-plt = np = sns = itertools = colors6 = None
+plt = np = sns = itertools = colors6 = vcol = None
+
+
+def z_normalization(dataset: np.ndarray) -> np.ndarray:
+    """
+    Computes the Z-normalization
+    :param dataset:
+    :return:
+    """
+    mean = dataset.mean(axis=1)
+    std = dataset.std(axis=1)
+    return (dataset - vcol(mean)) / vcol(std)
 
 
 def create_heatmap(dataset, labels, cmap='Reds', title=None):

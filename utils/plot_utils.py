@@ -5,8 +5,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
-from utils.metrics_utils import compute_FPRs_TPRs
-from utils.utils import k_fold
+from metrics_utils import compute_FPRs_TPRs
+from utils import k_fold
 
 
 def plot_histogram(array, labels, titles, nbins: int = 10) -> None:
@@ -724,6 +724,7 @@ def plot_tuningLinearSVMUnbalanced_evaluation():
     fig.set_size_inches(20, 5)
     fig.tight_layout()
     fig.show()
+    fig.savefig(fname="../plots/evaluation/tuning_SVMLinUnb_evaluation", dpi=180)
 
     label_params = axs[0].get_legend_handles_labels()
     figl, axl = plt.subplots(figsize=(6.5, 5))
@@ -791,7 +792,7 @@ def plot_tuning_LinearSVMBalanced_evaluation():
     figl.show()
 
     fig.show()
-    fig.savefig(fname="../plots/evaluation/tuning_SVM_linear_balanced", dpi=180)
+    fig.savefig(fname="../plots/evaluation/tuning_SVMLinBal_evaluation", dpi=180)
 
 
 def plot_tuningPolySVM_evaluation():
@@ -1156,11 +1157,11 @@ if __name__ == '__main__':
     # plot_tuningRBFSVM()
     # print(os.path.abspath("."))
 
-    # plot_tuningLinearSVMUnbalanced_evaluation()
-    # plot_tuning_LinearSVMBalanced_evaluation()
-    # plot_tuningPolySVM_evaluation()
-    # plot_tuningRBFSVM_evaluation()
-    # plot_lambda_evaluation()
-    # plot_tuningGMM_evaluation()
+    plot_tuningLinearSVMUnbalanced_evaluation()
+    plot_tuning_LinearSVMBalanced_evaluation()
+    plot_tuningPolySVM_evaluation()
+    plot_tuningRBFSVM_evaluation()
+    plot_lambda_evaluation()
+    plot_tuningGMM_evaluation()
     # plot_tuningGMM2()
     pass

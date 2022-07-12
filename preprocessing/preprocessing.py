@@ -1,8 +1,6 @@
 import numpy as np
 from scipy.stats import norm
 
-from utils.matrix_utils import vcol
-
 
 def PCA(dataset, training_data, m):
     """
@@ -26,17 +24,6 @@ def PCA(dataset, training_data, m):
     DP = np.dot(P.T, dataset)
 
     return DP
-
-
-def z_normalization(dataset: np.ndarray) -> np.ndarray:
-    """
-    Computes the Z-normalization
-    :param dataset:
-    :return:
-    """
-    mean = dataset.mean(axis=1)
-    std = dataset.std(axis=1)
-    return (dataset - vcol(mean)) / vcol(std)
 
 
 def gaussianize(training_data: np.ndarray, dataset: np.ndarray) -> np.ndarray:
