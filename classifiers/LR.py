@@ -2,10 +2,10 @@ import numpy as np
 from scipy import optimize as opt
 
 from classifiers.Classifier import ClassifierClass
-from matrix_utils import vrow
+from utils.matrix_utils import vrow
 # from utils.metrics_utils import compute_min_DCF
 # from utils.utils import k_fold
-from utils import splitData_SingleFold
+from utils.utils import splitData_SingleFold
 
 
 class LR(ClassifierClass):

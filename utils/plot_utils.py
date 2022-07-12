@@ -5,8 +5,9 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
-from metrics_utils import compute_FPRs_TPRs
-from utils import k_fold
+from utils.metrics_utils import compute_FPRs_TPRs
+from preprocessing.preprocessing import gaussianize
+from utils.utils import k_fold
 
 
 def plot_histogram(array, labels, titles, nbins: int = 10) -> None:
@@ -59,7 +60,7 @@ def create_heatmap(dataset, labels):
     for i, d in enumerate(datasets):
         data_map1 = np.abs(np.corrcoef(d))
         im1, cbar1 = heatmap(data_map1, [i for i in range(8)], [i for i in range(8)], ax=ax[i, 0], cmap="Greys")
-        annotate_heatmap(im1, size=13, fontweight="bold")
+        annotate_heatmap(im1, size=13, fontweight="extra bold")
 
         data_map2 = np.abs(np.corrcoef(d[:, labels == 1]))
         im2, cbar2 = heatmap(data_map2, [i for i in range(8)], [i for i in range(8)], ax=ax[i, 1], cmap="Oranges")
@@ -1117,7 +1118,7 @@ def plot_tuningGMM_evaluation2():
     figl3.savefig(fname="../plots/evaluation/tuning_GMM_legend_pi0-9")
 
 
-if __name__ == '__main__':
+def plot_main():
     # DO NOT COMMENT
     plt.rcParams.update({
         "text.usetex": True,
@@ -1161,7 +1162,10 @@ if __name__ == '__main__':
     # plot_tuning_LinearSVMBalanced_evaluation()
     # plot_tuningPolySVM_evaluation()
     # plot_tuningRBFSVM_evaluation()
-    plot_lambda_evaluation()
+    # plot_lambda_evaluation()
     # plot_tuningGMM_evaluation()
     # plot_tuningGMM2()
-    pass
+
+
+if __name__ == '__main__':
+    plot_main()
