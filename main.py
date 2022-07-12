@@ -21,7 +21,7 @@ from simulations.tuning import tuning_parameters_LinearSVMUnbalanced_evaluation,
 from utils.metrics_utils import bayes_error_plots_data, bayes_error_plots_data_evaluation
 from utils.plot_utils import create_scatterplots, bayes_error_plots, plot_lambda_evaluation, \
     plot_tuningPolySVM_evaluation, plot_tuningRBFSVM_evaluation, plot_tuningGMM_evaluation, \
-    ROC_curve
+    ROC_curve, ROC_curve_evaluation
 from utils.utils import load_dataset
 
 
@@ -150,7 +150,7 @@ def main():
              "alpha": 0.1,
              "psi": 0.1}]
 
-    # ROC_curve(training_data, training_labels, classifiers, args)
+    ROC_curve(training_data, training_labels, classifiers, args)
 
     # =============== BAYES ERROR PLOT ==================
     # for i, classifier in enumerate(classifiers):
@@ -216,13 +216,16 @@ def main():
     # SVM_LinearBalanced_evaluation(training_data, training_labels, testing_data, testing_labels, K_LinearB, C_LinearB, actualDCF=True, calibratedScore=True)
     # GMM_evaluation(training_data, training_labels, testing_data, testing_labels, g, alpha=0.1, psi=0.01, actualDCF=True, calibratedScore=True)
 
+    # =============== ROC - EXPERIMENTAL RESULT ===============
+    # ROC_curve_evaluation(training_data, training_labels, testing_data, testing_labels, classifiers, args)
+
     # =============== BAYES ERROR PLOT - EXPERIMENTAL RESULT ===============
-    for i, classifier in enumerate(classifiers):
-        print(f"{'*'*30} bep {i+1}/{len(classifiers)} {'*'*30}")
-        bayes_error_plots_data_evaluation(training_data, training_labels, testing_data, testing_labels, classifier, **args[i])
-    print(f"plotting...")
-    for a in [True, False]:
-        bayes_error_plots(classifiers, after=a)
+    # for i, classifier in enumerate(classifiers):
+    #     print(f"{'*'*30} bep {i+1}/{len(classifiers)} {'*'*30}")
+    #     bayes_error_plots_data_evaluation(training_data, training_labels, testing_data, testing_labels, classifier, **args[i])
+    # print(f"plotting...")
+    # for a in [True, False]:
+    #     bayes_error_plots(classifiers, after=a)
 
     # ****************** TURN OFF PC AT END OF SIMULATION (needs sudo) ******************
     # (windows ?)

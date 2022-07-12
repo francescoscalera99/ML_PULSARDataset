@@ -8,6 +8,8 @@ import matplotlib
 
 from utils.metrics_utils import compute_FPRs_TPRs
 from utils.utils import k_fold
+from classifiers.Classifier import ClassifierClass
+
 
 
 def plot_histogram(array, labels, titles, nbins: int = 10) -> None:
@@ -986,6 +988,36 @@ def ROC_curve(training_data, training_labels, classifiers, args):
     plt.grid()
     f.show()
     f.savefig('plots/ROC/ROC_training.png')
+
+
+def ROC_curve_evaluation(training_data, training_labels, testing_data, testing_labels, classifiers, args):
+    plt.rcParams.update({
+        "text.usetex": True,
+        "font.family": "sans-serif",
+        "font.sans-serif": ["Computer Modern Serif"],
+        "axes.titlesize": 20,
+        "xtick.labelsize": 15,
+        "ytick.labelsize": 15,
+        "axes.labelsize": 18,
+        "legend.fontsize": 18,
+        "figure.dpi": 180
+    })
+    f, ax = plt.subplots()
+    colors = distinctipy.get_colors(len(classifiers))
+    for i, classifier in enumerate(classifiers):
+        c = classifier(training_data, training_labels, args[i])
+        c.train_model(args[i])
+        c.classify(testing_data, None)
+        score = c.get_llrs()
+        FPRs, TPRs = compute_FPRs_TPRs(score, testing_labels)
+        ax.plot(FPRs, TPRs, color=colors[i], label=f"{classifier.__name__}")
+    ax.set_title("ROC curve")
+    ax.set_xlabel("FPR")
+    ax.set_ylabel("TPR")
+    plt.legend()
+    plt.grid()
+    f.show()
+    f.savefig('plots/ROC/ROC_evaluation.png')
 
 
 def plot_tuningGMM_evaluation2():
