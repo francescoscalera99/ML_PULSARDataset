@@ -613,7 +613,7 @@ def bayes_error_plots(classifiers, after=False):
 
     fig.tight_layout()
     fig.subplots_adjust(hspace=0.3, wspace=0.2)
-    fig.savefig(fname=f"plots/bayes_error_plots/bep_{fname}")
+    fig.savefig(fname=f"plots/bayes_error_plots/bep_{fname}", dpi=180)
     fig.show()
 
 

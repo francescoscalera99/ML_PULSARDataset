@@ -219,17 +219,17 @@ def main():
     # =============== ROC - EXPERIMENTAL RESULT ===============
     # classifiers2 = list(reversed(classifiers))
     # args2 = list(reversed(args))
-    dtr = gaussianize(training_data, training_data)
-    dte = gaussianize(training_data, testing_data)
-
-    dtr7 = PCA(dtr, dtr, 7)
-    dte7 = PCA(dte, dtr, 7)
+    # dtr = gaussianize(training_data, training_data)
+    # dte = gaussianize(training_data, testing_data)
+    #
+    # dtr7 = PCA(dtr, dtr, 7)
+    # dte7 = PCA(dte, dtr, 7)
 
     # for i, c in enumerate(classifiers):
     #     print(f"Starting {c.__name__}...")
     #     generate_ROC_data(dtr7, training_labels, dte7, testing_labels, c, args[i])
 
-    ROC_curve_evaluation(classifiers)
+    # ROC_curve_evaluation(classifiers)
 
     # =============== BAYES ERROR PLOT - EXPERIMENTAL RESULT ===============
     # for i, classifier in enumerate(classifiers):
