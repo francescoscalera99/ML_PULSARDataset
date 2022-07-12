@@ -21,7 +21,8 @@ from simulations.tuning import tuning_parameters_LinearSVMUnbalanced_evaluation,
 from utils.metrics_utils import bayes_error_plots_data, bayes_error_plots_data_evaluation
 from utils.plot_utils import create_scatterplots, bayes_error_plots, plot_lambda_evaluation, \
     plot_tuningPolySVM_evaluation, plot_tuningRBFSVM_evaluation, plot_tuningGMM_evaluation, \
-    ROC_curve, ROC_curve_evaluation, generate_ROC_data
+    ROC_curve, ROC_curve_evaluation, generate_ROC_data, plot_tuningLinearSVMUnbalanced_evaluation, \
+    plot_tuning_LinearSVMBalanced_evaluation
 from utils.utils import load_dataset
 
 
@@ -175,17 +176,17 @@ def main():
 
     # =============== TUNING HYPERPARAMETERS - EXPERIMENTAL RESULT ===============
     # tuning_lambda_evaluation(training_data, training_labels, testing_data, testing_labels)
-    # plot_lambda_evaluation()
+    plot_lambda_evaluation()
     # tuning_parameters_LinearSVMUnbalanced_evaluation(training_data, training_labels, testing_data, testing_labels)
-    # plot_tuningLinearSVMUnbalanced_evaluation()
+    plot_tuningLinearSVMUnbalanced_evaluation()
     # tuning_parameters_LinearSVMBalanced_evaluation(training_data, training_labels, testing_data, testing_labels)
-    # plot_tuning_LinearSVMBalanced_evaluation()
+    plot_tuning_LinearSVMBalanced_evaluation()
     # tuning_parameters_PolySVM_evaluation(training_data, training_labels, testing_data, testing_labels)
-    # plot_tuningPolySVM_evaluation()
+    plot_tuningPolySVM_evaluation()
     # tuning_parameters_RBFSVM_evaluation(training_data, training_labels, testing_data, testing_labels)
-    # plot_tuningRBFSVM_evaluation()
+    plot_tuningRBFSVM_evaluation()
     # tuning_componentsGMM_evaluation(training_data, training_labels, testing_data, testing_labels)
-    # plot_tuningGMM_evaluation()
+    plot_tuningGMM_evaluation()
 
     lbd = 1e-7
     K_LinearB = 1.0  # This values comes from tuning of hyperparameters

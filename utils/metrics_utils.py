@@ -118,7 +118,7 @@ def bayes_error_plots_data_evaluation(training_data, training_labels, testing_da
     c = classifier(training_data, training_labels, **kwargs)
     c.train_model(**kwargs)
     c.classify(testing_data, None)
-
+    del c
     score = c.get_llrs()
 
     calibrated_score, ordered_labels = calibrateScores(vrow(score), testing_labels, lambd=1e-6, prior=0.5)

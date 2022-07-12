@@ -706,9 +706,9 @@ def plot_tuningLinearSVMUnbalanced_evaluation():
                 f"./../simulations/linearSVM/unbalanced/new/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}_PCA{str(m)}.npy")
             DCFs_evaluation = np.load(
                 f"../simulations/evaluation/linearSVM/unbalanced/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}_PCA{str(m)}.npy")
-            axs[i].plot(C_values, DCFs, color=colors6[j], label=r"$K=" + str(K) + r",\;\widetilde{\pi}=" + str(p) + r"$",
+            axs[i].plot(C_values, DCFs, color=colors6[j], linestyle="dashed", label=r"$K=" + str(K) + r",\;\widetilde{\pi}=" + str(p) + r"$",
                         linewidth=3)
-            axs[i].plot(C_values, DCFs_evaluation, linestyle="dashed", color=colors6[j],
+            axs[i].plot(C_values, DCFs_evaluation, color=colors6[j],
                         label=r"$K=" + str(K) + r",\;\widetilde{\pi}=" + str(p) + r"$" + "(eval.)",
                         linewidth=3)
             if m is None:
@@ -765,9 +765,9 @@ def plot_tuning_LinearSVMBalanced_evaluation():
                     f"../simulations/linearSVM/balanced/K{str(K).replace('.', '-')}_p{str(pi).replace('.', '-')}_pT{str(pi_T).replace('.', '-')}_PCA{str(m)}.npy")
                 DCFs_evaluation = np.load(
                     f"../simulations/evaluation/linearSVM/balanced/K{str(K).replace('.', '-')}_p{str(pi).replace('.', '-')}_pT{str(pi_T).replace('.', '-')}_PCA{str(m)}.npy")
-                axs[i, j].plot(C_values, DCFs, color=colors6[idx],
+                axs[i, j].plot(C_values, DCFs,  linestyle="dashed", color=colors6[idx],
                                label=rf"$K={K}$,\;" + r"$\widetilde{\pi}=$" + f"{pi}", linewidth=3)
-                axs[i, j].plot(C_values, DCFs_evaluation, linestyle="dashed", color=colors6[idx],
+                axs[i, j].plot(C_values, DCFs_evaluation, color=colors6[idx],
                                label=rf"$K={K}$,\;" + r"$\widetilde{\pi}=$" + f"{pi} (eval.)", linewidth=3)
                 if m is None:
                     axs[i, j].set_title('Gau, no PCA' + rf", $\pi_T={pi_T}$")
@@ -827,8 +827,8 @@ def plot_tuningPolySVM_evaluation():
             DCFs_evaluation = np.load(
                 f"../simulations/evaluation/polySVM/K{str(K).replace('.', '-')}_c{str(c).replace('.', '-')}_PCA{str(m)}.npy")
 
-            axs[i].plot(C_values, DCFs, color=colors8[j], label=rf"$K={K}$, $c={c}$", linewidth=2.5)
-            axs[i].plot(C_values, DCFs_evaluation, linestyle="dashed", color=colors8[j], label=rf"$K={K}$, $c={c}$ (eval.)", linewidth=2.5)
+            axs[i].plot(C_values, DCFs, color=colors8[j], linestyle="dashed",label=rf"$K={K}$, $c={c}$", linewidth=2.5)
+            axs[i].plot(C_values, DCFs_evaluation, color=colors8[j], label=rf"$K={K}$, $c={c}$ (eval.)", linewidth=2.5)
             if (m == False):
                 axs[i].set_title(f'5-fold, Raw features')
             else:
@@ -886,8 +886,8 @@ def plot_tuningRBFSVM_evaluation():
             DCFs_evaluation = np.load(
                 f"../simulations/evaluation/RBF/RBF_K{str(K).replace('.', '-')}_gamma{str(gamma).replace('.', '-')}_PCA{str(m)}.npy")
             lb = r"$\gamma = 10^{" + str(g_exp) + "}$"
-            axs[i].plot(C_values, DCFs, color=colors6[j], label=rf"$K={K}$, " + lb, linewidth=2.5)
-            axs[i].plot(C_values, DCFs_evaluation, linestyle="dashed", color=colors6[j], label=rf"$K={K}$, " + lb + " (eval.)", linewidth=2.5)
+            axs[i].plot(C_values, DCFs, color=colors6[j], linestyle="dashed", label=rf"$K={K}$, " + lb, linewidth=2.5)
+            axs[i].plot(C_values, DCFs_evaluation, color=colors6[j], label=rf"$K={K}$, " + lb + " (eval.)", linewidth=2.5)
             if m == False:
                 axs[i].set_title(f'5-fold, Raw features')
             else:
@@ -941,8 +941,8 @@ def plot_tuningGMM_evaluation():
             DCFs = np.load(f"../simulations/GMM/GMM_rawFeature-{r}_PCA{m}_{variant}{pp}.npy")
             DCFs_evaluation = np.load(f"../simulations/evaluation/GMM/GMM_rawFeature-{r}_PCA{m}_{variant}_pi{str(p).replace('.', '-')}.npy")
             label = r"$\widetilde{\pi}=$" + f"{p} "
-            axs[i, 1-int(r)].plot(components_values, DCFs, label=label, color=colors3[j//2], linewidth=3)
-            axs[i, 1-int(r)].plot(components_values, DCFs_evaluation, linestyle="dashed", label=label+"(eval.)", color=colors3[j//2], linewidth=3)
+            axs[i, 1-int(r)].plot(components_values, DCFs, linestyle="dashed", label=label, color=colors3[j//2], linewidth=3)
+            axs[i, 1-int(r)].plot(components_values, DCFs_evaluation, label=label+"(eval.)", color=colors3[j//2], linewidth=3)
             axs[i, 1-int(r)].set_xscale('log', base=2)
             axs[i, 1-int(r)].set_xticks(components_values)
             axs[i, 1-int(r)].set_yticks(y)
@@ -1069,8 +1069,8 @@ def plot_tuningGMM_evaluation2():
             DCFs = np.load(f"../simulations/GMM/GMM_rawFeature-{r}_PCA{m}_{variant}{pp}.npy")
             DCFs_evaluation = np.load(f"../simulations/evaluation/GMM/GMM_rawFeature-{r}_PCA{m}_{variant}_pi{str(p).replace('.', '-')}.npy")
             label = r"$\widetilde{\pi}=$" + f"{p}, {'raw' if r else 'gau'}"
-            axs[pis.index(p)][i // 2, i % 2].plot(components_values, DCFs, label=label, color=colors6[j], linewidth=3)
-            axs[pis.index(p)][i // 2, i % 2].plot(components_values, DCFs_evaluation, linestyle="dashed", label=label+"(eval.)", color=colors6[j], linewidth=3)
+            axs[pis.index(p)][i // 2, i % 2].plot(components_values, DCFs, label=label, linestyle="dashed", color=colors6[j], linewidth=3)
+            axs[pis.index(p)][i // 2, i % 2].plot(components_values, DCFs_evaluation, label=label+"(eval.)", color=colors6[j], linewidth=3)
             axs[pis.index(p)][i // 2, i % 2].set_xscale('log', base=2)
             axs[pis.index(p)][i // 2, i % 2].set_xticks(components_values)
             axs[pis.index(p)][i // 2, i % 2].set_yticks(y)
