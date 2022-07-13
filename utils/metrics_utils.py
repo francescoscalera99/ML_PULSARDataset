@@ -2,7 +2,7 @@ import numpy as np
 
 from classifiers.LR import calibrateScores
 from utils.matrix_utils import vrow
-from utils.utils import k_fold
+from utils.misc_utils import k_fold
 
 
 def build_confusion_matrix(testing_labels: np.ndarray, predicted_labels: np.ndarray) -> np.ndarray:

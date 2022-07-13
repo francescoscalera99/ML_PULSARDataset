@@ -6,7 +6,7 @@ import scipy.optimize
 from classifiers.Classifier import ClassifierClass
 from utils.matrix_utils import vrow, vcol
 from utils.metrics_utils import compute_min_DCF
-from utils.utils import k_fold
+from utils.misc_utils import k_fold
 
 
 class SVM(ClassifierClass):

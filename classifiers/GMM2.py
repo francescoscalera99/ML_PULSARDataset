@@ -5,7 +5,7 @@ import scipy.special as special
 
 from classifiers.Classifier import ClassifierClass
 from utils.matrix_utils import vrow, vcol, empirical_dataset_mean, empirical_dataset_covariance
-from utils.utils import k_fold
+from utils.misc_utils import k_fold
 
 
 # import warnings

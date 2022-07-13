@@ -7,7 +7,7 @@ from classifiers.LR import LR
 from classifiers.MVG import MVG
 from classifiers.SVM import SVM
 from utils.plot_utils import bayes_error_plots
-from utils.utils import load_dataset
+from utils.misc_utils import load_dataset
 
 
 def get_same_distrib_partition(dtr, ltr, perc=0.1, num_samples=1000):

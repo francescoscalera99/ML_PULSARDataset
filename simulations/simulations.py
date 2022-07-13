@@ -8,7 +8,7 @@ from classifiers.LR import LR, calibrateScores
 from classifiers.MVG import MVG
 from classifiers.SVM import SVM
 from utils.metrics_utils import compute_actual_DCF, compute_min_DCF
-from utils.utils import k_fold
+from utils.misc_utils import k_fold
 
 
 def MVG_simulations(training_data, training_labels, calibratedScore=False, actualDCF=False):
