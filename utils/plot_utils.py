@@ -1,4 +1,5 @@
 import itertools
+import sys
 
 import distinctipy
 import matplotlib
@@ -7,7 +8,7 @@ import numpy as np
 
 from preprocessing.preprocessing import gaussianize
 from utils.metrics_utils import compute_FPRs_TPRs
-from utils.utils import k_fold
+from utils.misc_utils import k_fold
 
 
 def plot_histogram(array, labels, titles, nbins: int = 10) -> None:
@@ -644,11 +645,11 @@ def plot_lambda_evaluation():
             axs[i].plot(lbd_values, DCFs_evaluation, color=colors[j],
                                     label=r"$\widetilde{\pi}=" + f"{pi}$ (eval.)")
             if m == False:
-                axs[i].set_title(f'5-fold, Raw features')
+                axs[i].set_title(f'Raw features')
             elif m is None:
-                axs[i].set_title(f'5-fold, no PCA')
+                axs[i].set_title(f'no PCA')
             else:
-                axs[i].set_title(f'5-fold, PCA (m={m})')
+                axs[i].set_title(f'PCA (m={m})')
 
             axs[i].set_xlabel(r'$\lambda$')
             axs[i].set_ylabel(r'$minDCF$')
@@ -765,11 +766,11 @@ def plot_tuningLinearSVMUnbalanced_evaluation():
                         label=r"$K=" + str(K) + r",\;\widetilde{\pi}=" + str(p) + r"$" + "(eval.)",
                         linewidth=3)
             if m is None:
-                axs[i].set_title(rf"Gau, no PCA, $\pi_T=0.5$")
+                axs[i].set_title(rf"Gau, no PCA")
             elif m == False:
-                axs[i].set_title(rf"Raw, no PCA, $\pi_T=0.5$")
+                axs[i].set_title(rf"Raw, no PCA")
             else:
-                axs[i].set_title(rf"Gau, PCA ($m = {m}$), $\pi_T=0.5$")
+                axs[i].set_title(rf"Gau, PCA ($m = {m}$)")
             # axs[i].legend()
             axs[i].set_xlabel('$C$')
             axs[i].set_ylabel('$minDCF$')
@@ -787,6 +788,67 @@ def plot_tuningLinearSVMUnbalanced_evaluation():
     axl.axis(False)
     axl.legend(*label_params, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
     figl.show()
+
+
+def plot_tuningLinearSVMUnbalanced_evaluation2():
+    C_values = np.logspace(-3, 3, 20)
+    m_values = [False, 7]
+    K_values = [1.0]
+    priors = [0.5, 0.1, 0.9]
+
+    i = 0
+
+    plt.rcParams.update({
+        "text.usetex": True,
+        "font.family": "sans-serif",
+        "font.sans-serif": ["Computer Modern Serif"],
+        "axes.titlesize": 22,
+        "axes.labelsize": 30,
+        "legend.fontsize": 20,
+        "xtick.labelsize": 30,
+        "ytick.labelsize": 30,
+    })
+
+    fig, axs = plt.subplots(1, 2, sharey='row')
+    # colors = distinctipy.get_colors(6, pastel_factor=0.7)
+    for m in m_values:
+        hyperparameters = itertools.product(K_values, priors)
+        for j, (K, p) in enumerate(hyperparameters):
+            DCFs = np.load(
+                f"./../simulations/linearSVM/unbalanced/new/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}_PCA{str(m)}.npy")
+            DCFs_evaluation = np.load(
+                f"../simulations/evaluation/linearSVM/unbalanced/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}_PCA{str(m)}.npy")
+            axs[i].plot(C_values, DCFs, color=colors6[j], linestyle="dashed", label=r"$K=" + str(K) + r",\;\widetilde{\pi}=" + str(p) + r"$",
+                        linewidth=3)
+            axs[i].plot(C_values, DCFs_evaluation, color=colors6[j],
+                        label=r"$K=" + str(K) + r",\;\widetilde{\pi}=" + str(p) + r"$" + "(eval.)",
+                        linewidth=3)
+            if m is None:
+                axs[i].set_title(rf"Gau, no PCA")
+            elif m == False:
+                axs[i].set_title(rf"Raw, no PCA")
+            else:
+                axs[i].set_title(rf"Gau, PCA ($m = {m}$)")
+            # axs[i].legend()
+            axs[i].set_xlabel('$C$')
+            axs[i].set_ylabel('$minDCF$')
+            axs[i].set_xscale('log')
+            axs[i].yaxis.set_tick_params(labelbottom=True)
+            axs[i].set_xticks([10 ** i for i in range(-2, 3, 2)])
+        i += 1
+    fig.set_size_inches(20, 5)
+    fig.tight_layout()
+
+    lines_labels = [ax.get_legend_handles_labels() for ax in fig.axes]
+    lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
+    fig.legend(lines[:6], labels[:6], loc=7, ncol=1)
+
+    fig.subplots_adjust(right=0.8)
+    fig.subplots_adjust(wspace=0.2)
+
+    fig.show()
+    fig.savefig(fname="../plots/evaluation/tuning_SVMLinUnb_evaluation2", dpi=180)
+
 
 
 def plot_tuning_LinearSVMBalanced_evaluation():
@@ -851,6 +913,65 @@ def plot_tuning_LinearSVMBalanced_evaluation():
     fig.savefig(fname="../plots/evaluation/tuning_SVMLinBal_evaluation", dpi=180)
 
 
+def plot_tuning_LinearSVMBalanced_evaluation2():
+    C_values = np.logspace(-3, 3, 20)
+    m_values = [False, 7]
+    pi_T_values = [0.5]
+    K_values = [1.0]
+    prior = [0.5, 0.1, 0.9]
+
+    plt.rcParams.update({
+        "text.usetex": True,
+        "font.family": "sans-serif",
+        "font.sans-serif": ["Computer Modern Serif"],
+        "axes.titlesize": 30,
+        "axes.labelsize": 30,
+        "legend.fontsize": 20,
+        "xtick.labelsize": 30,
+        "ytick.labelsize": 30,
+    })
+
+    i = 0
+    fig, axs = plt.subplots(1, 2, sharey='all')
+
+    for m in m_values:
+        j = 0
+        for pi_T in pi_T_values:
+            hyperparameters = itertools.product(K_values, prior)
+            for idx, (K, pi) in enumerate(hyperparameters):
+                DCFs = np.load(
+                    f"../simulations/linearSVM/balanced/K{str(K).replace('.', '-')}_p{str(pi).replace('.', '-')}_pT{str(pi_T).replace('.', '-')}_PCA{str(m)}.npy")
+                DCFs_evaluation = np.load(
+                    f"../simulations/evaluation/linearSVM/balanced/K{str(K).replace('.', '-')}_p{str(pi).replace('.', '-')}_pT{str(pi_T).replace('.', '-')}_PCA{str(m)}.npy")
+                axs[i].plot(C_values, DCFs,  linestyle="dashed", color=colors6[idx],
+                               label=rf"$K={K}$,\;" + r"$\widetilde{\pi}=$" + f"{pi}", linewidth=3)
+                axs[i].plot(C_values, DCFs_evaluation, color=colors6[idx],
+                               label=rf"$K={K}$,\;" + r"$\widetilde{\pi}=$" + f"{pi} (eval.)", linewidth=3)
+                if not m:
+                    axs[i].set_title('Raw, no PCA, ' + rf"$\pi_T={pi_T}$")
+                else:
+                    axs[i].set_title('Gau, PCA ' + rf"($m = {m}$), $\pi_T={pi_T}$")
+                axs[i].set_xlabel(r"$C$")
+                axs[i].set_ylabel(r"$minDCF$")
+                axs[i].set_xscale('log')
+                axs[i].yaxis.set_tick_params(labelbottom=True)
+            j += 1
+        i += 1
+
+    fig.set_size_inches(20, 5)
+    fig.tight_layout()
+
+    lines_labels = [ax.get_legend_handles_labels() for ax in fig.axes]
+    lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
+    fig.legend(lines[:6], labels[:6], loc=7, ncol=1)
+
+    fig.subplots_adjust(right=0.8)
+    fig.subplots_adjust(wspace=0.2)
+
+    fig.show()
+    fig.savefig(fname="../plots/evaluation/tuning_SVMLinBal_evaluation2", dpi=180)
+
+
 def plot_tuningPolySVM_evaluation():
     C_values = np.logspace(-3, 3, 20)
     m_values = [False, None, 7, 5]
@@ -884,9 +1005,9 @@ def plot_tuningPolySVM_evaluation():
             axs[i].plot(C_values, DCFs, color=colors8[j], linestyle="dashed",label=rf"$K={K}$, $c={c}$", linewidth=2.5)
             axs[i].plot(C_values, DCFs_evaluation, color=colors8[j], label=rf"$K={K}$, $c={c}$ (eval.)", linewidth=2.5)
             if (m == False):
-                axs[i].set_title(f'5-fold, Raw features')
+                axs[i].set_title(f'Raw features')
             else:
-                axs[i].set_title(f'5-fold, PCA (m = {m})')
+                axs[i].set_title(f'PCA (m = {m})')
             if i == 0:
                 axs[i].legend(ncol=1, loc="upper right")
             axs[i].set_xlabel(r"$C$")
@@ -906,6 +1027,56 @@ def plot_tuningPolySVM_evaluation():
     figl.show()
 
     fig.savefig(fname="../plots/evaluation/tuning_PolySVM_evaluation", dpi=180)
+
+
+def plot_tuningPolySVM_evaluation2():
+    C_values = np.logspace(-3, 3, 20)
+    m_values = [False, 7]
+    K_values = [1.0]
+    c_values = [0, 1, 10, 15]
+
+    num_colors = len(K_values) * len(c_values)
+    # colors = distinctipy.get_colors(num_colors, pastel_factor=0.7)
+
+    plt.rcParams.update({
+        "text.usetex": True,
+        "font.family": "sans-serif",
+        "font.sans-serif": ["Computer Modern Serif"],
+        "axes.titlesize": 28,
+        "axes.labelsize": 30,
+        "legend.fontsize": 15,
+        "xtick.labelsize": 30,
+        "ytick.labelsize": 30,
+    })
+
+    i = 0
+    fig, axs = plt.subplots(1, 2, sharey="row")
+    for m in m_values:
+        hyperparameters = itertools.product(K_values, c_values)
+        for j, (K, c) in enumerate(hyperparameters):
+            DCFs = np.load(
+                f"../simulations/polySVM/K{str(K).replace('.', '-')}_c{str(c).replace('.', '-')}_PCA{str(m)}.npy")
+            DCFs_evaluation = np.load(
+                f"../simulations/evaluation/polySVM/K{str(K).replace('.', '-')}_c{str(c).replace('.', '-')}_PCA{str(m)}.npy")
+
+            axs[i].plot(C_values, DCFs, color=colors8[j], linestyle="dashed",label=rf"$K={K}$, $c={c}$", linewidth=2.5)
+            axs[i].plot(C_values, DCFs_evaluation, color=colors8[j], label=rf"$K={K}$, $c={c}$ (eval.)", linewidth=2.5)
+            if (m == False):
+                axs[i].set_title(f'Raw features')
+            else:
+                axs[i].set_title(f'PCA (m = {m})')
+            if i == 0:
+                axs[i].legend(ncol=1, loc="upper right")
+            axs[i].set_xlabel(r"$C$")
+            axs[i].set_ylabel(r"$minDCF$")
+            axs[i].set_xscale('log')
+            axs[i].set_xticks([10 ** i for i in range(-2, 3, 2)])
+        i += 1
+    fig.set_size_inches(12, 5)
+    fig.tight_layout()
+
+    fig.show()
+    fig.savefig(fname="../plots/evaluation/tuning_PolySVM_evaluation2", dpi=180)
 
 
 def plot_tuningRBFSVM_evaluation():
@@ -943,9 +1114,9 @@ def plot_tuningRBFSVM_evaluation():
             axs[i].plot(C_values, DCFs, color=colors6[j], linestyle="dashed", label=rf"$K={K}$, " + lb, linewidth=2.5)
             axs[i].plot(C_values, DCFs_evaluation, color=colors6[j], label=rf"$K={K}$, " + lb + " (eval.)", linewidth=2.5)
             if m == False:
-                axs[i].set_title(f'5-fold, Raw features')
+                axs[i].set_title(f'Raw features')
             else:
-                axs[i].set_title(rf"5-fold, PCA ($m = {m}$)")
+                axs[i].set_title(rf"PCA ($m = {m}$)")
             if i == 0:
                 axs[i].legend(ncol=1)
 
@@ -965,6 +1136,59 @@ def plot_tuningRBFSVM_evaluation():
     # axl.axis(False)
     # axl.legend(*label_params, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
     # figl.show()
+
+
+def plot_tuningRBFSVM_evaluation2():
+    C_values = np.logspace(-3, 3, 20)
+    m_values = [False, 7]
+    K_values = [0.0]
+    gamma_exp = [-2, -3, -4]
+    i = 0
+    plt.clf()
+
+    # fig.suptitle('RBF SVM')
+    plt.rcParams.update({
+        "text.usetex": True,
+        "axes.titlesize": 28,
+        "axes.labelsize": 20,
+        "legend.fontsize": 16,
+        "xtick.labelsize": 30,
+        "ytick.labelsize": 30,
+    })
+
+    fig, axs = plt.subplots(1, 2, sharey="all")
+
+    # num_colors = len(K_values) * len(gamma_values)
+    # colors = distinctipy.get_colors(num_colors, pastel_factor=0.7)
+
+    for m in m_values:
+        hyperparameters = itertools.product(K_values, gamma_exp)
+        for j, (K, g_exp) in enumerate(hyperparameters):
+            gamma = 10 ** g_exp
+            DCFs = np.load(
+                f"../simulations/RBF/RBF_K{str(K).replace('.', '-')}_c{str(gamma).replace('.', '-')}_PCA{str(m)}.npy")
+            DCFs_evaluation = np.load(
+                f"../simulations/evaluation/RBF/RBF_K{str(K).replace('.', '-')}_gamma{str(gamma).replace('.', '-')}_PCA{str(m)}.npy")
+            lb = r"$\gamma = 10^{" + str(g_exp) + "}$"
+            axs[i].plot(C_values, DCFs, color=colors6[j], linestyle="dashed", label=rf"$K={K}$, " + lb, linewidth=2.5)
+            axs[i].plot(C_values, DCFs_evaluation, color=colors6[j], label=rf"$K={K}$, " + lb + " (eval.)", linewidth=2.5)
+            if m == False:
+                axs[i].set_title(f'Raw features')
+            else:
+                axs[i].set_title(rf"PCA ($m = {m}$)")
+            if i == 0:
+                axs[i].legend(ncol=1)
+
+            axs[i].set_xlabel(r"$C$")
+            axs[i].set_ylabel(r"$minDCF$")
+            axs[i].set_xscale('log')
+            axs[i].set_xticks([10 ** i for i in range(-2, 3, 2)])
+        i += 1
+
+    fig.set_size_inches(12, 5)
+    fig.tight_layout()
+    fig.show()
+    fig.savefig(fname="../plots/evaluation/tuning_RBFSVM_evaluation2", dpi=180)
 
 
 def plot_tuningGMM_evaluation():
@@ -1190,6 +1414,21 @@ def plot_main():
     # colors3 = distinctipy.get_colors(3, pastel_factor=1, colorblind_type='Deuteranomaly')
     # print(colors3)
 
+    # plot_lambda()
+    # plot_tuningPolySVM()
+    # plot_tuningRBFSVM()
+    # print(os.path.abspath("."))
+
+    # plot_tuning_LinearSVMBalanced_evaluation()
+    # plot_tuning_LinearSVMBalanced_evaluation2()
+    # plot_tuningLinearSVMUnbalanced_evaluation2()
+    # plot_tuningPolySVM_evaluation2()
+    # plot_tuningRBFSVM_evaluation2()
+    # plot_lambda_evaluation()
+    plot_tuningGMM_evaluation()
+
+
+if __name__ == '__main__':
     colors3 = [(0.5348547306212659, 0.5139339239248601, 0.5268686469375292),
                (0.9927895402526214, 0.7352147015471453, 0.5581049747178046),
                (0.524907193614528, 0.7671952975947081, 0.976588025007669)]
@@ -1208,19 +1447,5 @@ def plot_main():
                (0.5114677713143507, 0.5061193495393317, 0.9951605179132765),
                (0.5830073483609048, 0.5244350779880778, 0.7931264147573027),
                (0.5692188040526873, 0.7826586898074446, 0.5098679245540738)]
-    # plot_lambda()
-    # plot_tuningPolySVM()
-    # plot_tuningRBFSVM()
-    # print(os.path.abspath("."))
 
-    # plot_tuningLinearSVMUnbalanced_evaluation()
-    # plot_tuning_LinearSVMBalanced_evaluation()
-    # plot_tuningPolySVM_evaluation()
-    # plot_tuningRBFSVM_evaluation()
-    plot_lambda_evaluation()
-    # plot_tuningGMM_evaluation()
-    # plot_tuningGMM2()
-
-
-if __name__ == '__main__':
     plot_main()
