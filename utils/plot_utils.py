@@ -674,7 +674,7 @@ def plot_lambda_evaluation():
     fig.subplots_adjust(hspace=0.7)
     fig.show()
 
-    fig.savefig(fname="../plots/evaluation/lambda", dpi=180)
+    fig.savefig(fname="../plots/evaluation/tuning_lr", dpi=180)
 
 
 def plot_lambda_evaluation2():
@@ -1424,8 +1424,8 @@ def plot_main():
     # plot_tuningLinearSVMUnbalanced_evaluation2()
     # plot_tuningPolySVM_evaluation2()
     # plot_tuningRBFSVM_evaluation2()
-    # plot_lambda_evaluation()
-    plot_tuningGMM_evaluation()
+    plot_lambda_evaluation()
+    # plot_tuningGMM_evaluation()
 
 
 if __name__ == '__main__':
