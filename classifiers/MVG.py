@@ -6,7 +6,13 @@ from utils.matrix_utils import covariance_matrix_mean, vrow, vcol
 
 
 class MVG(ClassifierClass):
+    """
+    A MultiVariate Gaussian classifier
+    """
     class Model(ClassifierClass.Model):
+        """
+        The parameters found in the training step
+        """
         def __init__(self,
                      mu0: np.ndarray,
                      c0: np.ndarray,
@@ -70,7 +76,7 @@ class MVG(ClassifierClass):
         Y = [self.logpdf_GAU_1sample(X[:, i:i + 1], mu, C) for i in range(X.shape[1])]
         return np.array(Y).ravel()
 
-    def get_llrs(self):
+    def get_scores(self):
         return self._score_matrix[1, :] - self._score_matrix[0, :]
 
 

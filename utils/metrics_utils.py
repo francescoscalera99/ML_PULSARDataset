@@ -1,3 +1,6 @@
+# ******************************************************************************************************************** #
+# This file holds all the functions that operate on matrices and arrays                                                #
+# ******************************************************************************************************************** #
 import numpy as np
 
 from classifiers.LR import calibrateScores
@@ -118,7 +121,7 @@ def bayes_error_plots_data_evaluation(training_data, training_labels, testing_da
     c.train_model(**kwargs)
     c.classify(testing_data, None)
     del c
-    score = c.get_llrs()
+    score = c.get_scores()
 
     calibrated_score, ordered_labels = calibrateScores(vrow(score), testing_labels, lambd=1e-6, prior=0.5)
     for e in effPrior:

@@ -1,9 +1,12 @@
+# ******************************************************************************************************************** #
+# This file holds all the functions used to perform the analysis in terms of DCF during the training/validation phase  #
+# ******************************************************************************************************************** #
 import itertools
 
 import numpy as np
 from prettytable import PrettyTable
 
-from classifiers.GMM2 import GMM
+from classifiers.GMM import GMM
 from classifiers.LR import LR, calibrateScores
 from classifiers.MVG import MVG
 from classifiers.SVM import SVM

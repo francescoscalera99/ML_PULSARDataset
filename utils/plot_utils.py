@@ -1,5 +1,7 @@
+# ******************************************************************************************************************** #
+# This file holds all the functions that produce plots.                                                                #
+# ******************************************************************************************************************** #
 import itertools
-import sys
 
 import distinctipy
 import matplotlib
@@ -1336,7 +1338,7 @@ def generate_ROC_data(training_data, training_labels, testing_data, testing_labe
     c = classifier(training_data, training_labels, **args)
     c.train_model(**args)
     c.classify(testing_data, None)
-    score = c.get_llrs()
+    score = c.get_scores()
     FPRs, TPRs = compute_FPRs_TPRs(score, testing_labels)
     np.save(f"simulations/evaluation/ROC/{classifier.__name__}_TPRs", TPRs)
     np.save(f"simulations/evaluation/ROC/{classifier.__name__}_FPRs", FPRs)

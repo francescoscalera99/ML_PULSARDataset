@@ -26,6 +26,7 @@ def vrow(x) -> np.ndarray:
         raise RuntimeError(f"Error: {x} is not an iterable")
     return x.reshape((1, x.size))
 
+
 def empirical_dataset_mean(dataset: np.ndarray) -> np.ndarray:
     """
     Computes the empirical mean of the given dataset

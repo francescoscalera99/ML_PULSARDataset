@@ -1,9 +1,12 @@
+# ******************************************************************************************************************** #
+# This file holds all the functions used to perform the analysis in terms of DCF during the evaluation phase           #
+# ******************************************************************************************************************** #
 import itertools
 
 import numpy as np
 from prettytable import PrettyTable
 
-from classifiers.GMM2 import GMM
+from classifiers.GMM import GMM
 from classifiers.LR import calibrateScores, LR
 from classifiers.MVG import MVG
 from classifiers.SVM import SVM
@@ -46,7 +49,7 @@ def MVG_evaluation(training_data, ltr, testing_data, evaluationLabels, actualDCF
         mvg.train_model()
         mvg.classify(dte, None)
 
-        llrs = mvg.get_llrs()
+        llrs = mvg.get_scores()
         del mvg
 
         if actualDCF:
@@ -108,7 +111,7 @@ def LR_evaluation(training_data, ltr, testing_data, evaluationLabels, lbd, actua
         logReg.train_model()
         logReg.classify(dte, None)
 
-        llrs = logReg.get_llrs()
+        llrs = logReg.get_scores()
         del logReg
 
         if actualDCF:
@@ -168,7 +171,7 @@ def SVM_LinearUnbalanced_evaluation(training_data, ltr, testing_data, evaluation
         svm.train_model(balanced=False, pi_T=None)
         svm.classify(dte, None)
 
-        llrs = svm.get_llrs()
+        llrs = svm.get_scores()
         del svm
 
         if actualDCF:
@@ -232,7 +235,7 @@ def SVM_LinearBalanced_evaluation(training_data, ltr, testing_data, evaluationLa
         svm.train_model(balanced=True, pi_T=pi_T)
         svm.classify(dte, None)
 
-        llrs = svm.get_llrs()
+        llrs = svm.get_scores()
         del svm
 
         if actualDCF:
@@ -293,7 +296,7 @@ def SVM_Poly_evaluation(training_data, ltr, testing_data, evaluationLabels, K, C
         svm.train_model(balanced=True, pi_T=pi_T)
         svm.classify(dte, None)
 
-        llrs = svm.get_llrs()
+        llrs = svm.get_scores()
         del svm
 
         if actualDCF:
@@ -355,7 +358,7 @@ def SVM_RBF_evaluation(training_data, ltr, testing_data, evaluationLabels, K, C,
         svm.train_model(balanced=True, pi_T=pi_T)
         svm.classify(dte, None)
 
-        llrs = svm.get_llrs()
+        llrs = svm.get_scores()
         del svm
 
         if actualDCF:
@@ -423,7 +426,7 @@ def GMM_evaluation(training_data, ltr, testing_data, evaluationLabels, g, alpha,
         gmm.train_model(alpha=alpha, psi=psi, G=g)
         gmm.classify(dte, None)
 
-        llrs = gmm.get_llrs()
+        llrs = gmm.get_scores()
         del gmm
 
         if actualDCF:

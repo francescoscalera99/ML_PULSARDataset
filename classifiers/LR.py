@@ -9,7 +9,13 @@ from utils.misc_utils import splitData_SingleFold
 
 
 class LR(ClassifierClass):
+    """
+    A Logistic Regression classifier
+    """
     class Model(ClassifierClass.Model):
+        """
+        The parameters found in the training step
+        """
         def __init__(self, w: np.ndarray, b: float):
             self.w = w
             self.b = b
@@ -22,6 +28,11 @@ class LR(ClassifierClass):
         self._scores = None
 
     def objective_function(self, v):
+        """
+        The objective function of the model
+        :param v: the array returned by the L-BFGS algorithm
+        :return: the value of the objective function
+        """
         w, b = v[0:-1], v[-1]
         z = 2 * self.training_labels - 1
         x = self.training_data
@@ -44,30 +55,19 @@ class LR(ClassifierClass):
         predicted_labels = (self._scores > 0).astype(int)
         return predicted_labels
 
-    def get_llrs(self):
+    def get_scores(self):
         return self._scores
 
 
-# def calibrateScores(scores, evaluationLabels, prior=0.5, lambd=1e-3, pi_T=0.5):
-#     # f(s) = as+b can be interpreted as the llr for the two class hypothesis
-#     # class posterior probability: as+b+log(pi/(1-pi)) = as +b'
-#     logReg = LR(vrow(scores), evaluationLabels, lbd=lambd, pi_T=pi_T)
-#     logReg.train_model()
-#     logReg.classify(vrow(scores), None)
-#     calibratedScore = logReg.get_llrs() - np.log(prior/(1-prior))
-#     return calibratedScore
-#
-
-# def calibrateScores(scores, evaluationLabels, lambd, prior):
-#     # f(s) = as+b can be interpreted as the llr for the two class hypothesis
-#     # class posterior probability: as+b+log(pi/(1-pi)) = as +b'
-#     calibratedScore, calibratedEvaluationLabels = k_fold(vrow(scores), evaluationLabels, LR, 5, m=None, raw=True,
-#                                                          seed=0, lbd=lambd, pi_T=prior)
-#     calibratedScore = calibratedScore - np.log(prior / (1 - prior))
-#     return calibratedScore, calibratedEvaluationLabels
-
-
 def calibrateScores(scores, evaluationLabels, lambd, prior):
+    """
+    The function used to calibrate the scores through prior-weighted LR
+    :param scores: the "raw" scores produced by some classifier
+    :param evaluationLabels: the corresponding labels
+    :param lambd: the lambda value for the Logistic Regression
+    :param prior: the prior used to train the prior-weighted LR
+    :return: the calibrated scores and the corresponding labels
+    """
     # f(s) = as+b can be interpreted as the llr for the two class hypothesis
     # class posterior probability: as+b+log(pi/(1-pi)) = as +b'
 
@@ -76,6 +76,6 @@ def calibrateScores(scores, evaluationLabels, lambd, prior):
     lr.train_model()
     lr.classify(val_set, None)
 
-    calibrated_scores = lr.get_llrs()
+    calibrated_scores = lr.get_scores()
 
     return calibrated_scores, val_labels

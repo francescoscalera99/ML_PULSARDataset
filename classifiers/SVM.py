@@ -10,7 +10,13 @@ from utils.misc_utils import k_fold
 
 
 class SVM(ClassifierClass):
+    """
+    A Support Vector Machine classifier
+    """
     class Model:
+        """
+        The parameters found in the training step
+        """
         def __init__(self, w_star, alpha_star):
             self.w = w_star[:-1]
             self.b = w_star[-1]
@@ -23,6 +29,9 @@ class SVM(ClassifierClass):
             return self.w, self.b, self.alpha
 
     class Kernel:
+        """
+        A class that models the different kernel functions for a SVM classifier
+        """
         def __init__(self, parameters, kernel_type, csi=0):
             self._csi = csi
             self._type = kernel_type
@@ -75,6 +84,12 @@ class SVM(ClassifierClass):
                    * vrow(self.training_labels))
 
     def _primal(self, w, b):
+        """
+        The primal objective function of the SVM
+        :param w: parameter
+        :param b: parameter
+        :return: the value of the primal objective function
+        """
         w_ = np.vstack((vcol(w), b))
         first_term = 0.5 * w_.T @ w_
         second_term = 1 - self.training_labels * (w_.T @ self._D)
@@ -83,11 +98,22 @@ class SVM(ClassifierClass):
         return first_term + second_term
 
     def _neg_dual(self, alpha):
+        """
+        The negative of the dual objective function of the SVM
+        :param alpha: parameter
+        :return: the value of the dual objective function at alpha and its gradient at alpha
+        """
         dual_objective_neg = 0.5 * alpha.T @ self._H @ alpha - np.sum(alpha)
         gradient = self._H @ alpha - 1
         return dual_objective_neg, vrow(gradient)
 
     def _solve_dual(self, balanced, pi_T) -> Model:
+        """
+        Solves the dual formulation of the problem
+        :param balanced: whether the constraints of the problem are balanced or not
+        :param pi_T: the prior class probability used for balancing
+        :return: the trained model
+        """
         num_samples = self.training_labels.size
         alpha0 = np.zeros(num_samples)
         if balanced:
@@ -120,7 +146,7 @@ class SVM(ClassifierClass):
         predictions = np.array(self._scores > 0, dtype=int)
         return predictions
 
-    def get_llrs(self):
+    def get_scores(self):
         return self._scores[0]
 
     def compute_duality_gap(self) -> tuple:
@@ -135,108 +161,3 @@ class SVM(ClassifierClass):
         d = float(self._neg_dual(alpha)[0])
 
         return p, d, p + d
-
-
-def tuning_parameters_PolySVM(training_data, training_labels):
-    m_values = [7, 5]
-    C_values = np.logspace(-3, 3, 20)
-    K_values = [0.0, 1.0]
-    c_values = [0, 1, 10, 15]
-
-    for m in m_values:
-        hyperparameters = itertools.product(c_values, K_values)
-        for c, K in hyperparameters:
-            DCFs = []
-            for i, C in enumerate(C_values):
-                if m == False:
-                    llrs, evaluationLabels = k_fold(training_data, training_labels, SVM, 5, m=None, raw=True, k=K, c=C,
-                                                    balanced=True, pi_T=0.5,
-                                                    kernel_params=(2, c), kernel_type='poly')
-                else:
-                    llrs, evaluationLabels = k_fold(training_data, training_labels, SVM, 5, m=m, raw=False, k=K, c=C,
-                                                    balanced=True, pi_T=0.5,
-                                                    kernel_params=(2, c), kernel_type='poly')
-                min_dcf = compute_min_DCF(llrs, evaluationLabels, 0.5, 1, 1)
-                print(i + 1, f"PCA{m} min_DCF for C ={C} with c ={c} and K ={K}-> {min_dcf}")
-                DCFs.append(min_dcf)
-            np.save(f"K{str(K).replace('.', '-')}_c{str(c).replace('.', '-')}_PCA{str(m)}", np.array(DCFs))
-
-
-def tuning_parameters_RBFSVM(training_data, training_labels):
-    m_values = [False, None, 7, 5]
-    C_values = np.logspace(-3, 3, 20)
-    K_values = [0.0, 1.0]
-    gamma_values = [1e-2, 1e-3, 1e-4]
-
-    for m in m_values:
-        hyperparameters = itertools.product(gamma_values, K_values)
-        for gamma, K in hyperparameters:
-            DCFs = []
-            for (i, C) in enumerate(C_values):
-                if m == False:
-                    llrs, evaluationLabels = k_fold(training_data, training_labels, SVM, 5, m=None, raw=True, k=K, c=C,
-                                                    balanced=True, pi_T=0.5,
-                                                    kernel_params=gamma, kernel_type='RBF')
-                else:
-                    llrs, evaluationLabels = k_fold(training_data, training_labels, SVM, 5, m=m, raw=False, k=K, c=C,
-                                                    balanced=True, pi_T=0.5,
-                                                    kernel_params=gamma, kernel_type='RBF')
-                min_dcf = compute_min_DCF(llrs, evaluationLabels, 0.5, 1, 1)
-                print(i + 1, "min_DCF for C = ", C, "with gamma = ", gamma, "and K =", K, "->", min_dcf)
-                DCFs.append(min_dcf)
-            np.save(f"RBF_K{str(K).replace('.', '-')}_gamma{str(gamma).replace('.', '-')}_PCA{str(m)}", np.array(DCFs))
-
-
-def tuning_parameters_LinearSVMUnbalanced(training_data, training_labels):
-    C_values = np.logspace(-2, 2, 20)
-    K_values = [1.0, 10.0]
-    priors = [0.5, 0.1, 0.9]
-    ms = [False, None, 7, 5]
-
-    hyperparameters = itertools.product(ms, K_values, priors)
-    for m, K, p in hyperparameters:
-        DCFs = []
-        for i, C in enumerate(C_values):
-            if m == False:
-                llrs, evaluationLabels = k_fold(training_data, training_labels, SVM, 5, m=None, raw=True, k=K, c=C,
-                                                kernel_params=(1, 0),
-                                                kernel_type='poly', balanced=False, pi_T=None)
-            else:
-                llrs, evaluationLabels = k_fold(training_data, training_labels, SVM, 5, m=m, raw=False, k=K, c=C,
-                                                kernel_params=(1, 0),
-                                                kernel_type='poly', balanced=False, pi_T=None)
-            min_dcf = compute_min_DCF(llrs, evaluationLabels, p, 1, 1)
-            print(f"Dataset PCA{m} iteration {i + 1} ", "min_DCF for K = ", K, "with prior = ", p, "->",
-                  min_dcf)
-            DCFs.append(min_dcf)
-        np.save(f"simulations/linearSVM/unbalanced/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}_PCA{m}",
-                np.array(DCFs))
-
-
-def tuning_parameters_LinearSVMBalanced(training_data, training_labels):
-    K_values = [1.0, 10.0]
-    priors = [0.5, 0.1, 0.9]
-    pi_T_values = [0.5, 0.1, 0.9]
-    ms = [False, None, 7, 5]
-    C_values = np.logspace(-2, 2, 20)
-    h = itertools.product(ms, pi_T_values, K_values, priors)
-
-    for i, (m, pi_T, K, p) in enumerate(h):
-        DCFs = []
-        for i, C in enumerate(C_values):
-            if m == False:
-                llrs, evaluationLabels = k_fold(training_data, training_labels, SVM, 5, m=None, raw=True, k=K,
-                                                c=C, balanced=True, pi_T=pi_T,
-                                                kernel_params=(1, 0), kernel_type='poly')
-            else:
-                llrs, evaluationLabels = k_fold(training_data, training_labels, SVM, 5, m=m, raw=False, k=K,
-                                                c=C, balanced=True, pi_T=pi_T,
-                                                kernel_params=(1, 0), kernel_type='poly')
-            min_dcf = compute_min_DCF(llrs, evaluationLabels, p, 1, 1)
-            print(f"Dataset PCA{m} iteration {i + 1} ", "min_DCF for K = ", K, "with prior = ", p, "pi_T = ",
-                  pi_T, "->",
-                  min_dcf)
-            DCFs.append(min_dcf)
-        np.save(
-            f"simulations/linearSVM/balanced/K{str(K).replace('.', '-')}_p{str(p).replace('.', '-')}_pT{str(pi_T).replace('.', '-')}_PCA{m}",
-            np.array(DCFs))

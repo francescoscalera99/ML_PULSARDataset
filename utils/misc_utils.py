@@ -1,3 +1,6 @@
+# ******************************************************************************************************************** #
+# This file holds all the miscellaneous functions                                                                      #
+# ******************************************************************************************************************** #
 import numpy as np
 
 from classifiers.Classifier import ClassifierClass
@@ -125,7 +128,7 @@ def k_fold(dataset: np.ndarray,
         c = classifier(dtrain, training_labels, **kwargs)
         c.train_model(**kwargs)
         c.classify(dtev, None)
-        llrs.extend(c.get_llrs().tolist())
+        llrs.extend(c.get_scores().tolist())
         labels.extend(testing_labels.tolist())
         bool_indices[i] = True
         del c

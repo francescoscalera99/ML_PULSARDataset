@@ -305,3 +305,12 @@ def plot_tuningGMM_evaluation2():
     axl3.legend(*label_params3, loc="center", bbox_to_anchor=(0.5, 0.5), prop={"size": 40})
     figl3.show()
     figl3.savefig(fname="../plots/evaluation/tuning_GMM_legend_pi0-9")
+
+
+def get_same_distrib_partition(dtr, ltr, perc=0.1, num_samples=1000):
+    idx = np.random.permutation(dtr.shape[1])
+    idx_t = idx[:num_samples]
+    dtr2 = dtr[:, idx_t]
+    ltr2 = ltr[idx_t]
+
+    return dtr2, ltr2

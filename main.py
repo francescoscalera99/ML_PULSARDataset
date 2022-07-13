@@ -1,22 +1,12 @@
 #!/Users/riccardo/VENV/python3_9/bin/python3.9
 
-import numpy as np
-
-from classifiers.GMM2 import GMM
+from classifiers.GMM import GMM
 from classifiers.LR import LR
 from classifiers.MVG import MVG
 from classifiers.SVM import SVM
+from simulations.simulations import LR_simulations
 from utils.plot_utils import bayes_error_plots
 from utils.misc_utils import load_dataset
-
-
-def get_same_distrib_partition(dtr, ltr, perc=0.1, num_samples=1000):
-    idx = np.random.permutation(dtr.shape[1])
-    idx_t = idx[:num_samples]
-    dtr2 = dtr[:, idx_t]
-    ltr2 = ltr[idx_t]
-
-    return dtr2, ltr2
 
 
 def main():
@@ -44,7 +34,7 @@ def main():
     # =============== LOGISTIC REGRESSION ===============
     # tuning_lambda(training_data, training_labels)
     lbd = 1e-7
-    LR_simulations(training_data, training_labels, lbd)
+    # LR_simulations(training_data, training_labels, lbd)
 
     # =============== SUPPORT VECTOR MACHINE ===============
     # print("LINEAR SVM - TUNING PARAMETERS")

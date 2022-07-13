@@ -5,15 +5,18 @@ import scipy.special as special
 
 from classifiers.Classifier import ClassifierClass
 from utils.matrix_utils import vrow, vcol, empirical_dataset_mean, empirical_dataset_covariance
+# from utils.metrics_utils import compute_min_DCF
 from utils.misc_utils import k_fold
 
 
-# import warnings
-# warnings.filterwarnings('error')
-
-
 class GMM(ClassifierClass):
+    """
+    A Gaussian Mixture Model classifier
+    """
     class Model(ClassifierClass.Model):
+        """
+        The GMM model holds the parameters that model each class distribution
+        """
         def __init__(self):
             self.gmms = []
             self.scores = []
@@ -103,6 +106,13 @@ class GMM(ClassifierClass):
         self._model = None
 
     def _em_estimation(self, dataset, gmm0, psi):
+        """
+        Runs the EM algorithm
+        :param dataset: the collection of all samples from the same class
+        :param gmm0: the initial component
+        :param psi: the parameter used for eigenvalue constraining
+        :return: the components produced by the algorithm
+        """
         num_components = len(gmm0)
         num_samples = dataset.shape[1]
 
@@ -164,6 +174,14 @@ class GMM(ClassifierClass):
         return gmm
 
     def _lbg(self, dataset, desired_n_components, alpha=0.1, psi=0.01):
+        """
+        Runs the LBG algorithm
+        :param dataset: the collection of all samples from the same class
+        :param desired_n_components: the number of components requested to the algorithm
+        :param alpha: the coefficient for the displacement of the new centroids after one split
+        :param psi: the parameter used for eigenvalue constraining
+        :return: the computed final components
+        """
         def split_gmm(gmm_to_split):
             # gmm in the form [(w0, µ0, ∑0), (w1, µ1, ∑1), ...]
             new_gmm = []
@@ -186,16 +204,6 @@ class GMM(ClassifierClass):
             num_components = len(gmm)
 
         return gmm
-
-    # def _mix_pdf(self, x):
-    #     d = np.zeros_like(x)
-    #     num_components = self._gmm[0].size
-    #     weights, means, covs = self._gmm
-    #     weights = vcol(weights)
-    #     for g in range(num_components):
-    #         dd = weights[g] * norm.pdf(x, loc=float(means[g, :]), scale=float(covs[g, :, :]))
-    #         d += vrow(dd)
-    #     return d
 
     def train_model(self, **kwargs) -> None:
         alpha = kwargs['alpha']
@@ -251,30 +259,5 @@ class GMM(ClassifierClass):
                 predictions = np.argmax(posterior_probs, axis=0)
                 return predictions
 
-    def get_llrs(self):
+    def get_scores(self):
         return self._scores
-
-
-def tuning_componentsGMM(training_data, training_labels, alpha=0.1, psi=0.01):
-    variants = ['full-cov', 'diag', 'tied']
-    raw = [True, False]
-    m_values = [None, 7]
-    components_values = [2**i for i in range(9)]
-    pis = [0.1, 0.9]
-
-    hyperparameters = list(itertools.product(variants, raw, m_values, pis))
-
-    # CICCIO: 12:24
-    curr_hyp = hyperparameters[0:12]
-
-    i = 0
-    for variant, r, m, p in curr_hyp:
-        DCFs = []
-        for g in components_values:
-            print(f"Inner iteration {i+1}/{len(curr_hyp)*len(components_values)}")
-            llrs, evalutationLabels = k_fold(training_data, training_labels, GMM, 5, seed=0, raw=r, m=m, type=variant,
-                                             alpha=alpha, psi=psi, G=g)
-            min_dcf = compute_min_DCF(llrs, evalutationLabels, p, 1, 1)
-            DCFs.append(min_dcf)
-            i += 1
-        np.save(f"simulations/GMM/GMM_rawFeature-{r}_PCA{m}_{variant}_pi{str(p).replace('.', '-')}", DCFs)
