@@ -44,13 +44,6 @@ class GMM(ClassifierClass):
 
     @staticmethod
     def _logpdf_GAU_ND(x, mu, C):
-        """
-        Evaluates the log-pdf for samples
-        :param x: the array of samples
-        :param mu: the average of :param x
-        :param C: the covariance matrix of :param x
-        :return: the log-density
-        """
         if mu.shape[0] != C.shape[0]:
             raise RuntimeError("Mean and covariance should have one dimension in common.\n"
                                f"mu.shape = {mu.shape}\n"
@@ -64,13 +57,6 @@ class GMM(ClassifierClass):
 
     @staticmethod
     def _logpdf_GAU_ND_1(x, mu, C):
-        """
-        Evaluates the log-pdf for a single sample
-        :param x:
-        :param mu:
-        :param C:
-        :return:
-        """
         if mu.shape[0] != C.shape[0]:
             raise RuntimeError
 
