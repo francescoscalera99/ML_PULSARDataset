@@ -1247,6 +1247,64 @@ def plot_tuningGMM_evaluation():
     figl1.savefig(fname="../plots/evaluation/tuning_GMM_legend_PCA7")
 
 
+def plot_tuningGMM_evaluation2():
+    variants = ['full-cov']
+    raw = [True, False]
+    m_values = [None, 7]
+    pis = [0.5, 0.1, 0.9]
+    components_values = [2 ** i for i in range(9)]
+    plt.rcParams.update({
+        "text.usetex": True,
+        "font.family": "sans-serif",
+        "font.sans-serif": ["Computer Modern Serif"],
+        "axes.titlesize": 30,
+        "axes.labelsize": 20,
+        "legend.fontsize": 20,
+        "xtick.labelsize": 20,
+        "ytick.labelsize": 20,
+    })
+
+    fig, axs = plt.subplots(1, 2)
+    y = np.arange(0.0, 1.1, 0.2)
+
+    for i, (variant, m) in enumerate(itertools.product(variants, m_values)):
+        for j, (p, r) in enumerate(itertools.product(pis, raw)):
+
+            if (r and m == 7) or (not r and m is None):
+                continue
+
+            pp = '' if p == 0.5 else "_pi" + str(p).replace('.', '-')
+            DCFs = np.load(f"../simulations/GMM/GMM_rawFeature-{r}_PCA{m}_{variant}{pp}.npy")
+            DCFs_evaluation = np.load(f"../simulations/evaluation/GMM/GMM_rawFeature-{r}_PCA{m}_{variant}_pi{str(p).replace('.', '-')}.npy")
+            label = r"$\widetilde{\pi}=$" + f"{p} "
+            axs[i].plot(components_values, DCFs, linestyle="dashed", label=label, color=colors3[j//2], linewidth=3)
+            axs[i].plot(components_values, DCFs_evaluation, label=label+"(eval.)", color=colors3[j//2], linewidth=3)
+            axs[i].set_xscale('log', base=2)
+            axs[i].set_xticks(components_values)
+            axs[i].set_yticks(y)
+            axs[i].set_xlabel("Number of components")
+            axs[i].set_ylabel(r"$DCF$")
+            v = 'tied full-cov' if variant == 'tied' else variant
+
+            pca = f"PCA ($m={m}$)" if m is not None else "no PCA"
+            axs[i].set_title(rf"{v}, {pca}, {'raw' if r else 'gau'}", size=20)
+
+        # axs[i // 2, i % 2].legend(loc='upper right', framealpha=0.5)
+
+    fig.set_size_inches(14, 5)
+    fig.tight_layout()
+
+    lines_labels = [ax.get_legend_handles_labels() for ax in fig.axes]
+    lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
+    fig.legend(lines[:6], labels[:6], loc=7, ncol=1)
+
+    fig.subplots_adjust(right=0.8)
+    fig.subplots_adjust(wspace=0.2)
+
+    fig.show()
+    fig.savefig(fname="../plots/evaluation/tuning_GMM", dpi=180)
+
+
 def ROC_curve(training_data, training_labels, classifiers, args):
     plt.rcParams.update({
         "text.usetex": True,
@@ -1311,7 +1369,7 @@ def ROC_curve_evaluation(classifiers):
     f.savefig('plots/ROC/ROC_evaluation.png')
 
 
-def plot_tuningGMM_evaluation2():
+def plot_tuningGMM_evaluation3():
     variants = ['full-cov', 'diag', 'tied']
     raw = [True, False]
     m_values = [None, 7]
@@ -1424,8 +1482,8 @@ def plot_main():
     # plot_tuningLinearSVMUnbalanced_evaluation2()
     # plot_tuningPolySVM_evaluation2()
     # plot_tuningRBFSVM_evaluation2()
-    plot_lambda_evaluation()
-    # plot_tuningGMM_evaluation()
+    # plot_lambda_evaluation()
+    plot_tuningGMM_evaluation2()
 
 
 if __name__ == '__main__':
